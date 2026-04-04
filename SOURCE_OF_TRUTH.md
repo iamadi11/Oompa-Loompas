@@ -469,6 +469,7 @@ Every screen answers:
 * shared packages
 * static analysis
 * code graph tooling
+* **code-review-graph MCP** — mandatory for agent context selection and review as specified in **§20.4** (reduces token use versus undirected search and full-file reads)
 
 ---
 
@@ -641,6 +642,7 @@ Every change must include:
 * core revenue paths shipped below the accessibility bar without a recorded exception (§7.6)
 * expanding data collection, retention, or cross-border handling without alignment to §9.5
 * merging web or client changes that **breach documented performance budgets** on core routes without recorded justification (§7.7)
+* **routine exploration or code review** via undirected grep/glob or bulk file reads when the **code-review-graph** MCP is sufficient — wastes context and violates §20.4
 
 ---
 
@@ -786,6 +788,18 @@ Context must be:
 * deterministic
 
 Full-repo reads are forbidden unless explicitly required
+
+---
+
+## 20.4 Code-review-graph MCP (mandatory)
+
+For **all autonomous agents and AI-assisted engineering** in this repository:
+
+* The **code-review-graph** MCP MUST be used **before** undirected exploration via bulk search (e.g. repo-wide grep), glob sweeps, or reading entire source files when the goal is to **understand structure, callers, impact, tests, or review changes**.
+* **Rationale:** the graph returns **minimal, task-relevant context**, which **reduces tokens** in prompts and completions versus pulling large or unrelated files into context.
+* **Fall back** to search or direct file reads **only** when the graph does not cover the needed symbol or path, or when the task explicitly requires a file the graph cannot satisfy (e.g. generated artifacts, config outside the graph, or human-specified paths).
+
+Violation of this rule for routine exploration or review is **non-compliant** with §20.1–20.3.
 
 ---
 
