@@ -1,5 +1,5 @@
 ---
-name: Research First
+name: research-first
 description: Structured research workflow per SOT §6 — required before any implementation
 ---
 

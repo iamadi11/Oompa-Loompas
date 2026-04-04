@@ -1,5 +1,5 @@
 ---
-name: Validate Release
+name: validate-release
 description: Pre-merge and pre-release validation checklist per SOT §22.1 release gates
 ---
 

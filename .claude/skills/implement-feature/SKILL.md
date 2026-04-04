@@ -1,5 +1,5 @@
 ---
-name: Implement Feature
+name: implement-feature
 description: Full lifecycle implementation of a feature per SOT §16 mandatory workflow
 ---
 

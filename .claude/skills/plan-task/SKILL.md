@@ -1,5 +1,5 @@
 ---
-name: Plan Task
+name: plan-task
 description: Decompose goals into atomic, testable tasks per SOT §21.2 — Planner agent workflow
 ---
 

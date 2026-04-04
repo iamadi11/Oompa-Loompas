@@ -1,5 +1,5 @@
 ---
-name: Ship
+name: ship
 description: Fully autonomous feature lifecycle. AI determines what to build next, thinks as PM + BA + architect + dev team + QA + devops + brutal critic user. Documents everything. Updates code-review-graph wiki throughout. Zero human input unless genuinely blocked.
 ---
 

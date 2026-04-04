@@ -1,5 +1,5 @@
 ---
-name: Fix Bug
+name: fix-bug
 description: Systematic bug fix workflow per SOT §5.3 — failing test + fix + regression protection
 ---
 

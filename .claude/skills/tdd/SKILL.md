@@ -1,5 +1,5 @@
 ---
-name: TDD
+name: tdd
 description: Test-driven development workflow — define and write tests before implementation per SOT §4.1 and §5
 ---
 

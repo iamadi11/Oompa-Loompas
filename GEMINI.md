@@ -1,38 +1,122 @@
-<!-- code-review-graph MCP tools -->
-## MCP Tools: code-review-graph
+# GEMINI.md — AI Development Rules
 
-**IMPORTANT: This project has a knowledge graph. ALWAYS use the
-code-review-graph MCP tools BEFORE using Grep/Glob/Read to explore
-the codebase.** The graph is faster, cheaper (fewer tokens), and gives
-you structural context (callers, dependents, test coverage) that file
-scanning cannot.
+> Authority: SOURCE_OF_TRUTH.md (v1.0.0, immutable).
+> Applies to: Gemini and all Google AI agents.
+> In any conflict: SOURCE_OF_TRUTH.md wins.
 
-### When to use graph tools FIRST
+---
 
-- **Exploring code**: `semantic_search_nodes` or `query_graph` instead of Grep
-- **Understanding impact**: `get_impact_radius` instead of manually tracing imports
-- **Code review**: `detect_changes` + `get_review_context` instead of reading entire files
-- **Finding relationships**: `query_graph` with callers_of/callees_of/imports_of/tests_for
-- **Architecture questions**: `get_architecture_overview` + `list_communities`
+## 0. CORE DIRECTIVE
 
-Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
+You are operating on the **Creator Revenue Intelligence System** — a financial outcome engine for creators (₹50K–₹5L/month). This is NOT a dashboard, CRM, task manager, or analytics tool. It makes and drives decisions autonomously.
 
-### Key Tools
+Every action must: increase revenue OR reduce risk. If neither → do not do it.
 
-| Tool | Use when |
-|------|----------|
-| `detect_changes` | Reviewing code changes — gives risk-scored analysis |
-| `get_review_context` | Need source snippets for review — token-efficient |
-| `get_impact_radius` | Understanding blast radius of a change |
-| `get_affected_flows` | Finding which execution paths are impacted |
-| `query_graph` | Tracing callers, callees, imports, tests, dependencies |
-| `semantic_search_nodes` | Finding functions/classes by name or keyword |
-| `get_architecture_overview` | Understanding high-level codebase structure |
-| `refactor_tool` | Planning renames, finding dead code |
+---
 
-### Workflow
+## 1. CONTEXT OPTIMIZATION (MANDATORY FIRST STEP)
 
-1. The graph auto-updates on file changes (via hooks).
-2. Use `detect_changes` for code review.
-3. Use `get_affected_flows` to understand impact.
-4. Use `query_graph` pattern="tests_for" to check coverage.
+**Use code-review-graph MCP BEFORE any file search or read.**
+
+| Goal | Tool |
+|------|------|
+| Explore code / find symbols | `semantic_search_nodes` or `query_graph` |
+| Understand change impact | `get_impact_radius` |
+| Review a change | `detect_changes` + `get_review_context` |
+| Trace callers/tests | `query_graph` with pattern |
+| Architecture overview | `get_architecture_overview` + `list_communities` |
+
+Fall back to file reads **only** when the graph cannot satisfy the query.
+**Full-repo reads are forbidden.**
+
+---
+
+## 2. MANDATORY EXECUTION WORKFLOW (NO STEPS SKIPPED)
+
+```
+1. RESEARCH   → feasibility, alternatives, primary sources
+2. PLAN       → scope, approach, risks, rollback sketch
+3. TEST FIRST → define cases and failure modes before code
+4. IMPLEMENT  → small atomic units only
+5. TESTS GREEN → ≥90% coverage; fix until passing
+6. VALIDATE   → real browser for UI; full user flow
+7. DOCUMENT   → purpose, inputs, outputs, edge cases, failure modes
+8. INSTRUMENT → post-deploy measurement for outcome-bearing work
+```
+
+**No research → No development.**
+
+---
+
+## 3. ARCHITECTURE (FINAL)
+
+- **Modular Monolith, Monorepo** — not microservices, not polyrepo, not serverless-first
+- Modules: `Deal`, `Payment`, `Deliverable`, `Notification`, `Intelligence`
+- Data flow: `Input → Validate → Normalize → Process → Output`
+- No cross-module leakage. No circular dependencies.
+
+```
+/apps/web   /apps/api   /apps/worker
+/packages/ui  /packages/db  /packages/types  /packages/utils  /packages/config
+/infra  /docs
+```
+
+---
+
+## 4. STACK
+
+TypeScript (strict) · Next.js · Fastify · PostgreSQL · Redis · ESLint + Prettier
+
+---
+
+## 5. TESTING
+
+- ≥90% coverage — mandatory
+- Unit + Integration + E2E
+- Every bug: failing test + fix + regression protection
+- Deterministic outputs only
+
+---
+
+## 6. DECISION PRIORITY
+
+1. User Outcome (revenue) → 2. System Determinism → 3. Simplicity → 4. Dev Velocity → 5. Extensibility
+
+---
+
+## 7. BUILD FILTER (ALL MUST BE TRUE)
+
+1. Increases revenue OR reduces risk
+2. Can be automated OR reduces manual effort
+3. Is the simplest viable system
+
+If any fail → reject.
+
+---
+
+## 8. ANTI-PATTERNS (FORBIDDEN)
+
+- Build without research
+- Implement without test definition
+- Large untested changes
+- Cross-module leakage
+- Secrets in source/logs/output
+- Full-repo scan when graph suffices
+- Silent failures
+- Non-deterministic behavior
+
+---
+
+## 9. SECURITY
+
+Secrets only in: environment, secret managers, platform stores.
+Never in source, prompts, logs, or agent output.
+
+---
+
+## 10. AUTONOMY
+
+Proceed without asking. Escalate to human ONLY when:
+- Blocked after all retry approaches exhausted
+- Ambiguity cannot be resolved from SOURCE_OF_TRUTH.md
+- Policy explicitly requires human approval
