@@ -1,8 +1,10 @@
 {
   "mcpServers": {
     "code-review-graph": {
-      "command": "code-review-graph",
+      "command": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12",
       "args": [
+        "-m",
+        "code_review_graph",
         "serve"
       ],
       "type": "stdio",
