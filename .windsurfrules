@@ -1,38 +1,116 @@
-<!-- code-review-graph MCP tools -->
-## MCP Tools: code-review-graph
+# Windsurf Rules — Creator Revenue Intelligence System
 
-**IMPORTANT: This project has a knowledge graph. ALWAYS use the
-code-review-graph MCP tools BEFORE using Grep/Glob/Read to explore
-the codebase.** The graph is faster, cheaper (fewer tokens), and gives
-you structural context (callers, dependents, test coverage) that file
-scanning cannot.
+## Authority
+SOURCE_OF_TRUTH.md is the single decision authority. In any conflict, it wins.
+This is a **financial outcome engine for creators** — not a dashboard, CRM, or analytics tool.
 
-### When to use graph tools FIRST
+---
 
-- **Exploring code**: `semantic_search_nodes` or `query_graph` instead of Grep
-- **Understanding impact**: `get_impact_radius` instead of manually tracing imports
-- **Code review**: `detect_changes` + `get_review_context` instead of reading entire files
-- **Finding relationships**: `query_graph` with callers_of/callees_of/imports_of/tests_for
-- **Architecture questions**: `get_architecture_overview` + `list_communities`
+## Context Optimization (MANDATORY FIRST STEP)
 
-Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
+Always use code-review-graph MCP before any file search:
+- Explore code: `semantic_search_nodes` or `query_graph`
+- Impact analysis: `get_impact_radius`
+- Code review: `detect_changes` + `get_review_context`
+- Trace tests: `query_graph` pattern="tests_for"
+- Architecture: `get_architecture_overview`
 
-### Key Tools
+Only fall back to file reads when the graph cannot satisfy the query.
 
-| Tool | Use when |
-|------|----------|
-| `detect_changes` | Reviewing code changes — gives risk-scored analysis |
-| `get_review_context` | Need source snippets for review — token-efficient |
-| `get_impact_radius` | Understanding blast radius of a change |
-| `get_affected_flows` | Finding which execution paths are impacted |
-| `query_graph` | Tracing callers, callees, imports, tests, dependencies |
-| `semantic_search_nodes` | Finding functions/classes by name or keyword |
-| `get_architecture_overview` | Understanding high-level codebase structure |
-| `refactor_tool` | Planning renames, finding dead code |
+---
 
-### Workflow
+## Mandatory Execution Workflow
 
-1. The graph auto-updates on file changes (via hooks).
-2. Use `detect_changes` for code review.
-3. Use `get_affected_flows` to understand impact.
-4. Use `query_graph` pattern="tests_for" to check coverage.
+Every implementation task must follow these steps in order — no skipping:
+
+1. RESEARCH — technical feasibility, alternatives, primary sources
+2. PLAN — scope, approach, risks, rollback sketch
+3. TEST DEFINITION — acceptance criteria and failure modes before code
+4. IMPLEMENT — small atomic units only
+5. TESTS GREEN — fix until passing, ≥90% coverage
+6. VALIDATE — real browser for UI; full user flow for features
+7. DOCUMENT — purpose, inputs, outputs, edge cases, failure modes
+8. INSTRUMENT — post-deploy measurement for outcome-bearing work
+
+**No research → No development. No test definition → No implementation.**
+
+---
+
+## Architecture (Final — Do Not Change)
+
+- Modular Monolith inside Monorepo
+- NOT: microservices, polyrepo, serverless-first
+- Modules: Deal, Payment, Deliverable, Notification, Intelligence
+- Data flow: Input → Validate → Normalize → Process → Output
+- No cross-module leakage. No circular dependencies.
+
+Repo structure:
+```
+/apps/web    /apps/api    /apps/worker
+/packages/ui /packages/db /packages/types /packages/utils /packages/config
+/infra       /docs
+```
+
+---
+
+## Stack
+
+TypeScript (strict) + Next.js + Fastify + PostgreSQL + Redis
+ESLint + Prettier enforced. No `any`. No implicit types.
+
+---
+
+## Testing
+
+- ≥90% coverage mandatory
+- Unit + Integration + E2E
+- Every bug: failing test + fix + regression test
+- Deterministic outputs only
+
+---
+
+## Decision Priority
+
+1. User Outcome (revenue) → 2. System Determinism → 3. Simplicity → 4. Dev Velocity → 5. Extensibility
+
+Tradeoffs: Speed→Correctness | Flexibility→Simplicity | Automation→Control | Intelligence→Trust
+
+---
+
+## Build Filter
+
+Only build if ALL true:
+1. Increases revenue OR reduces risk
+2. Can be automated OR reduces manual effort
+3. Is the simplest viable system
+
+---
+
+## Forbidden Actions
+
+- Build without research
+- Implement without test definition
+- Large untested changes
+- Assumption-driven logic
+- Cross-module leakage
+- Secrets in source/logs/output
+- Full-repo scan when graph suffices
+- Silent failures
+- Non-deterministic behavior
+- Breaking contracts without migration
+
+---
+
+## Security
+
+Secrets only in: environment, secret managers, platform stores.
+Never in source, prompts, logs, or output.
+
+---
+
+## Autonomy
+
+Proceed without asking. Escalate to human ONLY when:
+- Blocked after all retry approaches exhausted
+- Ambiguity cannot be resolved from SOURCE_OF_TRUTH.md
+- Policy explicitly requires human approval

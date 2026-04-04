@@ -9,6 +9,13 @@
         "timeout": 5000
       }
     ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "command": "echo '[HOOK] Bash tool invoked — ensure code-review-graph was used first for exploration'",
+        "timeout": 1000
+      }
+    ],
     "SessionStart": [
       {
         "command": "code-review-graph status --json",
