@@ -9,11 +9,18 @@ export const prisma = {
     delete: vi.fn(),
     count: vi.fn(),
   },
+  payment: {
+    findMany: vi.fn(),
+    findUnique: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+  },
 }
 
 export const Prisma = {
   Decimal: class Decimal {
-    private val: number
+    val: number
     constructor(v: number | string) {
       this.val = Number(v)
     }

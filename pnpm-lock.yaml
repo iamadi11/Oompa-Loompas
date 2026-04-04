@@ -121,6 +121,9 @@ importers:
       '@oompa/config':
         specifier: workspace:*
         version: link:../config
+      '@types/node':
+        specifier: ^20.14.0
+        version: 20.19.39
       prisma:
         specifier: ^5.18.0
         version: 5.22.0

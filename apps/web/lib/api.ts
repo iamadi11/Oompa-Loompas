@@ -1,4 +1,13 @@
-import type { Deal, CreateDeal, UpdateDeal, DealListFilters, ApiResponse } from '@oompa/types'
+import type {
+  Deal,
+  CreateDeal,
+  UpdateDeal,
+  DealListFilters,
+  Payment,
+  CreatePayment,
+  UpdatePayment,
+  ApiResponse,
+} from '@oompa/types'
 
 const API_BASE = process.env['NEXT_PUBLIC_API_URL'] ?? 'http://localhost:3001'
 
@@ -58,6 +67,28 @@ class ApiClient {
 
   async deleteDeal(id: string): Promise<void> {
     return this.request<void>(`/api/v1/deals/${id}`, { method: 'DELETE' })
+  }
+
+  async listPayments(dealId: string): Promise<ApiResponse<Payment[]>> {
+    return this.request<ApiResponse<Payment[]>>(`/api/v1/deals/${dealId}/payments`)
+  }
+
+  async createPayment(dealId: string, data: CreatePayment): Promise<ApiResponse<Payment>> {
+    return this.request<ApiResponse<Payment>>(`/api/v1/deals/${dealId}/payments`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async updatePayment(id: string, data: UpdatePayment): Promise<ApiResponse<Payment>> {
+    return this.request<ApiResponse<Payment>>(`/api/v1/payments/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async deletePayment(id: string): Promise<void> {
+    return this.request<void>(`/api/v1/payments/${id}`, { method: 'DELETE' })
   }
 }
 

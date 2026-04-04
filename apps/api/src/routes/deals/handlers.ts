@@ -57,7 +57,9 @@ export async function listDeals(
     return sendError(reply, new ValidationError(parsed.errors.map((e) => e.message).join(', ')))
   }
 
-  const { status, brandName, sortBy, sortOrder, page, limit } = parsed.data
+  const { status, brandName, sortBy, sortOrder } = parsed.data
+  const page = parsed.data.page ?? 1
+  const limit = parsed.data.limit ?? 20
 
   const where: Prisma.DealWhereInput = {}
   if (status) where['status'] = status
@@ -66,7 +68,7 @@ export async function listDeals(
   const [deals, total] = await Promise.all([
     prisma.deal.findMany({
       where,
-      orderBy: { [sortBy]: sortOrder },
+      orderBy: { [sortBy as string]: sortOrder },
       skip: (page - 1) * limit,
       take: limit,
     }),
