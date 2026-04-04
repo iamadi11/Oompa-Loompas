@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum DealStatus {
+  DRAFT
+  NEGOTIATING
+  ACTIVE
+  DELIVERED
+  PAID
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PARTIAL
+  RECEIVED
+  OVERDUE
+  REFUNDED
+}
+
+enum Currency {
+  INR
+  USD
+  EUR
+  GBP
+}
+
+model Deal {
+  id        String     @id @default(uuid())
+  title     String     @db.VarChar(255)
+  brandName String     @map("brand_name") @db.VarChar(255)
+  value     Decimal    @db.Decimal(15, 2)
+  currency  Currency   @default(INR)
+  status    DealStatus @default(DRAFT)
+  startDate DateTime?  @map("start_date")
+  endDate   DateTime?  @map("end_date")
+  notes     String?    @db.Text
+
+  payments Payment[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([brandName])
+  @@index([createdAt(sort: Desc)])
+  @@map("deals")
+}
+
+model Payment {
+  id         String        @id @default(uuid())
+  dealId     String        @map("deal_id")
+  deal       Deal          @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  amount     Decimal       @db.Decimal(15, 2)
+  currency   Currency      @default(INR)
+  status     PaymentStatus @default(PENDING)
+  dueDate    DateTime?     @map("due_date")
+  receivedAt DateTime?     @map("received_at")
+  notes      String?       @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([dealId])
+  @@index([status])
+  @@index([dueDate])
+  @@map("payments")
+}

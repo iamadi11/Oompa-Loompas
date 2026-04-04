@@ -1,0 +1,64 @@
+import type { Deal, CreateDeal, UpdateDeal, DealListFilters, ApiResponse } from '@oompa/types'
+
+const API_BASE = process.env['NEXT_PUBLIC_API_URL'] ?? 'http://localhost:3001'
+
+class ApiClient {
+  private async request<T>(
+    path: string,
+    options: RequestInit = {},
+  ): Promise<T> {
+    const res = await fetch(`${API_BASE}${path}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      ...options,
+    })
+
+    if (!res.ok) {
+      const error = (await res.json().catch(() => ({ message: 'Unknown error' }))) as {
+        message: string
+      }
+      throw new Error(error.message ?? `HTTP ${res.status}`)
+    }
+
+    if (res.status === 204) return undefined as T
+
+    return res.json() as Promise<T>
+  }
+
+  async listDeals(
+    filters: Partial<DealListFilters> = {},
+  ): Promise<ApiResponse<Deal[]>> {
+    const params = new URLSearchParams()
+    Object.entries(filters).forEach(([k, v]) => {
+      if (v !== undefined) params.set(k, String(v))
+    })
+    const qs = params.toString()
+    return this.request<ApiResponse<Deal[]>>(`/api/v1/deals${qs ? `?${qs}` : ''}`)
+  }
+
+  async getDeal(id: string): Promise<ApiResponse<Deal>> {
+    return this.request<ApiResponse<Deal>>(`/api/v1/deals/${id}`)
+  }
+
+  async createDeal(data: CreateDeal): Promise<ApiResponse<Deal>> {
+    return this.request<ApiResponse<Deal>>('/api/v1/deals', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async updateDeal(id: string, data: UpdateDeal): Promise<ApiResponse<Deal>> {
+    return this.request<ApiResponse<Deal>>(`/api/v1/deals/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async deleteDeal(id: string): Promise<void> {
+    return this.request<void>(`/api/v1/deals/${id}`, { method: 'DELETE' })
+  }
+}
+
+export const api = new ApiClient()
