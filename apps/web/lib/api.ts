@@ -6,6 +6,7 @@ import type {
   Payment,
   CreatePayment,
   UpdatePayment,
+  DashboardSummary,
   ApiResponse,
 } from '@oompa/types'
 
@@ -89,6 +90,10 @@ class ApiClient {
 
   async deletePayment(id: string): Promise<void> {
     return this.request<void>(`/api/v1/payments/${id}`, { method: 'DELETE' })
+  }
+
+  async getDashboard(): Promise<ApiResponse<DashboardSummary>> {
+    return this.request<ApiResponse<DashboardSummary>>('/api/v1/dashboard')
   }
 }
 
