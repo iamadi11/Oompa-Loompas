@@ -1,6 +1,7 @@
 # Browser MCP UX checklist — dashboard priority actions
 
 **Date:** 2026-04-06  
+**Latest MCP run:** 2026-04-06 — `/` snapshot: **What to do next** region, H2, helper text, priority row, financial + recent sections; **Pass** (unchanged from prior run).  
 **Base URL:** `http://localhost:3005` (Next dev; `@oompa/api` on `http://localhost:3001`)  
 **Source:** [docs/ux/dashboard-priority-actions.md](../ux/dashboard-priority-actions.md)
 

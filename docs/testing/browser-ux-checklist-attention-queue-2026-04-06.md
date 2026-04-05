@@ -1,6 +1,7 @@
 # Browser MCP UX checklist — dashboard priority actions + attention queue
 
 **Date:** 2026-04-06 (re-run)  
+**Latest MCP run:** 2026-04-06 — home `/` + `/attention` snapshots; **Pass** on all items below except **Nav click (tooling)** unchanged.  
 **Base URL:** `http://localhost:3005` (Next dev; API `http://localhost:3001`)  
 **Sources:** [docs/ux/dashboard-priority-actions.md](../ux/dashboard-priority-actions.md), [docs/ux/attention-queue.md](../ux/attention-queue.md)
 
@@ -17,7 +18,7 @@
 | **What to do next** above financial summary | dashboard §2 | **Pass** | Region + H2 present when overdue data exists. |
 | Helper copy + `aria-describedby` | dashboard a11y | **Pass** | Section described by helper paragraph id. |
 | Chase / Ship copy + amount / due | dashboard §3 | **Pass** | Row accessible name includes action type and amount. |
-| **View all N items** when `totalCount > 10` | dashboard §3 | **N/A** | Fixture had `priorityActionsTotalCount === 1`; link correctly hidden. |
+| **View all N items** when `totalCount > 10` | dashboard §3 | **N/A** | Latest run: still `priorityActionsTotalCount === 1`; overflow link to `/attention` correctly hidden. Home **Recent deals** link remains **View all** → `/deals` per [revenue-dashboard.md](../ux/revenue-dashboard.md) (not the priority overflow control). |
 | Nav **click** navigates | attention-queue §2 | **Fail (tooling)** | `browser_click` on header `<a href="/attention">` did not change URL; **direct** `browser_navigate` to `/attention` works. Native anchors are correct in DOM. |
 
 ## Attention queue page

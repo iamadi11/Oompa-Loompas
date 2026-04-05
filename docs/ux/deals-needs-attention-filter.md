@@ -8,6 +8,8 @@
 ## States
 - **All deals:** Default; subtitle shows deal count.
 - **Needs attention:** Subtitle clarifies “deals with overdue work”; may be zero.
+- **Needs attention, zero matches:** Title **You're all caught up**, explanation that nothing is overdue, primary **View all deals**, secondary **Back to overview**. Page header still shows **Add deal** (copy also mentions adding a deal).
+- **All deals, zero deals:** Title **No deals yet**, primary **Add deal**, secondary **Back to overview**; header hides duplicate **Add deal**.
 - **Attention page:** Footer link “Browse deals with overdue work” applies the same filter.
 
 ## Accessibility

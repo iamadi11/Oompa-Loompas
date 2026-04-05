@@ -1,6 +1,7 @@
 # Browser MCP UX checklist — deals “needs attention” filter
 
 **Date:** 2026-04-06 (post-filter ship)  
+**Latest MCP run:** 2026-04-06 — `/`, `/deals`, `/deals?needsAttention=true`, `/attention`; all **200**; table below re-confirmed.  
 **Base URL:** `http://localhost:3005` (Next dev; API `http://localhost:3001`)  
 **Source:** [docs/ux/deals-needs-attention-filter.md](../ux/deals-needs-attention-filter.md)
 
@@ -19,7 +20,7 @@
 | **All deals** subtitle = deal count | states | **Pass** | “4 deals” with fixture data. |
 | **Needs attention** subtitle = overdue copy | states | **Pass** | “1 deal with overdue work” with fixture data. |
 | **Attention** footer link applies filter | states | **Pass** | Link “Browse deals with overdue work” `href` = `/deals?needsAttention=true` (attribute check). |
-| **Zero** needs-attention list | states | **Not exercised** | Requires seed with no overdue deals/payments; copy in code: “0 deals with overdue work”. |
+| **Zero** needs-attention list | states | **Pass (copy); live N/A** | Fixture still has overdue work → list not empty in browser. Copy + `DealList` covered by unit tests; manual browser when DB has zero overdue rows. |
 
 ## Cross-check (dashboard / attention unchanged)
 
@@ -30,4 +31,4 @@
 
 ## Code fixes this run
 
-None — all exercised items passed after operational Next restart.
+**2026-04-06 (latest):** None — snapshots matched UX; **Browse deals with overdue work** `href` = `/deals?needsAttention=true` (attribute check on `/attention`).

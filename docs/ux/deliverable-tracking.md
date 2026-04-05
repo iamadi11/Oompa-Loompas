@@ -75,9 +75,8 @@ What I'd complain about:
   (Acceptable for Phase 1 — they're ordered by creation time, predictable)
 - No bulk 'add multiple' flow. If I have 10 deliverables I add them one by one.
   (Acceptable for Phase 1 — the form is fast)
-- If I mark something complete by mistake, I have to... delete it? Actually PATCH
-  supports reverting to PENDING. But the UI doesn't expose it.
-  (Fix: if status=COMPLETED, show 'Undo' instead of 'Mark complete')
+- If I mark something complete by mistake, I tap **Undo** on the row — PATCH
+  reverts to PENDING (same as API contract).
 
 What I'd tell another creator:
 'It's the first place I've seen that connects what I promised to deliver

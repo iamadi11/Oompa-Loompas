@@ -84,7 +84,7 @@ export default async function DealsPage({ searchParams }: Props) {
                 : `${deals.length} deals`}
           </p>
         </div>
-        {(deals.length > 0 || loadError) && (
+        {!loadError && (needsAttention || deals.length > 0) && (
           <Link
             href="/deals/new"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
@@ -102,7 +102,7 @@ export default async function DealsPage({ searchParams }: Props) {
           </Link>
         )}
       </div>
-      <DealList deals={deals} />
+      <DealList deals={deals} emptyVariant={needsAttention ? 'needsAttention' : 'all'} />
     </div>
   )
 }

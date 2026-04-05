@@ -30,3 +30,15 @@
 
 - Re-run on **production** `next start` for SW + installability (Lighthouse) and true offline fetch behavior.
 - If `pnpm dev` should always win port 3000, free the conflicting process or document a standard alternate port.
+
+---
+
+## Addendum — same day (dashboard / attention / deals filter)
+
+Cross-doc runs logged in:
+
+- [browser-ux-checklist-dashboard-priority-actions-2026-04-06.md](./browser-ux-checklist-dashboard-priority-actions-2026-04-06.md)
+- [browser-ux-checklist-attention-queue-2026-04-06.md](./browser-ux-checklist-attention-queue-2026-04-06.md)
+- [browser-ux-checklist-deals-needs-attention-2026-04-06.md](./browser-ux-checklist-deals-needs-attention-2026-04-06.md)
+
+**Summary:** Local dev **3005** — home, deals (all + needs attention), attention queue: **Pass**; no new code fixes. **Needs-attention empty** and **attention empty/error** paths still not live-exercised with this fixture.
