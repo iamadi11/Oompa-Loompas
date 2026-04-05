@@ -61,6 +61,13 @@ describe('ApiClient', () => {
     expect(url).toContain('page=2')
   })
 
+  it('listDeals serializes needsAttention when true', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ data: [] }))
+    await api.listDeals({ needsAttention: 'true' })
+    const url = String(fetchMock.mock.calls[0]?.[0])
+    expect(url).toContain('needsAttention=true')
+  })
+
   it('getDeal requests by id', async () => {
     fetchMock.mockResolvedValueOnce(jsonResponse({ data: { id: '1' } }))
     await api.getDeal('abc')

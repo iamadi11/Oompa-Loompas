@@ -62,6 +62,8 @@ export type UpdateDeal = z.infer<typeof UpdateDealSchema>
 export const DealListFiltersSchema = z.object({
   status: DealStatusSchema.optional(),
   brandName: z.string().optional(),
+  /** Query: `needsAttention=true` — deals with at least one overdue payment or overdue PENDING deliverable. */
+  needsAttention: z.enum(['true', 'false']).optional(),
   sortBy: z.enum(['createdAt', 'updatedAt', 'value', 'status']).default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
   page: z.coerce.number().int().min(1).default(1),

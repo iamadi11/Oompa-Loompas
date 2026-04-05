@@ -2,10 +2,12 @@ import Link from 'next/link'
 import type { Deal } from '@oompa/types'
 import { DealList } from '../../components/deals/DealList'
 
-async function getDeals(): Promise<{ deals: Deal[]; loadError: string | null }> {
+async function getDeals(needsAttention: boolean): Promise<{ deals: Deal[]; loadError: string | null }> {
   const apiBase = process.env['API_URL'] ?? 'http://localhost:3001'
+  const qs = new URLSearchParams({ limit: '100', sortOrder: 'desc' })
+  if (needsAttention) qs.set('needsAttention', 'true')
   try {
-    const res = await fetch(`${apiBase}/api/v1/deals?limit=100&sortOrder=desc`, {
+    const res = await fetch(`${apiBase}/api/v1/deals?${qs.toString()}`, {
       cache: 'no-store',
     })
     if (!res.ok) {
@@ -24,8 +26,14 @@ async function getDeals(): Promise<{ deals: Deal[]; loadError: string | null }> 
   }
 }
 
-export default async function DealsPage() {
-  const { deals, loadError } = await getDeals()
+type Props = {
+  searchParams: Record<string, string | string[] | undefined>
+}
+
+export default async function DealsPage({ searchParams }: Props) {
+  const raw = searchParams['needsAttention']
+  const needsAttention = raw === 'true' || raw === '1'
+  const { deals, loadError } = await getDeals(needsAttention)
 
   return (
     <div>
@@ -38,11 +46,42 @@ export default async function DealsPage() {
           {loadError}
         </div>
       )}
+      <nav className="flex flex-wrap items-center gap-2 text-sm mb-4" aria-label="Deal filters">
+        <Link
+          href="/deals"
+          className={`rounded-md px-3 py-1.5 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 ${
+            !needsAttention
+              ? 'bg-gray-900 text-white'
+              : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+          }`}
+          aria-current={!needsAttention ? 'page' : undefined}
+        >
+          All deals
+        </Link>
+        <Link
+          href="/deals?needsAttention=true"
+          className={`rounded-md px-3 py-1.5 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 ${
+            needsAttention
+              ? 'bg-amber-900 text-white'
+              : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+          }`}
+          aria-current={needsAttention ? 'page' : undefined}
+        >
+          Needs attention
+        </Link>
+      </nav>
+
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-gray-900">Deals</h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            {deals.length === 1 ? '1 deal' : `${deals.length} deals`}
+            {needsAttention
+              ? deals.length === 1
+                ? '1 deal with overdue work'
+                : `${deals.length} deals with overdue work`
+              : deals.length === 1
+                ? '1 deal'
+                : `${deals.length} deals`}
           </p>
         </div>
         {(deals.length > 0 || loadError) && (

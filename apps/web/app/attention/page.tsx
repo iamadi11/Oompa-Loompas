@@ -99,6 +99,16 @@ export default async function AttentionPage() {
         </h2>
         <PriorityActionList actions={data.actions} className="flex flex-col gap-2" />
       </section>
+
+      <p className="text-sm text-gray-600">
+        <Link
+          href="/deals?needsAttention=true"
+          className="font-medium text-brand-600 hover:text-brand-700 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+        >
+          Browse deals with overdue work
+        </Link>
+        <span className="text-gray-500"> — same filter as the deal list.</span>
+      </p>
     </div>
   )
 }

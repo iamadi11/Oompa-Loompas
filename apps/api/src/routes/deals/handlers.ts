@@ -57,13 +57,42 @@ export async function listDeals(
     return sendError(reply, new ValidationError(parsed.errors.map((e) => e.message).join(', ')))
   }
 
-  const { status, brandName, sortBy, sortOrder } = parsed.data
+  const { status, brandName, sortBy, sortOrder, needsAttention } = parsed.data
   const page = parsed.data.page ?? 1
   const limit = parsed.data.limit ?? 20
 
-  const where: Prisma.DealWhereInput = {}
-  if (status) where['status'] = status
-  if (brandName) where['brandName'] = { contains: brandName, mode: 'insensitive' }
+  const now = new Date()
+  const andFilters: Prisma.DealWhereInput[] = []
+
+  if (status) andFilters.push({ status })
+  if (brandName) {
+    andFilters.push({ brandName: { contains: brandName, mode: 'insensitive' } })
+  }
+  if (needsAttention === 'true') {
+    andFilters.push({
+      OR: [
+        {
+          payments: {
+            some: {
+              dueDate: { not: null, lt: now },
+              status: { notIn: ['RECEIVED', 'REFUNDED'] },
+            },
+          },
+        },
+        {
+          deliverables: {
+            some: {
+              status: 'PENDING',
+              dueDate: { not: null, lt: now },
+            },
+          },
+        },
+      ],
+    })
+  }
+
+  const where: Prisma.DealWhereInput =
+    andFilters.length === 0 ? {} : { AND: andFilters }
 
   const [deals, total] = await Promise.all([
     prisma.deal.findMany({

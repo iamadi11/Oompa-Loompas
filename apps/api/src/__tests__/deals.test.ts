@@ -72,6 +72,42 @@ describe('GET /api/v1/deals', () => {
     expect(response.statusCode).toBe(400)
     await fastify.close()
   })
+
+  it('returns 400 for invalid needsAttention filter', async () => {
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'GET',
+      url: '/api/v1/deals?needsAttention=yes',
+    })
+
+    expect(response.statusCode).toBe(400)
+    await fastify.close()
+  })
+
+  it('applies needsAttention prisma filter when true', async () => {
+    mockPrisma.deal.findMany.mockResolvedValue([])
+    mockPrisma.deal.count.mockResolvedValue(0)
+
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'GET',
+      url: '/api/v1/deals?needsAttention=true',
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(mockPrisma.deal.findMany).toHaveBeenCalled()
+    const callArg = mockPrisma.deal.findMany.mock.calls[0]?.[0] as {
+      where: { AND?: unknown[]; OR?: unknown }
+    }
+    expect(callArg.where.AND).toHaveLength(1)
+    expect(callArg.where.AND?.[0]).toMatchObject({
+      OR: expect.arrayContaining([
+        expect.objectContaining({ payments: expect.any(Object) }),
+        expect.objectContaining({ deliverables: expect.any(Object) }),
+      ]),
+    })
+    await fastify.close()
+  })
 })
 
 describe('GET /api/v1/deals/:id', () => {
