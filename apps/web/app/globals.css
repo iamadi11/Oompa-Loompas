@@ -3,10 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --font-sans: 'Inter', system-ui, sans-serif;
-  }
-
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -18,5 +14,15 @@
 
   *:focus-visible {
     @apply outline-2 outline-offset-2 outline-brand-500;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }

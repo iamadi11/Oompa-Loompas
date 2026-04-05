@@ -11,3 +11,8 @@ coverage
 .DS_Store
 prisma/migrations/*.sql
 *.log
+
+# PWA build output (apps/web — regenerated each `next build`)
+apps/web/public/sw.js
+apps/web/public/workbox-*.js
+apps/web/public/fallback-*.js

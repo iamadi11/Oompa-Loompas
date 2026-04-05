@@ -27,11 +27,12 @@ Endless exploration without a bounded artifact is forbidden.
 
 ### Step 3 — Technical Feasibility
 
-1. Identify the technical approach
-2. Check for blockers: missing dependencies, API limitations, contract conflicts
-3. Assess risk: what could go wrong?
-4. Check: does this approach fit within the modular monolith architecture?
-5. Verify: no cross-module leakage required, no circular dependencies introduced
+1. For **`apps/web`** UI or PWA work, read `docs/ux/web-shell-pwa.md` and `docs/architecture/pwa-web-client.md` (SOURCE_OF_TRUTH §7.8) before proposing caching or offline behavior
+2. Identify the technical approach
+3. Check for blockers: missing dependencies, API limitations, contract conflicts
+4. Assess risk: what could go wrong?
+5. Check: does this approach fit within the modular monolith architecture?
+6. Verify: no cross-module leakage required, no circular dependencies introduced
 
 ### Step 4 — Alternatives Analysis
 

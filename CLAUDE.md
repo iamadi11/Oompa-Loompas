@@ -1,6 +1,6 @@
 # CLAUDE.md — AI Development Rules
 
-> Derived from SOURCE_OF_TRUTH.md (v1.0.0, immutable).
+> Derived from SOURCE_OF_TRUTH.md (v1.1.0, immutable).
 > In any conflict: SOURCE_OF_TRUTH.md wins.
 > This file governs ALL autonomous and AI-assisted work in this repository.
 
@@ -167,6 +167,7 @@ Never do any of the following:
 - **WCAG 2.2 Level AA** on all user-facing flows; core revenue paths (onboarding, deals, payments, invoicing) must be keyboard-operable with visible focus
 - Real browser testing is mandatory for UI changes — not optional
 - The product must feel: intentional, premium, human-crafted — NOT generated or templated
+- **Web / PWA (§7.8):** Installable web client with deterministic offline messaging for revenue paths; shell, motion, and reduced-motion rules in `docs/ux/web-shell-pwa.md` and `docs/architecture/pwa-web-client.md`
 
 ---
 

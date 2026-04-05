@@ -1,5 +1,7 @@
 # UX: Revenue Dashboard
 
+**Web shell & PWA:** [web-shell-pwa.md](./web-shell-pwa.md) · [pwa-web-client.md](../architecture/pwa-web-client.md)
+
 ## User Journey
 
 1. Creator opens the app (home page `/`)

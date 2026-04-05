@@ -1,6 +1,6 @@
 # AGENTS.md — AI Agent Development Rules
 
-> Authority: SOURCE_OF_TRUTH.md (v1.0.0, immutable).
+> Authority: SOURCE_OF_TRUTH.md (v1.1.0, immutable).
 > Applies to: all AI agents (Claude, GPT, Gemini, Cursor, Windsurf, OpenCode, custom agents).
 > In any conflict: SOURCE_OF_TRUTH.md wins.
 
@@ -182,6 +182,7 @@ If any fail → **reject or redesign**.
 - WCAG 2.2 Level AA on all user-facing flows
 - Core revenue paths (onboarding, deals, payments, invoicing): keyboard-operable, visible focus
 - Real browser testing mandatory for UI changes
+- **Web / PWA (§7.8):** Follow `docs/ux/web-shell-pwa.md` and `docs/architecture/pwa-web-client.md` for installability, offline shell, and network-truth rules for money paths
 
 ---
 

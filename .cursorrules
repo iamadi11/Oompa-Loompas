@@ -69,6 +69,14 @@ ESLint + Prettier enforced. No `any`. No implicit types.
 
 ---
 
+## Web client / PWA (SOURCE_OF_TRUTH §7.8)
+
+- Web app is an installable PWA where the platform supports it (manifest, icons, HTTPS in production).
+- Service workers must not treat cached API or financial data as authoritative offline; revenue paths use network truth when online and explicit offline messaging otherwise.
+- Shell, typography, motion, and `prefers-reduced-motion`: `docs/ux/web-shell-pwa.md` and `docs/architecture/pwa-web-client.md`.
+
+---
+
 ## Decision Priority
 
 1. User Outcome (revenue) → 2. System Determinism → 3. Simplicity → 4. Dev Velocity → 5. Extensibility

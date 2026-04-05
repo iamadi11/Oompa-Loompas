@@ -1,6 +1,6 @@
 # GEMINI.md — AI Development Rules
 
-> Authority: SOURCE_OF_TRUTH.md (v1.0.0, immutable).
+> Authority: SOURCE_OF_TRUTH.md (v1.1.0, immutable).
 > Applies to: Gemini and all Google AI agents.
 > In any conflict: SOURCE_OF_TRUTH.md wins.
 
@@ -66,6 +66,8 @@ Fall back to file reads **only** when the graph cannot satisfy the query.
 ## 4. STACK
 
 TypeScript (strict) · Next.js · Fastify · PostgreSQL · Redis · ESLint + Prettier
+
+**Web client:** PWA per SOURCE_OF_TRUTH §7.8 — see `docs/ux/web-shell-pwa.md` and `docs/architecture/pwa-web-client.md`.
 
 ---
 

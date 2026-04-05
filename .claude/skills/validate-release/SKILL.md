@@ -58,6 +58,13 @@ For any user-facing changes:
 - [ ] WCAG 2.2 AA: visible focus indicators, semantic HTML, labels on forms
 - [ ] No regressions on other flows
 
+For changes to **`apps/web`** PWA plumbing (manifest, service worker, `next.config`, offline route, shell):
+
+- [ ] Production build (`pnpm --filter @oompa/web build`) succeeds
+- [ ] Manifest + icons load without errors (DevTools → Application)
+- [ ] Service worker active only in production build, not required in `next dev`
+- [ ] Offline / fallback does not present stale deal or payment data as current (per `docs/testing/pwa-web-client.md`)
+
 ### Gate 6 — Performance Budgets
 
 For changes to `/apps/web` or routes in core revenue paths:

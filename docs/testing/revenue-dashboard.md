@@ -1,5 +1,7 @@
 # Test Plan: Revenue Dashboard
 
+**Web shell & PWA:** [web-shell-pwa.md](../ux/web-shell-pwa.md) · [pwa-web-client.md](../architecture/pwa-web-client.md) · [pwa-web-client testing](./pwa-web-client.md)
+
 ## Coverage Baseline
 
 Before this work: no dashboard module existed.

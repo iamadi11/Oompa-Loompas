@@ -1,8 +1,8 @@
 # SOURCE_OF_TRUTH.md
 
-Version: 1.0.0
+Version: 1.1.0
 Status: Immutable (Core System Definition)
-Last Updated: 2026-04-04
+Last Updated: 2026-04-06
 
 ---
 
@@ -424,6 +424,16 @@ Every screen answers:
 
 ---
 
+## 7.8 Web client / PWA
+
+* The **web client** is delivered as a **Progressive Web App (PWA)** where the platform supports installability: **Web App Manifest**, appropriate **icons** (including maskable-safe artwork), and **HTTPS** in production
+* **Installability** MUST NOT regress **§7.6**: keyboard operation, visible focus, semantic structure, and assistive technology compatibility remain mandatory after install
+* A **service worker** MAY be used for install criteria, **static asset precaching**, and an **offline shell**; it MUST NOT present **cached API or financial state as authoritative** when the network is unavailable
+* **Revenue-bearing reads and writes** (deals, payments, deliverables, invoicing, balances) MUST use **network truth** when online; when offline, the product MUST show **deterministic, explicit messaging** (e.g. connection required) — no silent stale money data
+* **Motion** MUST respect **prefers-reduced-motion**; transitions remain **short and purposeful** per §7.4 and MUST NOT harm **CLS** or focus management
+
+---
+
 # 8. MULTI-AGENT SYSTEM
 
 ## 8.1 Agents
@@ -450,7 +460,7 @@ Every screen answers:
 ## 9.1 Stack
 
 * TypeScript (strict)
-* Next.js
+* Next.js (**web client shipped as a PWA** where the browser supports installability, per §7.8)
 * Fastify
 * PostgreSQL
 * Redis
@@ -968,6 +978,19 @@ Default to:
 * simplicity over complexity
 
 Deviation is not allowed.
+
+---
+
+# DOCUMENT CHANGELOG
+
+## 1.1.0 (2026-04-06)
+
+* Added **§7.8 Web client / PWA**: installability, service worker boundaries, offline UX for revenue paths, motion and reduced-motion rules
+* Clarified **§9.1 Stack**: Next.js web client is delivered as a PWA per §7.8
+
+## 1.0.0 (2026-04-04)
+
+* Initial immutable core system definition
 
 ---
 

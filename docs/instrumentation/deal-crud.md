@@ -1,5 +1,7 @@
 # Instrumentation: Deal CRUD
 
+**Web shell & PWA:** [web-shell-pwa.md](../ux/web-shell-pwa.md) · [pwa instrumentation](./pwa-web-client.md)
+
 ## Hypothesis
 If creators can record a deal in <60 seconds and view all active deals on one screen,
 they will use this as their primary deal tracking tool within 7 days of onboarding.

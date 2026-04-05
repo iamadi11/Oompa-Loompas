@@ -1,5 +1,7 @@
 # Instrumentation: Revenue Dashboard
 
+**Web shell & PWA:** [web-shell-pwa.md](../ux/web-shell-pwa.md) · [pwa instrumentation](./pwa-web-client.md)
+
 ## Hypothesis
 
 If creators see their financial summary on the home page, they will open the app more frequently and take action on overdue payments faster. Expected: average session start time drops from "navigate to deals list first" to "home page read as entry point." Overdue follow-up rate (payments moving from PENDING to RECEIVED after being overdue) should increase within 14 days.

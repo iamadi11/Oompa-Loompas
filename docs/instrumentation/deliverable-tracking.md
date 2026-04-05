@@ -1,5 +1,7 @@
 # Instrumentation: Deliverable Tracking
 
+**Web shell & PWA:** [web-shell-pwa.md](../ux/web-shell-pwa.md) · [pwa instrumentation](./pwa-web-client.md)
+
 ## Hypothesis
 
 If creators can list obligations per deal (platform, type, due date) and mark completion in the same place as payments, fewer deliverables slip through the cracks and payment delays tied to “content not shipped” become visible in one surface. Expected: within 14 days of ship, a majority of active deals with value above a nominal threshold have at least one deliverable row.

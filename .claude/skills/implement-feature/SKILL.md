@@ -60,7 +60,8 @@ No step may be skipped. No human input unless blocked after retries.
 1. For UI changes: validate in real browser, check full user flow
 2. Verify every screen answers "What should I do next?"
 3. For core revenue paths: confirm keyboard navigation, visible focus, WCAG 2.2 AA
-4. For API changes: validate deterministic responses with real requests
+4. For **`apps/web`** work touching shell, PWA, or global styles: follow `docs/ux/web-shell-pwa.md` and `docs/architecture/pwa-web-client.md`
+5. For API changes: validate deterministic responses with real requests
 
 ### Step 7 — Document
 

@@ -1,5 +1,7 @@
 # Architecture: Deal CRUD
 
+**Web shell & PWA:** [web-shell-pwa.md](../ux/web-shell-pwa.md) · [pwa-web-client.md](./pwa-web-client.md)
+
 ## Module: Deal
 Phase 1 — Deal + Payment Intelligence
 

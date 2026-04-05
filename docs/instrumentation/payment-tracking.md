@@ -1,5 +1,7 @@
 # Instrumentation: Payment Tracking
 
+**Web shell & PWA:** [web-shell-pwa.md](../ux/web-shell-pwa.md) · [pwa instrumentation](./pwa-web-client.md)
+
 ## Hypothesis
 
 If creators can record payment milestones against deals, they will use this to track received vs outstanding amounts, leading to fewer missed payments and faster follow-up on overdue amounts. Expected: >60% of deals created will have at least one payment milestone within 7 days of deal creation.

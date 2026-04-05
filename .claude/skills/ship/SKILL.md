@@ -243,6 +243,7 @@ For each user-facing interaction:
 - Define the success state (what does "done" feel like?)
 - Confirm <100ms perceived response with optimistic updates
 - Confirm keyboard navigation on all core revenue path flows
+- For **`apps/web`**: align shell, installability, and offline rules with `docs/ux/web-shell-pwa.md` and `docs/architecture/pwa-web-client.md` (SOURCE_OF_TRUTH §7.8)
 
 ### 2.3 — Update Graph Wiki: UX Record
 
@@ -367,6 +368,7 @@ If a test cannot be made to pass: document the failure, attempt alternative appr
 4. Check: zero state, loading state, error state, success state all work
 5. Core revenue paths (onboarding, deals, payments, invoicing): keyboard nav, visible focus, semantic HTML, WCAG 2.2 AA
 6. Performance: LCP, INP, CLS within documented budgets
+7. If PWA or global web shell changed: production build of `@oompa/web`, manifest/SW checks per `docs/testing/pwa-web-client.md`
 
 ### Re-apply Critic User Test
 
