@@ -15,6 +15,7 @@ Run `pnpm --filter @oompa/web build` and `pnpm --filter @oompa/web start` (or pl
 ## Automated checks (recommended)
 
 - Run `pnpm --filter @oompa/web verify:pwa` — asserts `app/manifest.ts` and maskable icons exist (committed sources; not generated SW output).
+- Run `pnpm --filter @oompa/web test` — Vitest coverage for `lib/manifest-config.ts` (manifest shape) and `lib/api.ts` (API client; network truth at runtime).
 - Add CI step alongside `pnpm --filter @oompa/web build` for release branches.
 - Optional: Lighthouse CI on a stable URL when a staging environment exists.
 

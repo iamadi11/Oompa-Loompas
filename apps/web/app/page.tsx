@@ -101,7 +101,7 @@ export default async function HomePage() {
           </h2>
           <Link
             href="/deals"
-            className="text-sm text-brand-600 hover:text-brand-700 font-medium"
+            className="text-sm text-brand-600 hover:text-brand-700 font-medium rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
           >
             View all
           </Link>

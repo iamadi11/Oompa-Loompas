@@ -11,7 +11,7 @@ export function DealCard({ deal }: DealCardProps) {
   return (
     <Link
       href={`/deals/${deal.id}`}
-      className="block bg-white border border-gray-200 rounded-xl p-5 hover:border-brand-300 hover:shadow-sm transition-all group"
+      className="block bg-white border border-gray-200 rounded-xl p-5 hover:border-brand-300 hover:shadow-sm transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">

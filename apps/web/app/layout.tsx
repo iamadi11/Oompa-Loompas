@@ -61,14 +61,14 @@ export default function RootLayout({
             <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
               <a
                 href="/"
-                className="font-display text-lg font-semibold tracking-tight text-gray-900 transition-opacity duration-150 motion-reduce:transition-none hover:opacity-80 focus-visible:rounded-sm"
+                className="font-display text-lg font-semibold tracking-tight text-gray-900 transition-opacity duration-150 motion-reduce:transition-none hover:opacity-80 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
               >
                 Revenue
               </a>
               <nav className="flex gap-6 text-sm font-medium text-gray-600" aria-label="Main">
                 <a
                   href="/deals"
-                  className="rounded-sm transition-colors duration-150 motion-reduce:transition-none hover:text-gray-900"
+                  className="rounded-sm transition-colors duration-150 motion-reduce:transition-none hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
                 >
                   Deals
                 </a>

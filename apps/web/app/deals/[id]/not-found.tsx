@@ -7,7 +7,7 @@ export default function DealNotFound() {
       <p className="text-gray-500">This deal doesn&apos;t exist or may have been deleted.</p>
       <Link
         href="/deals"
-        className="text-sm font-medium text-brand-600 hover:text-brand-700 underline underline-offset-2"
+        className="text-sm font-medium text-brand-600 hover:text-brand-700 underline underline-offset-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
       >
         Back to deals
       </Link>

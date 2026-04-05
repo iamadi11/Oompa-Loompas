@@ -18,7 +18,7 @@ export default function OfflinePage() {
       <p className="mt-6">
         <Link
           href="/"
-          className="text-sm font-medium text-gray-900 underline underline-offset-4 decoration-gray-400 transition-colors duration-150 motion-reduce:transition-none hover:decoration-gray-900"
+          className="text-sm font-medium text-gray-900 underline underline-offset-4 decoration-gray-400 transition-colors duration-150 motion-reduce:transition-none hover:decoration-gray-900 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
         >
           Try home
         </Link>

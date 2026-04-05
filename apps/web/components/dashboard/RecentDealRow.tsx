@@ -17,7 +17,7 @@ export function RecentDealRow({ deal }: RecentDealRowProps) {
   return (
     <Link
       href={`/deals/${deal.id}`}
-      className="flex items-center gap-4 px-4 py-3 rounded-lg border border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50 transition-colors group"
+      className="flex items-center gap-4 px-4 py-3 rounded-lg border border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50 transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
     >
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 flex-wrap">
