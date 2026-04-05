@@ -100,6 +100,7 @@ describe('GET /api/v1/dashboard', () => {
     expect(body.data.activeDealsCount).toBe(0)
     expect(body.data.recentDeals).toEqual([])
     expect(body.data.priorityActions).toEqual([])
+    expect(body.data.priorityActionsTotalCount).toBe(0)
   })
 
   it('returns correct totalContractedValue (sum of all deal values)', async () => {
@@ -309,6 +310,7 @@ describe('GET /api/v1/dashboard', () => {
     expect(body.data.priorityActions[0].kind).toBe('overdue_payment')
     expect(body.data.priorityActions[0].paymentId).toBe('pay-older')
     expect(body.data.priorityActions[1].paymentId).toBe('pay-newer')
+    expect(body.data.priorityActionsTotalCount).toBe(2)
   })
 
   it('returns overdue_deliverable in priorityActions', async () => {
@@ -346,6 +348,7 @@ describe('GET /api/v1/dashboard', () => {
       deliverableId: 'del-1',
       deliverableTitle: 'Reel draft',
     })
+    expect(body.data.priorityActionsTotalCount).toBe(1)
   })
 
   it('includes mockDeal1 overdue payment in priorityActions', async () => {
@@ -363,6 +366,7 @@ describe('GET /api/v1/dashboard', () => {
       paymentId: 'pay-2',
       amount: 40000,
     })
+    expect(body.data.priorityActionsTotalCount).toBe(1)
   })
 
   it('orders overdue payment before overdue deliverable when due dates match', async () => {
@@ -410,6 +414,7 @@ describe('GET /api/v1/dashboard', () => {
     expect(body.data.priorityActions).toHaveLength(2)
     expect(body.data.priorityActions[0].kind).toBe('overdue_payment')
     expect(body.data.priorityActions[1].kind).toBe('overdue_deliverable')
+    expect(body.data.priorityActionsTotalCount).toBe(2)
   })
 
   it('caps priorityActions at 10', async () => {
@@ -437,5 +442,6 @@ describe('GET /api/v1/dashboard', () => {
     expect(res.statusCode).toBe(200)
     const body = res.json()
     expect(body.data.priorityActions).toHaveLength(10)
+    expect(body.data.priorityActionsTotalCount).toBe(12)
   })
 })

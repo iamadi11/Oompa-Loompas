@@ -67,6 +67,12 @@ export default function RootLayout({
               </a>
               <nav className="flex gap-6 text-sm font-medium text-gray-600" aria-label="Main">
                 <a
+                  href="/attention"
+                  className="rounded-sm transition-colors duration-150 motion-reduce:transition-none hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+                >
+                  Attention
+                </a>
+                <a
                   href="/deals"
                   className="rounded-sm transition-colors duration-150 motion-reduce:transition-none hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
                 >

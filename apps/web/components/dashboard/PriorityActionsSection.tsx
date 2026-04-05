@@ -1,13 +1,17 @@
 import Link from 'next/link'
 import type { DashboardPriorityAction } from '@oompa/types'
-import { formatCurrency, relativeTime } from '@oompa/utils'
+import { PriorityActionList } from './PriorityActionList'
 
 type Props = {
   actions: DashboardPriorityAction[]
+  /** Total overdue items before dashboard cap (same ordering as GET /attention). */
+  totalCount: number
 }
 
-export function PriorityActionsSection({ actions }: Props) {
+export function PriorityActionsSection({ actions, totalCount }: Props) {
   if (actions.length === 0) return null
+
+  const showViewAll = totalCount > actions.length
 
   return (
     <section
@@ -21,47 +25,17 @@ export function PriorityActionsSection({ actions }: Props) {
       <p id="priority-actions-desc" className="mt-1 text-sm text-amber-900/80">
         Overdue payments and deliverables — open the deal to follow up or update status.
       </p>
-      {/* role="list": Tailwind preflight removes list bullets; some engines drop list semantics without an explicit role. */}
-      <ul role="list" className="mt-4 flex flex-col gap-2">
-        {actions.map((action) => (
-          <li key={actionKey(action)}>
-            <Link
-              href={`/deals/${action.dealId}`}
-              className="flex flex-col gap-0.5 rounded-lg border border-amber-200/80 bg-white px-3 py-2.5 text-left shadow-sm transition hover:border-amber-300 hover:bg-amber-50/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
-            >
-              {action.kind === 'overdue_payment' ? (
-                <>
-                  <span className="text-sm font-medium text-gray-900">
-                    Chase payment · {action.dealTitle}
-                  </span>
-                  <span className="text-sm text-gray-600">
-                    {formatCurrency(action.amount, action.currency)}
-                    {action.dueDate !== null ? (
-                      <span className="text-gray-500"> · due {relativeTime(action.dueDate)}</span>
-                    ) : null}
-                  </span>
-                </>
-              ) : (
-                <>
-                  <span className="text-sm font-medium text-gray-900">
-                    Ship deliverable · {action.dealTitle}
-                  </span>
-                  <span className="text-sm text-gray-600">
-                    {action.deliverableTitle}
-                    {action.dueDate !== null ? (
-                      <span className="text-gray-500"> · due {relativeTime(action.dueDate)}</span>
-                    ) : null}
-                  </span>
-                </>
-              )}
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <PriorityActionList actions={actions} className="mt-4 flex flex-col gap-2" />
+      {showViewAll ? (
+        <p className="mt-3 text-sm">
+          <Link
+            href="/attention"
+            className="font-medium text-brand-600 hover:text-brand-700 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+          >
+            View all {totalCount} items
+          </Link>
+        </p>
+      ) : null}
     </section>
   )
-}
-
-function actionKey(a: DashboardPriorityAction): string {
-  return a.kind === 'overdue_payment' ? `p:${a.paymentId}` : `d:${a.deliverableId}`
 }

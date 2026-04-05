@@ -53,6 +53,13 @@ export const DashboardSummarySchema = z.object({
   totalDealsCount: z.number(),
   dominantCurrency: CurrencySchema,
   recentDeals: z.array(DashboardDealSchema),
+  /** Full count before dashboard cap; use GET /attention for the complete queue. */
+  priorityActionsTotalCount: z.number().int().nonnegative(),
   priorityActions: z.array(DashboardPriorityActionSchema),
 })
 export type DashboardSummary = z.infer<typeof DashboardSummarySchema>
+
+export const AttentionQueueSchema = z.object({
+  actions: z.array(DashboardPriorityActionSchema),
+})
+export type AttentionQueue = z.infer<typeof AttentionQueueSchema>

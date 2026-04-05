@@ -10,6 +10,7 @@ import type {
   CreateDeliverable,
   UpdateDeliverable,
   DashboardSummary,
+  AttentionQueue,
   ApiResponse,
 } from '@oompa/types'
 
@@ -97,6 +98,10 @@ class ApiClient {
 
   async getDashboard(): Promise<ApiResponse<DashboardSummary>> {
     return this.request<ApiResponse<DashboardSummary>>('/api/v1/dashboard')
+  }
+
+  async getAttention(): Promise<ApiResponse<AttentionQueue>> {
+    return this.request<ApiResponse<AttentionQueue>>('/api/v1/attention')
   }
 
   async listDeliverables(dealId: string): Promise<ApiResponse<Deliverable[]>> {

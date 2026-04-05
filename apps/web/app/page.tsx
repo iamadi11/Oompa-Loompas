@@ -58,7 +58,10 @@ export default async function HomePage() {
         </Link>
       </div>
 
-      <PriorityActionsSection actions={data.priorityActions} />
+      <PriorityActionsSection
+        actions={data.priorityActions}
+        totalCount={data.priorityActionsTotalCount}
+      />
 
       {/* Summary cards */}
       <section aria-labelledby="summary-heading">

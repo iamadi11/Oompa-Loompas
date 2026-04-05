@@ -163,6 +163,15 @@ describe('ApiClient', () => {
     )
   })
 
+  it('getAttention requests attention queue', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ data: { actions: [] } }))
+    await api.getAttention()
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3001/api/v1/attention',
+      expect.any(Object),
+    )
+  })
+
   it('listDeliverables uses deal path', async () => {
     fetchMock.mockResolvedValueOnce(jsonResponse({ data: [] }))
     await api.listDeliverables('d2')
