@@ -3,6 +3,7 @@ import type { DashboardSummary } from '@oompa/types'
 import { formatCurrency } from '@oompa/utils'
 import { SummaryCard } from '../components/dashboard/SummaryCard'
 import { RecentDealRow } from '../components/dashboard/RecentDealRow'
+import { PriorityActionsSection } from '../components/dashboard/PriorityActionsSection'
 
 const API_BASE = process.env['API_URL'] ?? 'http://localhost:3001'
 
@@ -56,6 +57,8 @@ export default async function HomePage() {
           + New deal
         </Link>
       </div>
+
+      <PriorityActionsSection actions={data.priorityActions} />
 
       {/* Summary cards */}
       <section aria-labelledby="summary-heading">

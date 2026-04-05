@@ -15,6 +15,34 @@ export const DashboardDealSchema = z.object({
 })
 export type DashboardDeal = z.infer<typeof DashboardDealSchema>
 
+/** Actionable items surfaced on the dashboard (overdue money or work). */
+export const DashboardOverduePaymentActionSchema = z.object({
+  kind: z.literal('overdue_payment'),
+  dealId: IdSchema,
+  dealTitle: z.string(),
+  paymentId: IdSchema,
+  amount: z.number(),
+  currency: CurrencySchema,
+  dueDate: z.string().datetime().nullable(),
+})
+export type DashboardOverduePaymentAction = z.infer<typeof DashboardOverduePaymentActionSchema>
+
+export const DashboardOverdueDeliverableActionSchema = z.object({
+  kind: z.literal('overdue_deliverable'),
+  dealId: IdSchema,
+  dealTitle: z.string(),
+  deliverableId: IdSchema,
+  deliverableTitle: z.string(),
+  dueDate: z.string().datetime().nullable(),
+})
+export type DashboardOverdueDeliverableAction = z.infer<typeof DashboardOverdueDeliverableActionSchema>
+
+export const DashboardPriorityActionSchema = z.discriminatedUnion('kind', [
+  DashboardOverduePaymentActionSchema,
+  DashboardOverdueDeliverableActionSchema,
+])
+export type DashboardPriorityAction = z.infer<typeof DashboardPriorityActionSchema>
+
 export const DashboardSummarySchema = z.object({
   totalContractedValue: z.number(),
   totalReceivedValue: z.number(),
@@ -25,5 +53,6 @@ export const DashboardSummarySchema = z.object({
   totalDealsCount: z.number(),
   dominantCurrency: CurrencySchema,
   recentDeals: z.array(DashboardDealSchema),
+  priorityActions: z.array(DashboardPriorityActionSchema),
 })
 export type DashboardSummary = z.infer<typeof DashboardSummarySchema>

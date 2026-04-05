@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+import type { DashboardPriorityAction } from '@oompa/types'
 import { buildServer } from '../server.js'
 import { prisma } from '@oompa/db'
 
@@ -56,6 +57,7 @@ const mockDeal1 = {
       updatedAt: new Date('2026-04-01T00:00:00.000Z'),
     },
   ],
+  deliverables: [],
 }
 
 const mockDeal2 = {
@@ -71,6 +73,7 @@ const mockDeal2 = {
   createdAt: new Date('2026-04-04T00:00:00.000Z'),
   updatedAt: new Date('2026-04-04T00:00:00.000Z'),
   payments: [],
+  deliverables: [],
 }
 
 describe('GET /api/v1/dashboard', () => {
@@ -96,6 +99,7 @@ describe('GET /api/v1/dashboard', () => {
     expect(body.data.totalDealsCount).toBe(0)
     expect(body.data.activeDealsCount).toBe(0)
     expect(body.data.recentDeals).toEqual([])
+    expect(body.data.priorityActions).toEqual([])
   })
 
   it('returns correct totalContractedValue (sum of all deal values)', async () => {
@@ -258,5 +262,180 @@ describe('GET /api/v1/dashboard', () => {
     expect(res.statusCode).toBe(200)
     const body = res.json()
     expect(body.data.overduePaymentsCount).toBe(0)
+  })
+
+  it('returns priorityActions for overdue payments with oldest due date first', async () => {
+    const olderDue = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)
+    const newerDue = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
+    const twoOverduePayments = {
+      ...mockDeal2,
+      id: DEAL_ID_2,
+      title: 'Dual Pay Deal',
+      payments: [
+        {
+          id: 'pay-newer',
+          dealId: DEAL_ID_2,
+          amount: makeDecimal(1000),
+          currency: 'INR',
+          status: 'PENDING',
+          dueDate: newerDue,
+          receivedAt: null,
+          notes: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 'pay-older',
+          dealId: DEAL_ID_2,
+          amount: makeDecimal(2000),
+          currency: 'INR',
+          status: 'PENDING',
+          dueDate: olderDue,
+          receivedAt: null,
+          notes: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
+      deliverables: [],
+    }
+    mockPrisma.deal.findMany.mockResolvedValue([twoOverduePayments])
+
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(body.data.priorityActions).toHaveLength(2)
+    expect(body.data.priorityActions[0].kind).toBe('overdue_payment')
+    expect(body.data.priorityActions[0].paymentId).toBe('pay-older')
+    expect(body.data.priorityActions[1].paymentId).toBe('pay-newer')
+  })
+
+  it('returns overdue_deliverable in priorityActions', async () => {
+    const deliverablePastDue = {
+      ...mockDeal2,
+      id: DEAL_ID_2,
+      title: 'Content Deal',
+      payments: [],
+      deliverables: [
+        {
+          id: 'del-1',
+          dealId: DEAL_ID_2,
+          title: 'Reel draft',
+          platform: 'INSTAGRAM',
+          type: 'REEL',
+          dueDate: pastDate,
+          status: 'PENDING',
+          completedAt: null,
+          notes: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
+    }
+    mockPrisma.deal.findMany.mockResolvedValue([deliverablePastDue])
+
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(body.data.priorityActions).toHaveLength(1)
+    expect(body.data.priorityActions[0]).toMatchObject({
+      kind: 'overdue_deliverable',
+      dealId: DEAL_ID_2,
+      deliverableId: 'del-1',
+      deliverableTitle: 'Reel draft',
+    })
+  })
+
+  it('includes mockDeal1 overdue payment in priorityActions', async () => {
+    mockPrisma.deal.findMany.mockResolvedValue([mockDeal1, mockDeal2])
+
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    const priorityActions = body.data.priorityActions as DashboardPriorityAction[]
+    const payAction = priorityActions.find((a) => a.kind === 'overdue_payment')
+    expect(payAction).toMatchObject({
+      kind: 'overdue_payment',
+      dealId: DEAL_ID_1,
+      paymentId: 'pay-2',
+      amount: 40000,
+    })
+  })
+
+  it('orders overdue payment before overdue deliverable when due dates match', async () => {
+    const sameDue = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+    const mixedDeal = {
+      ...mockDeal2,
+      id: DEAL_ID_2,
+      title: 'Mixed Deal',
+      payments: [
+        {
+          id: 'pay-same',
+          dealId: DEAL_ID_2,
+          amount: makeDecimal(5000),
+          currency: 'INR',
+          status: 'PENDING',
+          dueDate: sameDue,
+          receivedAt: null,
+          notes: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
+      deliverables: [
+        {
+          id: 'del-same',
+          dealId: DEAL_ID_2,
+          title: 'Story',
+          platform: 'INSTAGRAM' as const,
+          type: 'STORY' as const,
+          dueDate: sameDue,
+          status: 'PENDING',
+          completedAt: null,
+          notes: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
+    }
+    mockPrisma.deal.findMany.mockResolvedValue([mixedDeal])
+
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(body.data.priorityActions).toHaveLength(2)
+    expect(body.data.priorityActions[0].kind).toBe('overdue_payment')
+    expect(body.data.priorityActions[1].kind).toBe('overdue_deliverable')
+  })
+
+  it('caps priorityActions at 10', async () => {
+    const manyPayments = Array.from({ length: 12 }, (_, i) => ({
+      id: `pay-${i}`,
+      dealId: DEAL_ID_2,
+      amount: makeDecimal(1000),
+      currency: 'INR',
+      status: 'PENDING',
+      dueDate: new Date(Date.now() - (i + 1) * 24 * 60 * 60 * 1000),
+      receivedAt: null,
+      notes: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }))
+    const bulkDeal = {
+      ...mockDeal2,
+      payments: manyPayments,
+      deliverables: [],
+    }
+    mockPrisma.deal.findMany.mockResolvedValue([bulkDeal])
+
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(body.data.priorityActions).toHaveLength(10)
   })
 })

@@ -49,8 +49,9 @@ async function getDeliverables(dealId: string): Promise<Deliverable[]> {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const deal = await getDeal(params.id)
+  // Root layout template is "%s · Revenue"; do not embed "Revenue" again in the segment title.
   return {
-    title: deal ? `${deal.title} — Revenue` : 'Deal Not Found — Revenue',
+    title: deal ? deal.title : 'Deal not found',
   }
 }
 
