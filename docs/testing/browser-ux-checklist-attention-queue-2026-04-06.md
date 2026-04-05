@@ -1,14 +1,14 @@
 # Browser MCP UX checklist — dashboard priority actions + attention queue
 
 **Date:** 2026-04-06 (re-run)  
-**Latest MCP run:** 2026-04-06 (Cursor browser MCP) — `/`, `/attention`, `/deals`, `/deals?needsAttention=true` on **3005** after **`rm -rf apps/web/.next`** + **`next dev -p 3005`** from `apps/web` with API env; **Pass** below; **Nav `browser_click`** still **Fail (tooling)** (use **`browser_navigate`** for route changes).  
+**Latest MCP run:** 2026-04-06 (Cursor browser MCP, **repeat**) — same routes on **3005** after **stale `.next`** fix (**`./958.js`** **500** → **`rm -rf .next`** + **`next dev -p 3005`**, or **`pnpm dev:clean`** from **`apps/web`** + API env); **Pass** below; **Nav `browser_click`** still **Fail (tooling)**. MCP console may show **`data-cursor-ref` hydration** warnings (**tooling**), not app regressions.  
 **Base URL:** `http://localhost:3005` (Next dev; API `http://localhost:3001`)  
 **Sources:** [docs/ux/dashboard-priority-actions.md](../ux/dashboard-priority-actions.md), [docs/ux/attention-queue.md](../ux/attention-queue.md)
 
 ## Preconditions
 
 - API + web dev servers running; web env has `API_URL` / `NEXT_PUBLIC_API_URL` → API.
-- If Next returns **500** with `Cannot find module './NNN.js'`, restart `next dev` (stale chunk / HMR state).
+- If Next returns **500** with `Cannot find module './NNN.js'` (including traces through **`pages/_document`**), delete **`apps/web/.next`** and restart **`next dev`** from **`apps/web`**, or run **`pnpm dev:clean`** with **`API_URL` / `NEXT_PUBLIC_API_URL`** set.
 - If **`/attention`** (or other app routes) returns **404** while `/` works, restart `next dev` from `apps/web` on the checklist port (stale build / wrong cwd). This run: restart fixed MCP **404** on `/attention`.
 
 ## Dashboard priority actions (re-check)
