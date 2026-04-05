@@ -5,3 +5,4 @@ Human-oriented release notes and verification steps. **Semantic versions** for *
 | Version | Notes |
 |---------|--------|
 | [RELEASE-0.1.6.md](./RELEASE-0.1.6.md) | Home overview unavailable — a11y region + release docs |
+| [Ship gates (2026-04-06)](../testing/ship-gates-2026-04-06.md) | Autonomous `/ship` verification log + CI `.next` clean |

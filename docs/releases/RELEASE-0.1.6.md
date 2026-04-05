@@ -24,10 +24,13 @@ pnpm install
 pnpm typecheck
 pnpm lint
 pnpm test
-pnpm --filter @oompa/web build
+rm -rf apps/web/.next   # if `next build` fails with PageNotFoundError during “Collecting page data”
+pnpm build
 ```
 
 Optional manual check: run two Next profiles (dead API vs live API) as described in the **browser UX checklist** linked above.
+
+**Automated ship log:** [docs/testing/ship-gates-2026-04-06.md](../testing/ship-gates-2026-04-06.md)
 
 ## Deploy
 

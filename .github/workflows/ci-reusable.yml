@@ -51,6 +51,11 @@ jobs:
       - name: Test
         run: pnpm test
 
+      # Stale or partial `.next` from a previous job or cached workspace can make
+      # `next build` fail with PageNotFoundError while collecting page data.
+      - name: Clean Next.js output (web)
+        run: rm -rf apps/web/.next
+
       - name: Build (packages + apps)
         env:
           NEXT_PUBLIC_API_URL: ${{ inputs.next_public_api_url != '' && inputs.next_public_api_url || 'http://127.0.0.1:3001' }}

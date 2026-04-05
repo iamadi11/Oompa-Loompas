@@ -4,7 +4,15 @@ All notable changes to this repository are documented in this file.
 
 ## Unreleased
 
-_Nothing yet — see **[0.1.6]** and [docs/product/feature-candidates-2026-04.md](./docs/product/feature-candidates-2026-04.md)._
+### CI
+
+- **Reusable workflow:** remove **`apps/web/.next`** before **`pnpm build`** so stale Next output cannot break production builds ([`.github/workflows/ci-reusable.yml`](./.github/workflows/ci-reusable.yml)).
+
+### Documentation
+
+- **Ship gate log:** [docs/testing/ship-gates-2026-04-06.md](./docs/testing/ship-gates-2026-04-06.md)
+
+_See **[0.1.6]** and [docs/product/feature-candidates-2026-04.md](./docs/product/feature-candidates-2026-04.md) for the last versioned web release._
 
 ## [0.1.6] - 2026-04-06
 
