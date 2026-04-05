@@ -49,6 +49,14 @@ Define how the **global shell** (navigation, chrome, typography, motion) and **P
 - If manifest or SW fails: site degrades to standard web; no broken layout
 - If font fails to load: fall back to system stack without layout collapse
 
+## Global navigation (accessibility)
+
+- **Main** nav (`aria-label="Main"`): **Attention**, **Deals** use `aria-current="page"` when the route matches; active item uses stronger text weight and `text-gray-900` vs `text-gray-600` for inactive links.
+- **Revenue** (brand link to `/`): `aria-current="page"` on the home/overview route only.
+- **Deals** is considered current for `/deals`, `/deals/new`, and `/deals/[id]` so orientation persists inside the deal module.
+
+Decision record: [docs/decisions/2026-04-06-main-nav-aria-current.md](../decisions/2026-04-06-main-nav-aria-current.md).
+
 ## Related
 
 - [docs/architecture/pwa-web-client.md](../architecture/pwa-web-client.md)

@@ -14,7 +14,7 @@
 
 | Item | Source | Result | Notes |
 |------|--------|--------|--------|
-| Global shell: brand + Deals nav | web-shell | **Pass** | Snapshot: links “Revenue”, “Deals”; `nav` labelled “Main” |
+| Global shell: brand + Deals nav | web-shell | **Pass** | Links “Revenue”, “Attention”, “Deals”; `nav` “Main”; **MCP 2026-04-06:** `states: [current]` on **Revenue** (`/`), **Attention** (`/attention`), **Deals** (`/deals`). |
 | Skip link | web-shell / deal-crud a11y | **Pass** | “Skip to main content” present |
 | Offline copy (connection required for money) | web-shell | **Pass** | H1 “You are offline”; body states deals/payments/balances need internet |
 | Manifest JSON (name, icons, display, theme) | pwa testing | **Pass** | `GET /manifest.webmanifest` returned valid JSON with expected fields |
@@ -30,6 +30,7 @@
 
 - Re-run on **production** `next start` for SW + installability (Lighthouse) and true offline fetch behavior.
 - If `pnpm dev` should always win port 3000, free the conflicting process or document a standard alternate port.
+- If **`/attention`** or **`/deals`** returns **404** while `/` works on the same port, restart `next dev` from `apps/web` with `API_URL` / `NEXT_PUBLIC_API_URL` (stale or mis-rooted process).
 
 ---
 
@@ -41,4 +42,4 @@ Cross-doc runs logged in:
 - [browser-ux-checklist-attention-queue-2026-04-06.md](./browser-ux-checklist-attention-queue-2026-04-06.md)
 - [browser-ux-checklist-deals-needs-attention-2026-04-06.md](./browser-ux-checklist-deals-needs-attention-2026-04-06.md)
 
-**Summary:** Local dev **3005** — home, deals (all + needs attention), attention queue: **Pass**; no new code fixes. **Needs-attention empty** and **attention empty/error** paths still not live-exercised with this fixture.
+**Summary:** Local dev **3005** — home, deals (all + needs attention), attention queue: **Pass** after **`next dev` restart** when `/attention` had been **404**. Main nav **`aria-current`** verified via MCP `states: [current]`. **Nav link click** in MCP still does not perform client navigation (**tooling**). **Needs-attention empty** and **attention empty/error** paths still not live-exercised with this fixture.

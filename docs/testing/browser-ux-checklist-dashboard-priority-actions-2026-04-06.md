@@ -1,7 +1,7 @@
 # Browser MCP UX checklist — dashboard priority actions
 
 **Date:** 2026-04-06  
-**Latest MCP run:** 2026-04-06 — `/` snapshot: **What to do next** region, H2, helper text, priority row, financial + recent sections; **Pass** (unchanged from prior run).  
+**Latest MCP run:** 2026-04-06 — `/` on **3005**: **What to do next**, summary, recent deals; **Revenue** brand link `states: [current]`; **Pass**.  
 **Base URL:** `http://localhost:3005` (Next dev; `@oompa/api` on `http://localhost:3001`)  
 **Source:** [docs/ux/dashboard-priority-actions.md](../ux/dashboard-priority-actions.md)
 
@@ -9,6 +9,7 @@
 
 - API and web dev servers running with `API_URL` / `NEXT_PUBLIC_API_URL` pointing at the API.
 - For **success-path** checks, at least one overdue payment or overdue PENDING deliverable must exist (otherwise `priorityActions` is empty by design).
+- If **`curl -s -o /dev/null -w '%{http_code}' http://localhost:3005/attention`** prints **404** while `/` is **200**, the dev server on that port is **stale or wrong tree** — stop it and restart from `apps/web`: `API_URL=http://localhost:3001 NEXT_PUBLIC_API_URL=http://localhost:3001 pnpm exec next dev -p 3005`.
 
 ## Results (vs UX doc)
 
@@ -23,6 +24,7 @@
 | **Semantic list** | Accessibility | **Pass (mitigated)** | MCP snapshot flattens tree (`listitem` may appear without parent `list` in YAML). `ul` now has explicit `role="list"` to counter Tailwind preflight `list-style: none` stripping list semantics in some engines. |
 | **Focus ring on priority links** | Accessibility | **Pass** | Component sets `focus-visible:ring-2` + offset; global `*:focus-visible` outline in `globals.css`. |
 | **Plain language, not color-only** | Accessibility | **Pass** | Action type in text (“Chase payment” / “Ship deliverable”); amber panel is decorative only. |
+| **Main nav `aria-current` on home** | [web-shell-pwa.md](../ux/web-shell-pwa.md) | **Pass** | `/` — link “Revenue” has `states: [current]`; Attention + Deals do not. |
 | **Document title on deal detail** | Related shell quality | **Fail → Fixed** | Was `test — Revenue · Revenue` because `generateMetadata` duplicated the app name with the root `title.template`. Set segment title to deal title only → `test · Revenue`. |
 
 ## Follow-ups

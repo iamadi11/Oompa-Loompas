@@ -1,7 +1,7 @@
 # Browser MCP UX checklist — deals “needs attention” filter
 
 **Date:** 2026-04-06 (post-filter ship)  
-**Latest MCP run:** 2026-04-06 — `/`, `/deals`, `/deals?needsAttention=true`, `/attention`; all **200**; table below re-confirmed.  
+**Latest MCP run:** 2026-04-06 — after **next dev** restart on **3005**: `/deals`, `/deals?needsAttention=true`, `/attention` — **200**; main nav **Deals** `states: [current]` on deal routes; filter + footer `href` **Pass**.  
 **Base URL:** `http://localhost:3005` (Next dev; API `http://localhost:3001`)  
 **Source:** [docs/ux/deals-needs-attention-filter.md](../ux/deals-needs-attention-filter.md)
 
@@ -9,11 +9,13 @@
 
 - API + web dev servers running; web env has `API_URL` / `NEXT_PUBLIC_API_URL` → API.
 - If `/` returns **500** with a missing chunk (`Cannot find module './NNN.js'`), restart `next dev` on 3005 (same as [attention-queue checklist](./browser-ux-checklist-attention-queue-2026-04-06.md)).
+- If app routes return **404** in browser/MCP while `/` is fine, restart dev from `apps/web` on this port ([attention-queue checklist](./browser-ux-checklist-attention-queue-2026-04-06.md) § Preconditions).
 
 ## Checklist
 
 | Item | Source | Result | Notes |
 |------|--------|--------|-------|
+| **Main nav `aria-current` on deals** | [web-shell-pwa.md](../ux/web-shell-pwa.md) | **Pass** | `/deals` and `/deals?needsAttention=true` — “Deals” `states: [current]` (alongside filter `aria-current` on All / Needs attention). |
 | **Deal filters** nav present | a11y | **Pass** | `navigation` name “Deal filters”. |
 | **All deals** default; `aria-current="page"` when active | journey + a11y | **Pass** | `/deals` — “All deals” has `states: [current]`; “Needs attention” does not. |
 | **Needs attention** active state | journey + a11y | **Pass** | `/deals?needsAttention=true` — “Needs attention” has `states: [current]`. |
@@ -31,4 +33,4 @@
 
 ## Code fixes this run
 
-**2026-04-06 (latest):** None — snapshots matched UX; **Browse deals with overdue work** `href` = `/deals?needsAttention=true` (attribute check on `/attention`).
+**2026-04-06 (latest):** **Operational** — restarted `next dev` on **3005** from `apps/web` (with API env) so **`/attention`** / **`/deals`** were no longer **404** in MCP. Product snapshots then matched UX; **Browse deals with overdue work** `href` = `/deals?needsAttention=true` (attribute check on `/attention`).
