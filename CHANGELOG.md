@@ -12,6 +12,12 @@ All notable changes to this repository are documented in this file.
 
 - **`pnpm dev:clean`** — removes **`.next`** then runs **`next dev -p 3005`** (use with **`API_URL` / `NEXT_PUBLIC_API_URL`** when recovering from **missing chunk** dev **500**s).
 
+## [0.1.5] - 2026-04-06
+
+### `@oompa/web`
+
+- Home **overview** distinguishes **dashboard unavailable** (API/network failure) from **no deals yet**: `resolveHomeOverviewState` in `lib/home-page.ts`, **`OverviewFetchError`** with **Try again** (`router.refresh()`), unit tests in `lib/__tests__/home-page.test.ts`.
+
 ## [0.1.4] - 2026-04-06
 
 ### `@oompa/web`

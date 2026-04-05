@@ -1,9 +1,11 @@
 import Link from 'next/link'
 import type { DashboardSummary } from '@oompa/types'
 import { formatCurrency } from '@oompa/utils'
-import { SummaryCard } from '../components/dashboard/SummaryCard'
-import { RecentDealRow } from '../components/dashboard/RecentDealRow'
+import { OverviewFetchError } from '../components/dashboard/OverviewFetchError'
 import { PriorityActionsSection } from '../components/dashboard/PriorityActionsSection'
+import { RecentDealRow } from '../components/dashboard/RecentDealRow'
+import { SummaryCard } from '../components/dashboard/SummaryCard'
+import { resolveHomeOverviewState } from '../lib/home-page'
 
 const API_BASE = process.env['API_URL'] ?? 'http://localhost:3001'
 
@@ -20,9 +22,13 @@ async function getDashboardData(): Promise<DashboardSummary | null> {
 
 export default async function HomePage() {
   const data = await getDashboardData()
+  const state = resolveHomeOverviewState(data)
 
-  // Empty state — no deals yet or API unreachable
-  if (!data || data.totalDealsCount === 0) {
+  if (state.kind === 'unavailable') {
+    return <OverviewFetchError />
+  }
+
+  if (state.kind === 'empty') {
     return (
       <div className="flex flex-col items-start gap-6 py-12">
         <div>
@@ -43,7 +49,8 @@ export default async function HomePage() {
     )
   }
 
-  const currency = data.dominantCurrency
+  const { data: dashboard } = state
+  const currency = dashboard.dominantCurrency
 
   return (
     <div className="space-y-8 py-6">
@@ -59,8 +66,8 @@ export default async function HomePage() {
       </div>
 
       <PriorityActionsSection
-        actions={data.priorityActions}
-        totalCount={data.priorityActionsTotalCount}
+        actions={dashboard.priorityActions}
+        totalCount={dashboard.priorityActionsTotalCount}
       />
 
       {/* Summary cards */}
@@ -69,30 +76,30 @@ export default async function HomePage() {
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <SummaryCard
             label="Contracted"
-            value={formatCurrency(data.totalContractedValue, currency)}
-            subtext={`${data.totalDealsCount} deal${data.totalDealsCount !== 1 ? 's' : ''}`}
+            value={formatCurrency(dashboard.totalContractedValue, currency)}
+            subtext={`${dashboard.totalDealsCount} deal${dashboard.totalDealsCount !== 1 ? 's' : ''}`}
           />
           <SummaryCard
             label="Received"
-            value={formatCurrency(data.totalReceivedValue, currency)}
+            value={formatCurrency(dashboard.totalReceivedValue, currency)}
             accent="green"
           />
           <SummaryCard
             label="Outstanding"
-            value={formatCurrency(data.totalOutstandingValue, currency)}
-            accent={data.overduePaymentsCount > 0 ? 'red' : 'default'}
+            value={formatCurrency(dashboard.totalOutstandingValue, currency)}
+            accent={dashboard.overduePaymentsCount > 0 ? 'red' : 'default'}
           />
           <SummaryCard
-            label={data.overduePaymentsCount > 0 ? 'Overdue' : 'Active deals'}
+            label={dashboard.overduePaymentsCount > 0 ? 'Overdue' : 'Active deals'}
             value={
-              data.overduePaymentsCount > 0
-                ? formatCurrency(data.overduePaymentsValue, currency)
-                : String(data.activeDealsCount)
+              dashboard.overduePaymentsCount > 0
+                ? formatCurrency(dashboard.overduePaymentsValue, currency)
+                : String(dashboard.activeDealsCount)
             }
-            accent={data.overduePaymentsCount > 0 ? 'red' : 'default'}
+            accent={dashboard.overduePaymentsCount > 0 ? 'red' : 'default'}
             subtext={
-              data.overduePaymentsCount > 0
-                ? `${data.overduePaymentsCount} payment${data.overduePaymentsCount !== 1 ? 's' : ''} overdue`
+              dashboard.overduePaymentsCount > 0
+                ? `${dashboard.overduePaymentsCount} payment${dashboard.overduePaymentsCount !== 1 ? 's' : ''} overdue`
                 : undefined
             }
           />
@@ -113,7 +120,7 @@ export default async function HomePage() {
           </Link>
         </div>
         <div className="flex flex-col gap-2">
-          {data.recentDeals.map((deal) => (
+          {dashboard.recentDeals.map((deal) => (
             <RecentDealRow key={deal.id} deal={deal} />
           ))}
         </div>
