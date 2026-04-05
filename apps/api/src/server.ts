@@ -4,6 +4,7 @@ import { corsPlugin } from './plugins/cors.js'
 import { dealRoutes } from './routes/deals/index.js'
 import { paymentRoutes } from './routes/payments/index.js'
 import { dashboardRoutes } from './routes/dashboard/index.js'
+import { deliverableRoutes } from './routes/deliverables/index.js'
 
 export async function buildServer() {
   const fastify = Fastify({
@@ -20,6 +21,7 @@ export async function buildServer() {
   await fastify.register(dealRoutes, { prefix: '/api/v1/deals' })
   await fastify.register(paymentRoutes, { prefix: '/api/v1' })
   await fastify.register(dashboardRoutes, { prefix: '/api/v1' })
+  await fastify.register(deliverableRoutes, { prefix: '/api/v1' })
 
   fastify.setErrorHandler((error, _request, reply) => {
     fastify.log.error(error)

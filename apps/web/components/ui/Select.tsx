@@ -8,7 +8,7 @@ interface SelectOption {
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label: string
   options: SelectOption[]
-  error?: string
+  error?: string | undefined
   placeholder?: string
 }
 

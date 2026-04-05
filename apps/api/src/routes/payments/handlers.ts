@@ -89,13 +89,8 @@ export async function createPayment(
     data: {
       dealId,
       amount: new Prisma.Decimal(amount),
-      currency: (currency ?? 'INR') as 'INR' | 'USD' | 'EUR' | 'GBP',
-      status: (status ?? 'PENDING') as
-        | 'PENDING'
-        | 'PARTIAL'
-        | 'RECEIVED'
-        | 'OVERDUE'
-        | 'REFUNDED',
+      currency: (currency ?? 'INR'),
+      status: (status ?? 'PENDING'),
       dueDate: dueDate ? new Date(dueDate) : null,
       notes: notes ?? null,
     },
@@ -127,15 +122,10 @@ export async function updatePayment(
     data: {
       ...(updates.amount !== undefined && { amount: new Prisma.Decimal(updates.amount) }),
       ...(updates.currency !== undefined && {
-        currency: updates.currency as 'INR' | 'USD' | 'EUR' | 'GBP',
+        currency: updates.currency,
       }),
       ...(updates.status !== undefined && {
-        status: updates.status as
-          | 'PENDING'
-          | 'PARTIAL'
-          | 'RECEIVED'
-          | 'OVERDUE'
-          | 'REFUNDED',
+        status: updates.status,
       }),
       ...(updates.dueDate !== undefined && {
         dueDate: updates.dueDate ? new Date(updates.dueDate) : null,

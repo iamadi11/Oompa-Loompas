@@ -42,7 +42,7 @@ describe('GET /api/v1/deals', () => {
     })
 
     expect(response.statusCode).toBe(200)
-    const body = response.json() as { data: unknown[]; meta: { total: number } }
+    const body = response.json()
     expect(body.data).toHaveLength(1)
     expect(body.meta.total).toBe(1)
     await fastify.close()
@@ -89,7 +89,7 @@ describe('GET /api/v1/deals/:id', () => {
     })
 
     expect(response.statusCode).toBe(200)
-    const body = response.json() as { data: { id: string; title: string } }
+    const body = response.json()
     expect(body.data.id).toBe(mockDeal.id)
     expect(body.data.title).toBe('Nike Reel Campaign')
     await fastify.close()
@@ -105,7 +105,7 @@ describe('GET /api/v1/deals/:id', () => {
     })
 
     expect(response.statusCode).toBe(404)
-    const body = response.json() as { error: string }
+    const body = response.json()
     expect(body.error).toBe('Not Found')
     await fastify.close()
   })
@@ -131,7 +131,7 @@ describe('POST /api/v1/deals', () => {
     })
 
     expect(response.statusCode).toBe(201)
-    const body = response.json() as { data: { id: string } }
+    const body = response.json()
     expect(body.data.id).toBe(mockDeal.id)
     await fastify.close()
   })
@@ -328,7 +328,7 @@ describe('GET /health', () => {
     const fastify = await buildServer()
     const response = await fastify.inject({ method: 'GET', url: '/health' })
     expect(response.statusCode).toBe(200)
-    const body = response.json() as { status: string }
+    const body = response.json()
     expect(body.status).toBe('ok')
     await fastify.close()
   })

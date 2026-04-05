@@ -83,7 +83,13 @@ export function DealForm({ deal, mode }: DealFormProps) {
     try {
       if (mode === 'create') {
         const result = await api.createDeal(parsed.data as CreateDeal)
-        router.push(`/deals/${result.data.id}`)
+        const id = result?.data?.id
+        if (!id) {
+          setServerError('Deal was created but the server response was incomplete. Check the deals list or try again.')
+          return
+        }
+        router.push(`/deals/${id}`)
+        router.refresh()
       } else if (deal) {
         await api.updateDeal(deal.id, parsed.data as UpdateDeal)
         router.push(`/deals/${deal.id}`)
@@ -99,7 +105,11 @@ export function DealForm({ deal, mode }: DealFormProps) {
   return (
     <form onSubmit={(e) => void handleSubmit(e)} noValidate className="flex flex-col gap-6">
       {serverError && (
-        <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700" role="alert">
+        <div
+          className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700"
+          role="alert"
+          aria-live="assertive"
+        >
           {serverError}
         </div>
       )}

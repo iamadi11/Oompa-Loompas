@@ -1,6 +1,6 @@
 import type { FastifyRequest, FastifyReply } from 'fastify'
 import { prisma } from '@oompa/db'
-import { Prisma } from '@oompa/db'
+import type { Prisma } from '@oompa/db'
 import { type Currency, type DealStatus, type PaymentStatus, computeIsOverdue, computePaymentSummary } from '@oompa/types'
 
 type DbDealWithPayments = {

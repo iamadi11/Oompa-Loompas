@@ -17,10 +17,10 @@
     "typecheck": "tsc --noEmit",
     "dev": "tsc --watch",
     "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev",
-    "db:migrate:deploy": "prisma migrate deploy",
-    "db:studio": "prisma studio",
-    "db:seed": "tsx src/seed.ts"
+    "db:migrate": "dotenv -e ../../apps/api/.env -- prisma migrate dev",
+    "db:migrate:deploy": "dotenv -e ../../apps/api/.env -- prisma migrate deploy",
+    "db:studio": "dotenv -e ../../apps/api/.env -- prisma studio",
+    "db:seed": "dotenv -e ../../apps/api/.env -- tsx src/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.18.0"
@@ -28,6 +28,7 @@
   "devDependencies": {
     "@oompa/config": "workspace:*",
     "@types/node": "^20.14.0",
+    "dotenv-cli": "^7.4.2",
     "prisma": "^5.18.0",
     "tsx": "^4.17.0",
     "typescript": "^5.5.4"

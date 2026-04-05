@@ -31,6 +31,33 @@ enum Currency {
   GBP
 }
 
+enum DeliverableStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+enum DeliverablePlatform {
+  INSTAGRAM
+  YOUTUBE
+  TWITTER
+  LINKEDIN
+  PODCAST
+  BLOG
+  OTHER
+}
+
+enum DeliverableType {
+  POST
+  REEL
+  STORY
+  VIDEO
+  INTEGRATION
+  MENTION
+  ARTICLE
+  OTHER
+}
+
 model Deal {
   id        String     @id @default(uuid())
   title     String     @db.VarChar(255)
@@ -42,7 +69,8 @@ model Deal {
   endDate   DateTime?  @map("end_date")
   notes     String?    @db.Text
 
-  payments Payment[]
+  payments     Payment[]
+  deliverables Deliverable[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -71,4 +99,25 @@ model Payment {
   @@index([status])
   @@index([dueDate])
   @@map("payments")
+}
+
+model Deliverable {
+  id          String              @id @default(uuid())
+  dealId      String              @map("deal_id")
+  deal        Deal                @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  title       String              @db.VarChar(255)
+  platform    DeliverablePlatform
+  type        DeliverableType
+  dueDate     DateTime?           @map("due_date")
+  status      DeliverableStatus   @default(PENDING)
+  completedAt DateTime?           @map("completed_at")
+  notes       String?             @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([dealId])
+  @@index([status])
+  @@index([dueDate])
+  @@map("deliverables")
 }

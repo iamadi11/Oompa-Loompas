@@ -154,7 +154,7 @@ export async function updateDeal(
     updates.status !== existing.status &&
     !isValidStatusTransition(
       existing.status as Parameters<typeof isValidStatusTransition>[0],
-      updates.status as Parameters<typeof isValidStatusTransition>[1],
+      updates.status,
     )
   ) {
     return sendError(
@@ -172,16 +172,10 @@ export async function updateDeal(
       ...(updates.brandName !== undefined && { brandName: updates.brandName }),
       ...(updates.value !== undefined && { value: new Prisma.Decimal(updates.value) }),
       ...(updates.currency !== undefined && {
-        currency: updates.currency as 'INR' | 'USD' | 'EUR' | 'GBP',
+        currency: updates.currency,
       }),
       ...(updates.status !== undefined && {
-        status: updates.status as
-          | 'DRAFT'
-          | 'NEGOTIATING'
-          | 'ACTIVE'
-          | 'DELIVERED'
-          | 'PAID'
-          | 'CANCELLED',
+        status: updates.status,
       }),
       ...(updates.startDate !== undefined && {
         startDate: updates.startDate ? new Date(updates.startDate) : null,

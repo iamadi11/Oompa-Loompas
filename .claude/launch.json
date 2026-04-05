@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "api",
+      "runtimeExecutable": "/Users/adityaraj/.nvm/versions/node/v20.14.0/bin/node",
+      "runtimeArgs": ["/Users/adityaraj/Desktop/My Projects/Oompa-Loompas/apps/api/node_modules/tsx/dist/cli.cjs", "watch", "src/index.ts"],
+      "cwd": "/Users/adityaraj/Desktop/My Projects/Oompa-Loompas/apps/api",
+      "port": 3001
+    },
+    {
+      "name": "web",
+      "runtimeExecutable": "/Users/adityaraj/.nvm/versions/node/v20.14.0/bin/node",
+      "runtimeArgs": ["/Users/adityaraj/Desktop/My Projects/Oompa-Loompas/apps/web/node_modules/next/dist/bin/next", "dev", "-p", "3000"],
+      "cwd": "/Users/adityaraj/Desktop/My Projects/Oompa-Loompas/apps/web",
+      "port": 3000
+    }
+  ]
+}

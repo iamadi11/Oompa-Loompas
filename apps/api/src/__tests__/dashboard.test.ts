@@ -87,7 +87,7 @@ describe('GET /api/v1/dashboard', () => {
     const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
 
     expect(res.statusCode).toBe(200)
-    const body = res.json() as { data: Record<string, unknown> }
+    const body = res.json()
     expect(body.data.totalContractedValue).toBe(0)
     expect(body.data.totalReceivedValue).toBe(0)
     expect(body.data.totalOutstandingValue).toBe(0)
@@ -104,7 +104,7 @@ describe('GET /api/v1/dashboard', () => {
     const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
 
     expect(res.statusCode).toBe(200)
-    const body = res.json() as { data: { totalContractedValue: number } }
+    const body = res.json()
     expect(body.data.totalContractedValue).toBe(125000) // 80000 + 45000
   })
 
@@ -114,7 +114,7 @@ describe('GET /api/v1/dashboard', () => {
     const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
 
     expect(res.statusCode).toBe(200)
-    const body = res.json() as { data: { totalReceivedValue: number } }
+    const body = res.json()
     expect(body.data.totalReceivedValue).toBe(40000) // only pay-1 is RECEIVED
   })
 
@@ -124,7 +124,7 @@ describe('GET /api/v1/dashboard', () => {
     const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
 
     expect(res.statusCode).toBe(200)
-    const body = res.json() as { data: { totalOutstandingValue: number } }
+    const body = res.json()
     expect(body.data.totalOutstandingValue).toBe(85000) // 125000 - 40000
   })
 
@@ -134,7 +134,7 @@ describe('GET /api/v1/dashboard', () => {
     const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
 
     expect(res.statusCode).toBe(200)
-    const body = res.json() as { data: { overduePaymentsCount: number } }
+    const body = res.json()
     expect(body.data.overduePaymentsCount).toBe(1) // pay-2 is PENDING + past dueDate
   })
 
@@ -144,7 +144,7 @@ describe('GET /api/v1/dashboard', () => {
     const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
 
     expect(res.statusCode).toBe(200)
-    const body = res.json() as { data: { overduePaymentsValue: number } }
+    const body = res.json()
     expect(body.data.overduePaymentsValue).toBe(40000) // pay-2 amount
   })
 
@@ -154,7 +154,7 @@ describe('GET /api/v1/dashboard', () => {
     const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
 
     expect(res.statusCode).toBe(200)
-    const body = res.json() as { data: { activeDealsCount: number } }
+    const body = res.json()
     expect(body.data.activeDealsCount).toBe(1) // only mockDeal1 is ACTIVE
   })
 
@@ -164,7 +164,7 @@ describe('GET /api/v1/dashboard', () => {
     const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
 
     expect(res.statusCode).toBe(200)
-    const body = res.json() as { data: { totalDealsCount: number } }
+    const body = res.json()
     expect(body.data.totalDealsCount).toBe(2)
   })
 
@@ -180,7 +180,7 @@ describe('GET /api/v1/dashboard', () => {
     const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
 
     expect(res.statusCode).toBe(200)
-    const body = res.json() as { data: { recentDeals: unknown[] } }
+    const body = res.json()
     expect(body.data.recentDeals).toHaveLength(5)
   })
 
@@ -190,7 +190,7 @@ describe('GET /api/v1/dashboard', () => {
     const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
 
     expect(res.statusCode).toBe(200)
-    const body = res.json() as { data: { recentDeals: Array<{ paymentSummary: Record<string, unknown> }> } }
+    const body = res.json()
     const deal = body.data.recentDeals[0]
     expect(deal).toBeDefined()
     expect(deal!.paymentSummary.totalContracted).toBe(80000)
@@ -221,7 +221,7 @@ describe('GET /api/v1/dashboard', () => {
     const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
 
     expect(res.statusCode).toBe(200)
-    const body = res.json() as { data: { overduePaymentsCount: number } }
+    const body = res.json()
     expect(body.data.overduePaymentsCount).toBe(0)
   })
 
@@ -231,7 +231,7 @@ describe('GET /api/v1/dashboard', () => {
     const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
 
     expect(res.statusCode).toBe(200)
-    const body = res.json() as { data: { dominantCurrency: string } }
+    const body = res.json()
     expect(body.data.dominantCurrency).toBe('INR')
   })
 
@@ -256,7 +256,7 @@ describe('GET /api/v1/dashboard', () => {
     const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
 
     expect(res.statusCode).toBe(200)
-    const body = res.json() as { data: { overduePaymentsCount: number } }
+    const body = res.json()
     expect(body.data.overduePaymentsCount).toBe(0)
   })
 })

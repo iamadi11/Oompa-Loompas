@@ -1,0 +1,25 @@
+# Local Postgres matching apps/api/.env.example defaults.
+# Run from repo root: docker compose -f infra/docker-compose.postgres.yml up -d
+#
+# If port 5432 is already taken (e.g. Homebrew Postgres), either stop that
+# service or change the left-hand port: "5433:5432" and set DATABASE_URL port 5433.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: oompa_dev
+    ports:
+      - '5432:5432'
+    volumes:
+      - oompa_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d oompa_dev']
+      interval: 3s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  oompa_pg_data:

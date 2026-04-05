@@ -1,10 +1,11 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import type { Deal, Payment } from '@oompa/types'
+import type { Deal, Payment, Deliverable } from '@oompa/types'
 import { formatCurrency } from '@oompa/utils'
 import { StatusBadge } from '../../../components/ui/Badge'
 import { DealForm } from '../../../components/deals/DealForm'
 import { PaymentSection } from '../../../components/payments/PaymentSection'
+import { DeliverableSection } from '../../../components/deliverables/DeliverableSection'
 
 interface Props {
   params: { id: string }
@@ -35,6 +36,17 @@ async function getPayments(dealId: string): Promise<Payment[]> {
   }
 }
 
+async function getDeliverables(dealId: string): Promise<Deliverable[]> {
+  try {
+    const res = await fetch(`${API_BASE}/api/v1/deals/${dealId}/deliverables`, { cache: 'no-store' })
+    if (!res.ok) return []
+    const body = (await res.json()) as { data: Deliverable[] }
+    return body.data
+  } catch {
+    return []
+  }
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const deal = await getDeal(params.id)
   return {
@@ -43,7 +55,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function DealDetailPage({ params }: Props) {
-  const [deal, payments] = await Promise.all([getDeal(params.id), getPayments(params.id)])
+  const [deal, payments, deliverables] = await Promise.all([
+    getDeal(params.id),
+    getPayments(params.id),
+    getDeliverables(params.id),
+  ])
   if (!deal) notFound()
 
   return (
@@ -59,6 +75,13 @@ export default async function DealDetailPage({ params }: Props) {
         <p className="text-3xl font-bold text-gray-900 mt-3">
           {formatCurrency(deal.value, deal.currency)}
         </p>
+      </div>
+
+      <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <DeliverableSection
+          dealId={deal.id}
+          initialDeliverables={deliverables}
+        />
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 p-6">

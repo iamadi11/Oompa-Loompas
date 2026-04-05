@@ -6,6 +6,9 @@ import type {
   Payment,
   CreatePayment,
   UpdatePayment,
+  Deliverable,
+  CreateDeliverable,
+  UpdateDeliverable,
   DashboardSummary,
   ApiResponse,
 } from '@oompa/types'
@@ -94,6 +97,28 @@ class ApiClient {
 
   async getDashboard(): Promise<ApiResponse<DashboardSummary>> {
     return this.request<ApiResponse<DashboardSummary>>('/api/v1/dashboard')
+  }
+
+  async listDeliverables(dealId: string): Promise<ApiResponse<Deliverable[]>> {
+    return this.request<ApiResponse<Deliverable[]>>(`/api/v1/deals/${dealId}/deliverables`)
+  }
+
+  async createDeliverable(dealId: string, data: CreateDeliverable): Promise<ApiResponse<Deliverable>> {
+    return this.request<ApiResponse<Deliverable>>(`/api/v1/deals/${dealId}/deliverables`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async updateDeliverable(id: string, data: UpdateDeliverable): Promise<ApiResponse<Deliverable>> {
+    return this.request<ApiResponse<Deliverable>>(`/api/v1/deliverables/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async deleteDeliverable(id: string): Promise<void> {
+    return this.request<void>(`/api/v1/deliverables/${id}`, { method: 'DELETE' })
   }
 }
 

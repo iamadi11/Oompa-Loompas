@@ -23,7 +23,7 @@ export function PaymentSection({
   initialPayments,
 }: PaymentSectionProps) {
   const router = useRouter()
-  const [payments] = useState<Payment[]>(initialPayments)
+  const payments = initialPayments
   const [showAddForm, setShowAddForm] = useState(false)
 
   const summary = computePaymentSummary(

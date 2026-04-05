@@ -46,7 +46,7 @@ describe('GET /api/v1/deals/:dealId/payments', () => {
     })
 
     expect(response.statusCode).toBe(200)
-    const body = response.json() as { data: unknown[] }
+    const body = response.json()
     expect(body.data).toHaveLength(1)
     await fastify.close()
   })
@@ -75,7 +75,7 @@ describe('GET /api/v1/deals/:dealId/payments', () => {
       url: `/api/v1/deals/${DEAL_ID}/payments`,
     })
 
-    const body = response.json() as { data: Array<{ isOverdue: boolean }> }
+    const body = response.json()
     expect(body.data[0]?.isOverdue).toBe(false)
     await fastify.close()
   })
@@ -91,7 +91,7 @@ describe('GET /api/v1/deals/:dealId/payments', () => {
       url: `/api/v1/deals/${DEAL_ID}/payments`,
     })
 
-    const body = response.json() as { data: Array<{ isOverdue: boolean }> }
+    const body = response.json()
     expect(body.data[0]?.isOverdue).toBe(true)
     await fastify.close()
   })
@@ -107,7 +107,7 @@ describe('GET /api/v1/deals/:dealId/payments', () => {
       url: `/api/v1/deals/${DEAL_ID}/payments`,
     })
 
-    const body = response.json() as { data: Array<{ isOverdue: boolean }> }
+    const body = response.json()
     expect(body.data[0]?.isOverdue).toBe(false)
     await fastify.close()
   })
@@ -129,7 +129,7 @@ describe('POST /api/v1/deals/:dealId/payments', () => {
     })
 
     expect(response.statusCode).toBe(201)
-    const body = response.json() as { data: { id: string; amount: number } }
+    const body = response.json()
     expect(body.data.id).toBe(PAYMENT_ID)
     await fastify.close()
   })
@@ -231,7 +231,7 @@ describe('PATCH /api/v1/payments/:id', () => {
     })
 
     expect(response.statusCode).toBe(200)
-    const body = response.json() as { data: { status: string } }
+    const body = response.json()
     expect(body.data.status).toBe('RECEIVED')
     await fastify.close()
   })
