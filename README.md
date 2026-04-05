@@ -17,6 +17,11 @@ Monorepo for the **Creator Revenue Intelligence System** — a financial outcome
 - **UX & shell:** [docs/ux/web-shell-pwa.md](./docs/ux/web-shell-pwa.md)
 - **Technical:** [docs/architecture/pwa-web-client.md](./docs/architecture/pwa-web-client.md)
 
+## Product planning
+
+- **Next feature candidates (research):** [docs/product/feature-candidates-2026-04.md](./docs/product/feature-candidates-2026-04.md)
+- **Release notes index:** [docs/releases/README.md](./docs/releases/README.md)
+
 ## Development
 
 ```bash
