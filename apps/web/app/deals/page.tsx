@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import type { Deal } from '@oompa/types'
 import { DealList } from '../../components/deals/DealList'
+import { isDealsNeedsAttentionFilter } from '../../lib/deals-page'
 
 async function getDeals(needsAttention: boolean): Promise<{ deals: Deal[]; loadError: string | null }> {
   const apiBase = process.env['API_URL'] ?? 'http://localhost:3001'
@@ -32,16 +33,14 @@ type Props = {
 }
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
-  const raw = searchParams['needsAttention']
-  const needsAttention = raw === 'true' || raw === '1'
+  const needsAttention = isDealsNeedsAttentionFilter(searchParams)
   return {
     title: needsAttention ? 'Needs attention' : 'Deals',
   }
 }
 
 export default async function DealsPage({ searchParams }: Props) {
-  const raw = searchParams['needsAttention']
-  const needsAttention = raw === 'true' || raw === '1'
+  const needsAttention = isDealsNeedsAttentionFilter(searchParams)
   const { deals, loadError } = await getDeals(needsAttention)
 
   return (
