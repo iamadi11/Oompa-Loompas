@@ -16,6 +16,7 @@
 - If the API is persistently down, repeated **Try again** is frustrating; future work could deep-link to status or offline shell messaging (not in this slice).
 
 ## Accessibility
-- **Keyboard:** **Try again** is a native `button` with focus ring via shared `Button` styles.
-- **WCAG 2.2 AA:** Sufficient contrast on primary button; heading hierarchy preserved (`h1` on page).
+- **Keyboard:** **Try again** is a native `button` with focus ring via shared `Button` styles (tab order: skip link → **Revenue** → **Attention** → **Deals** → **Try again**).
+- **Structure:** The error message lives in a **`section`** with `aria-labelledby` / `aria-describedby` linking the `h1` and reassurance paragraph, `aria-live="polite"` for screen-reader notice, and `aria-busy` while a retry is in flight.
+- **WCAG 2.2 AA:** Sufficient contrast on primary button; a single `h1` on the error view.
 - **Focus indicators:** `focus-visible` ring on button per design system.
