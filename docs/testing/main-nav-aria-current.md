@@ -17,3 +17,5 @@
 ## UI
 
 Manual or browser MCP: snapshot should expose `states: [current]` on the active main nav link (tool-dependent).
+
+**Verified 2026-04-06 (Cursor browser MCP, `http://localhost:3005`):** **Revenue** `current` on `/`; **Attention** on `/attention`; **Deals** on `/deals` and `/deals?needsAttention=true`.

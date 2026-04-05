@@ -1,8 +1,9 @@
 # Browser MCP UX checklist run
 
 **Date:** 2026-04-06  
+**Latest MCP run:** 2026-04-06 (Cursor browser MCP) — `/`, `/attention`, `/deals`, `/deals?needsAttention=true`, `/offline`; manifest via `curl`; **Pass** after **stale `.next` fix** and **deals `generateMetadata`** (see below).  
 **Environment:** Next.js dev (`next dev`), base URL `http://localhost:3005`  
-**Note:** `pnpm dev` from repo root failed to bind `@oompa/web` on `:3000` (EADDRINUSE). The browser session used a dedicated dev server on **3005** so the correct app was exercised.
+**Note:** `pnpm dev` from repo root may fail to bind `@oompa/web` on `:3000` (EADDRINUSE). This checklist assumes a dedicated dev server on **3005** from `apps/web` with `API_URL` / `NEXT_PUBLIC_API_URL` → API (`http://localhost:3001`).
 
 ## Sources
 
@@ -25,6 +26,8 @@
 | New deal form labels + controls | deal-crud | **Pass** | Named textboxes, combobox, buttons with accessible names |
 | Document title (no duplicate app name) | — | **Fail → Fixed** | Was `New Deal — Revenue · Revenue`; metadata title set to `New deal` |
 | Focus visible: shell + text links + cards | deal-crud a11y / pwa testing §5 | **Fail → Fixed** | Added `focus-visible:ring-*` to header links, “View all”, `DealCard`, `RecentDealRow`, offline + not-found links |
+| Dev server **500** (missing chunk e.g. `./808.js`) | — | **Fail → Fixed (ops)** | Removed `apps/web/.next`, restarted `pnpm exec next dev -p 3005` from `apps/web` with API env; **`GET /` → 200**. |
+| Deals list **document title** (tab / SR document name) | shell quality | **Fail → Fixed** | `/deals` and `/deals?needsAttention=true` used root default title; added `generateMetadata` on `app/deals/page.tsx` → **`Deals · Revenue`** / **`Needs attention · Revenue`**. |
 
 ## Follow-ups
 

@@ -1,7 +1,7 @@
 # Browser MCP UX checklist — dashboard priority actions
 
 **Date:** 2026-04-06  
-**Latest MCP run:** 2026-04-06 — `/` on **3005**: **What to do next**, summary, recent deals; **Revenue** brand link `states: [current]`; **Pass**.  
+**Latest MCP run:** 2026-04-06 (Cursor browser MCP) — `/` on **3005** after **`.next` clean + dev restart**: **What to do next**, **Financial summary**, **Recent deals**; **Revenue** `states: [current]`; **Pass**.  
 **Base URL:** `http://localhost:3005` (Next dev; `@oompa/api` on `http://localhost:3001`)  
 **Source:** [docs/ux/dashboard-priority-actions.md](../ux/dashboard-priority-actions.md)
 

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import type { Deal } from '@oompa/types'
 import { DealList } from '../../components/deals/DealList'
 
@@ -28,6 +29,14 @@ async function getDeals(needsAttention: boolean): Promise<{ deals: Deal[]; loadE
 
 type Props = {
   searchParams: Record<string, string | string[] | undefined>
+}
+
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const raw = searchParams['needsAttention']
+  const needsAttention = raw === 'true' || raw === '1'
+  return {
+    title: needsAttention ? 'Needs attention' : 'Deals',
+  }
 }
 
 export default async function DealsPage({ searchParams }: Props) {

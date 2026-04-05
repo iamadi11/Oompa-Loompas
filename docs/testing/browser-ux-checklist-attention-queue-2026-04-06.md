@@ -1,7 +1,7 @@
 # Browser MCP UX checklist — dashboard priority actions + attention queue
 
 **Date:** 2026-04-06 (re-run)  
-**Latest MCP run:** 2026-04-06 — `/`, `/attention`, `/deals`, `/deals?needsAttention=true` on **3005** after dev restart; **Pass** below; **Nav click** still **Fail (tooling)**.  
+**Latest MCP run:** 2026-04-06 (Cursor browser MCP) — `/`, `/attention`, `/deals`, `/deals?needsAttention=true` on **3005** after **`rm -rf apps/web/.next`** + **`next dev -p 3005`** from `apps/web` with API env; **Pass** below; **Nav `browser_click`** still **Fail (tooling)** (use **`browser_navigate`** for route changes).  
 **Base URL:** `http://localhost:3005` (Next dev; API `http://localhost:3001`)  
 **Sources:** [docs/ux/dashboard-priority-actions.md](../ux/dashboard-priority-actions.md), [docs/ux/attention-queue.md](../ux/attention-queue.md)
 

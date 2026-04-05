@@ -21,3 +21,5 @@ Matches mental model: “I’m in Deals until I explicitly leave.” No extra ch
 
 - `aria-current="page"` on exactly one main nav target per view (brand OR Attention OR Deals for home vs module routes).
 - Focus rings unchanged from shell standard.
+
+**Browser MCP check (2026-04-06):** Accessibility tree on dev **3005** showed `states: [current]` on the expected header link for `/`, `/attention`, `/deals`, and filtered `/deals?needsAttention=true` (see [browser-ux-checklist-run-2026-04-06.md](../testing/browser-ux-checklist-run-2026-04-06.md)).
