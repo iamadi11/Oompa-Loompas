@@ -1,5 +1,19 @@
 # Local infrastructure
 
+## GitHub Actions (CI/CD)
+
+Workflows live in **`.github/workflows/`**:
+
+| Workflow | When | GitHub Environment |
+|----------|------|--------------------|
+| **`ci.yml`** | Push / PR to **`main`** | _(none — repo defaults)_ |
+| **`deploy-staging.yml`** | Push to **`staging`** or **workflow dispatch** | **`staging`** |
+| **`deploy-production.yml`** | **Release published** or **workflow dispatch** | **`production`** |
+
+Create Environments under **Settings → Environments**. Suggested **variables** per environment: **`NEXT_PUBLIC_API_URL`** (and your API base URL for the web build). Suggested **secrets**: **`STAGING_DEPLOY_TOKEN`**, **`PRODUCTION_DEPLOY_TOKEN`** (or replace deploy steps with your provider’s CLI).
+
+The **`deploy-*`** jobs ship with a **no-op deploy** until you wire a real command; **`quality`** already runs typecheck, lint, test, and build.
+
 ## PostgreSQL (recommended for `P1010` / permission errors)
 
 On macOS with **Homebrew Postgres**, run once from the repo root:

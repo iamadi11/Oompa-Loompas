@@ -1,0 +1,42 @@
+# Staging — uses GitHub Environment "staging" (vars + secrets + protection rules).
+name: Deploy — staging
+
+on:
+  push:
+    branches: [staging]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-staging-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    uses: ./.github/workflows/ci-reusable.yml
+    with:
+      next_public_api_url: ${{ vars.NEXT_PUBLIC_API_URL }}
+    secrets: inherit
+    environment: staging
+
+  deploy:
+    name: Deploy to staging
+    needs: quality
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy (configure your platform)
+        env:
+          STAGING_DEPLOY_TOKEN: ${{ secrets.STAGING_DEPLOY_TOKEN }}
+        run: |
+          echo "Configure this step for your host (Fly.io, Railway, Kubernetes, etc.)."
+          echo "Use Environment secrets: STAGING_DEPLOY_TOKEN and vars: STAGING_URL, NEXT_PUBLIC_API_URL."
+          if [ -z "${STAGING_DEPLOY_TOKEN:-}" ]; then
+            echo "No STAGING_DEPLOY_TOKEN — skipping real deploy (quality gate already passed)."
+          fi

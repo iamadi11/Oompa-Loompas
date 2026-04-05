@@ -1,0 +1,58 @@
+# Called by CI and deploy workflows. Keeps quality gates in one place.
+name: Reusable CI
+
+on:
+  workflow_call:
+    inputs:
+      next_public_api_url:
+        description: Optional URL baked into @oompa/web at build time (staging/production)
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Typecheck, lint, test, build
+    runs-on: ubuntu-latest
+    env:
+      CI: 'true'
+      # API tests mock @oompa/db; no DATABASE_URL required.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint
+
+      # `pnpm format:check` is not run here: the root script targets the whole repo and
+      # currently includes many non–CI-generated paths that fail Prettier. Use locally
+      # or add a scoped `format:check:workspace` when ready.
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build (packages + apps)
+        env:
+          NEXT_PUBLIC_API_URL: ${{ inputs.next_public_api_url != '' && inputs.next_public_api_url || 'http://127.0.0.1:3001' }}
+          API_URL: ${{ inputs.next_public_api_url != '' && inputs.next_public_api_url || 'http://127.0.0.1:3001' }}
+        run: pnpm build
