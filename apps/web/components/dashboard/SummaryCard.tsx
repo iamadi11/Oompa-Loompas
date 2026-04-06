@@ -1,6 +1,7 @@
 'use client'
 
-import { motion, useReducedMotion } from 'motion/react'
+import { motion } from 'motion/react'
+import { useAllowEntranceMotion, usePrefersReducedMotion } from '../../lib/motion/use-prefers-motion'
 
 interface SummaryCardProps {
   label: string
@@ -31,19 +32,20 @@ export function SummaryCard({
   subtext,
   motionIndex = 0,
 }: SummaryCardProps) {
-  const reduce = useReducedMotion()
+  const allowEntrance = useAllowEntranceMotion()
+  const prefersReduced = usePrefersReducedMotion()
 
   return (
     <motion.div
       className={`rounded-2xl border p-4 sm:p-5 ${ACCENT_STYLES[accent]}`}
-      initial={reduce ? false : { opacity: 0, y: 20 }}
+      initial={allowEntrance ? { opacity: 0, y: 20 } : false}
       animate={{ opacity: 1, y: 0 }}
       transition={{
         duration: 0.42,
-        delay: reduce ? 0 : motionIndex * 0.08,
+        delay: allowEntrance ? motionIndex * 0.08 : 0,
         ease: [0.22, 1, 0.36, 1],
       }}
-      {...(!reduce ? { whileHover: { y: -2, transition: { duration: 0.2 } } } : {})}
+      {...(!prefersReduced ? { whileHover: { y: -2, transition: { duration: 0.2 } } } : {})}
     >
       <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-stone-500">{label}</p>
       <p className={`mt-2 text-xl sm:text-2xl font-bold tabular-nums tracking-tight ${VALUE_STYLES[accent]}`}>

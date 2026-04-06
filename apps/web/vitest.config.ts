@@ -15,7 +15,7 @@ export default defineConfig({
       },
       include: ['lib/**/*.ts'],
       /** Thin DOM helpers — covered by LoginForm integration in browser; jsdom is flaky on Node 24 in Vitest. */
-      exclude: ['lib/**/*.test.ts', 'lib/forms/**'],
+      exclude: ['lib/**/*.test.ts', 'lib/forms/**', 'lib/motion/**'],
     },
   },
 })

@@ -4,7 +4,8 @@ import type { Route } from 'next'
 import Link from 'next/link'
 import type { DashboardDeal } from '@oompa/types'
 import { formatCurrency } from '@oompa/utils'
-import { motion, useReducedMotion } from 'motion/react'
+import { motion } from 'motion/react'
+import { useAllowEntranceMotion, usePrefersReducedMotion } from '../../lib/motion/use-prefers-motion'
 import { StatusBadge } from '../ui/Badge'
 
 const MotionLink = motion.create(Link)
@@ -16,7 +17,8 @@ interface RecentDealRowProps {
 
 export function RecentDealRow({ deal, motionIndex = 0 }: RecentDealRowProps) {
   const { paymentSummary } = deal
-  const reduce = useReducedMotion()
+  const allowEntrance = useAllowEntranceMotion()
+  const prefersReduced = usePrefersReducedMotion()
   const receivedPct =
     paymentSummary.totalContracted > 0
       ? Math.round((paymentSummary.totalReceived / paymentSummary.totalContracted) * 100)
@@ -26,14 +28,14 @@ export function RecentDealRow({ deal, motionIndex = 0 }: RecentDealRowProps) {
     <MotionLink
       href={`/deals/${deal.id}` as Route}
       className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 px-4 py-3.5 rounded-xl border border-line/80 bg-surface-raised shadow-sm hover:border-line-strong hover:shadow-card transition-all duration-200 motion-reduce:transition-none group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
-      initial={reduce ? false : { opacity: 0, x: -12 }}
+      initial={allowEntrance ? { opacity: 0, x: -12 } : false}
       animate={{ opacity: 1, x: 0 }}
       transition={{
         duration: 0.38,
-        delay: reduce ? 0 : motionIndex * 0.07,
+        delay: allowEntrance ? motionIndex * 0.07 : 0,
         ease: [0.22, 1, 0.36, 1],
       }}
-      {...(!reduce
+      {...(!prefersReduced
         ? { whileHover: { x: 4, transition: { type: 'spring' as const, stiffness: 300, damping: 22 } } }
         : {})}
     >

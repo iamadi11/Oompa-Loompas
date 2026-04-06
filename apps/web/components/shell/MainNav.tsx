@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { motion, useReducedMotion } from 'motion/react'
+import { motion } from 'motion/react'
+import { usePrefersReducedMotion } from '../../lib/motion/use-prefers-motion'
 import { useEffect, useId, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { isMainNavCurrent } from '../../lib/main-nav'
@@ -54,7 +55,7 @@ function NavLinks(props: { onNavigate?: () => void; className?: string }) {
 }
 
 export function BrandHomeLink() {
-  const reduce = useReducedMotion()
+  const prefersReduced = usePrefersReducedMotion()
   return (
     <Link
       href="/dashboard"
@@ -63,7 +64,7 @@ export function BrandHomeLink() {
       <motion.span
         className="relative inline-block"
         transition={{ type: 'spring', stiffness: 420, damping: 22 }}
-        {...(!reduce ? { whileHover: { scale: 1.02 }, whileTap: { scale: 0.98 } } : {})}
+        {...(!prefersReduced ? { whileHover: { scale: 1.02 }, whileTap: { scale: 0.98 } } : {})}
       >
         {APP_DISPLAY_NAME}
         <span

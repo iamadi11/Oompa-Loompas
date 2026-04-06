@@ -6,6 +6,18 @@ Date: **2026-04-06** — **Latest agent pass (Browser MCP + curl + automated tes
 
 **Auth fixture:** `dev-browser-test@local.test` password rotated for automation (DB `users` row). **Do not** commit secrets; use your own seed user locally.
 
+### Re-run after blank `/` fix (`useAllowEntranceMotion`)
+
+`useReducedMotion()` returns **`null`** until hydration; treating it as falsy forced `initial={{ opacity: 0 }}` on marketing and other motion surfaces, so `/` could appear empty. **Fix:** [`apps/web/lib/motion/use-prefers-motion.ts`](../../apps/web/lib/motion/use-prefers-motion.ts) — entrance motion only when `useReducedMotion() === false`. **`RecentDealRow`** had a half-migrated hook usage (TypeScript break); wired to `useAllowEntranceMotion` / `usePrefersReducedMotion` in [`RecentDealRow.tsx`](../../apps/web/components/dashboard/RecentDealRow.tsx).
+
+| Check (MCP snapshot, same env)              | Result   | Notes                                                                 |
+| ----------------------------------------- | -------- | --------------------------------------------------------------------- |
+| Marketing `/` — visible hero + copy       | **Pass** | H1 "Know what to collect…", tagline, region "Outcome-first", list items |
+| Global **404** (unknown path)             | **Pass** | Title "Page not found · Oompa"; H1 "This page does not exist"; Home, Log in |
+| `/offline`, `/login`, `manifest.webmanifest` | **Pass** | Same as table below (curl + prior MCP)                                |
+| `pnpm -r` test / lint / build             | **Pass** | After `RecentDealRow` fix                                             |
+| `pnpm --filter @oompa/web verify:pwa`     | **Pass** |                                                                       |
+
 ---
 
 ## Cursor Browser MCP (`http://127.0.0.1:3000`) vs [web-shell-pwa.md](../ux/web-shell-pwa.md) / [pwa-web-client.md](./pwa-web-client.md)
@@ -31,6 +43,7 @@ Date: **2026-04-06** — **Latest agent pass (Browser MCP + curl + automated tes
 | **`next dev` crash (Next 16 + PWA)** | [`apps/web/package.json`](../../apps/web/package.json) — `dev` / `dev:clean` use **`next dev --webpack`** (same reason as production `next build --webpack`).                                                                                                                                                                                                 |
 | **Login GET leaked credentials**     | Controlled inputs + tooling filled DOM only → native **GET** `?email=&password=`; fixed by reading **`readNamedInput`** from the form node + **`onClick` on Sign in** (MCP) + **`onSubmit` for Enter**. See [`LoginForm.tsx`](../../apps/web/components/auth/LoginForm.tsx), [`lib/forms/read-named-input.ts`](../../apps/web/lib/forms/read-named-input.ts). |
 | **`browser_lock` + MCP**             | Lock overlay blocked automated clicks; run MCP **unlocked** unless user needs control handoff.                                                                                                                                                                                                                                                                |
+| **`RecentDealRow` TypeScript**        | Incomplete motion hook migration → `useAllowEntranceMotion` + `usePrefersReducedMotion` (see [`RecentDealRow.tsx`](../../apps/web/components/dashboard/RecentDealRow.tsx)).                                                                                                                                                                                    |
 
 ---
 

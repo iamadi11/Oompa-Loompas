@@ -4,7 +4,8 @@ import type { Route } from 'next'
 import Link from 'next/link'
 import type { Deal } from '@oompa/types'
 import { formatCurrency } from '@oompa/utils'
-import { motion, useReducedMotion } from 'motion/react'
+import { motion } from 'motion/react'
+import { useAllowEntranceMotion, usePrefersReducedMotion } from '../../lib/motion/use-prefers-motion'
 import { StatusBadge } from '../ui/Badge'
 
 const MotionLink = motion.create(Link)
@@ -16,20 +17,21 @@ interface DealCardProps {
 }
 
 export function DealCard({ deal, motionIndex = 0 }: DealCardProps) {
-  const reduce = useReducedMotion()
+  const allowEntrance = useAllowEntranceMotion()
+  const prefersReduced = usePrefersReducedMotion()
 
   return (
     <MotionLink
       href={`/deals/${deal.id}` as Route}
       className="block rounded-2xl border border-line/90 bg-surface-raised p-4 sm:p-5 shadow-card transition-all duration-200 motion-reduce:transition-none hover:border-brand-400/70 hover:shadow-card-hover group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
-      initial={reduce ? false : { opacity: 0, y: 16 }}
+      initial={allowEntrance ? { opacity: 0, y: 16 } : false}
       animate={{ opacity: 1, y: 0 }}
       transition={{
         duration: 0.4,
-        delay: reduce ? 0 : motionIndex * 0.06,
+        delay: allowEntrance ? motionIndex * 0.06 : 0,
         ease: [0.22, 1, 0.36, 1],
       }}
-      {...(!reduce
+      {...(!prefersReduced
         ? {
             whileHover: { y: -4, transition: { type: 'spring' as const, stiffness: 380, damping: 24 } },
             whileTap: { scale: 0.99 },
