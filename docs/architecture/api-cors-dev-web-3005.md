@@ -5,7 +5,7 @@
 
 ## Data flow
 **Input:** Request **`Origin`** header, **`NODE_ENV`**, **`WEB_URL`**.  
-**Validate:** Production → single origin string; development → deduped list (**`WEB_URL`** + fixed local dev hosts).  
+**Validate:** Production → single origin string; development → deduped list (**`WEB_URL`** + fixed local dev hosts) **plus** any **`http://localhost:*`** / **`http://127.0.0.1:*`** origin (covers **`next dev -p <port>`** without listing every port).  
 **Normalize:** `@fastify/cors` with **`credentials: true`**.  
 **Process:** Hook runs on parent Fastify instance via **`fastify-plugin`** (no encapsulation bug).  
 **Output:** Response CORS headers on non-preflight responses.
@@ -14,12 +14,12 @@
 No new HTTP routes. Behavior change is **response headers** only for allowed origins.
 
 ## Scale analysis
-Negligible: fixed small allowlist in memory per process.
+Negligible: small fixed list plus a cheap URL parse for loopback **`http`** origins in development only.
 
 ## Tech choices
 | Choice | Alternatives | Why this |
 |--------|----------------|----------|
-| Explicit dev host list | Dynamic `origin: true` | Deterministic, reviewable allowlist |
+| Fixed list + loopback `http` matcher in dev | `origin: true` everywhere | Keeps production on a single explicit origin; dev still works on arbitrary local ports without editing the plugin each time |
 | `fastify-plugin` wrapper | Bare async plugin | CORS applies to all routes on the root instance |
 
 ## Operational design

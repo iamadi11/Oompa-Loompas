@@ -27,3 +27,11 @@ Reflecting any Origin is convenient but broadens dev attack surface (e.g. malici
 
 ## Assumptions (to be validated)
 - Local API continues to run with **`NODE_ENV !== 'production'`** for development; production never needs the 3005 entries.
+
+## Amendment (2026-04-06) — loopback `http` on any port
+
+**Problem:** Developers run **`next dev -p <port>`** on many ports (**3006**, **3007**, etc.). Listing each port caused **CORS preflight failures** for in-browser **`fetch`** (e.g. create deal).
+
+**Change:** In **non-production**, after the fixed list check, allow **`http://localhost:<any>`** and **`http://127.0.0.1:<any>`** and echo that **`Origin`** back. **Reject** non-loopback hosts (e.g. **`http://192.168.x.x`**). **Production** unchanged.
+
+**Why not `origin: true` for all dev:** Still narrowed to **loopback `http`** only, not arbitrary **`file:`** or LAN origins.

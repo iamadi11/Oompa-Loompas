@@ -28,6 +28,15 @@
 4. Creator changes status via dropdown — transitions enforced
 5. Creator saves → optimistic spinner → success → refresh
 
+### Delete deal
+1. On the same **Edit deal** card, scroll to **Danger zone**
+2. **Delete deal** → browser confirm explains cascade (payments + deliverables)
+3. On success → redirect to **`/deals`**
+
+### Delete payment / deliverable
+- Each **payment** row: **Delete** (confirm) removes that milestone via API.
+- Each **deliverable** row: **Delete** (confirm) removes that row.
+
 ## States
 
 ### Zero state (first use, no deals)

@@ -49,6 +49,13 @@ export function DeliverableRow({ deliverable, onUpdate }: DeliverableRowProps) {
   }
 
   async function handleDelete() {
+    if (
+      !window.confirm(
+        `Remove deliverable "${deliverable.title}"? This cannot be undone.`,
+      )
+    ) {
+      return
+    }
     setUpdating(true)
     try {
       await api.deleteDeliverable(deliverable.id)

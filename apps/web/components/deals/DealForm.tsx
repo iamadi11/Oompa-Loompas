@@ -34,6 +34,7 @@ const STATUS_OPTIONS = [
 export function DealForm({ deal, mode }: DealFormProps) {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
@@ -99,6 +100,28 @@ export function DealForm({ deal, mode }: DealFormProps) {
       setServerError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  async function handleDeleteDeal() {
+    if (!deal) return
+    if (
+      !window.confirm(
+        `Permanently delete deal "${deal.title}"? All payments and deliverables for this deal will be removed. This cannot be undone.`,
+      )
+    ) {
+      return
+    }
+    setServerError(null)
+    setDeleting(true)
+    try {
+      await api.deleteDeal(deal.id)
+      router.push('/deals')
+      router.refresh()
+    } catch (err) {
+      setServerError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -187,14 +210,33 @@ export function DealForm({ deal, mode }: DealFormProps) {
           type="button"
           variant="secondary"
           onClick={() => router.back()}
-          disabled={submitting}
+          disabled={submitting || deleting}
         >
           Cancel
         </Button>
-        <Button type="submit" loading={submitting}>
+        <Button type="submit" loading={submitting} disabled={deleting}>
           {mode === 'create' ? 'Create deal' : 'Save changes'}
         </Button>
       </div>
+
+      {mode === 'edit' && deal && (
+        <div className="pt-8 mt-2 border-t border-red-100 rounded-b-xl">
+          <h3 className="text-sm font-semibold text-red-900">Danger zone</h3>
+          <p className="text-sm text-gray-600 mt-1 mb-4">
+            Delete this deal and all of its payment milestones and deliverables. This cannot be undone.
+          </p>
+          <Button
+            type="button"
+            variant="danger"
+            size="md"
+            loading={deleting}
+            disabled={submitting}
+            onClick={() => void handleDeleteDeal()}
+          >
+            Delete deal
+          </Button>
+        </div>
+      )}
     </form>
   )
 }

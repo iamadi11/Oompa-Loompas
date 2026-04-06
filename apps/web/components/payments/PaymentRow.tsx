@@ -15,6 +15,7 @@ interface PaymentRowProps {
 
 export function PaymentRow({ dealId, payment, onUpdate }: PaymentRowProps) {
   const [marking, setMarking] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   async function markReceived() {
     setMarking(true)
@@ -28,6 +29,26 @@ export function PaymentRow({ dealId, payment, onUpdate }: PaymentRowProps) {
       // Silently reset — the server error will appear if the parent re-fetches
     } finally {
       setMarking(false)
+    }
+  }
+
+  async function removePayment() {
+    const label = formatCurrency(payment.amount, payment.currency as 'INR' | 'USD' | 'EUR' | 'GBP')
+    if (
+      !window.confirm(
+        `Remove this ${label} payment milestone? This cannot be undone.`,
+      )
+    ) {
+      return
+    }
+    setDeleting(true)
+    try {
+      await api.deletePayment(payment.id)
+      onUpdate()
+    } catch {
+      // Parent refresh will surface persisted state; avoid silent success
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -82,6 +103,18 @@ export function PaymentRow({ dealId, payment, onUpdate }: PaymentRowProps) {
             Mark received
           </Button>
         )}
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          loading={deleting}
+          disabled={marking}
+          onClick={() => void removePayment()}
+          aria-label={`Delete payment milestone of ${formatCurrency(payment.amount, payment.currency as 'INR' | 'USD' | 'EUR' | 'GBP')}`}
+          className="!text-red-700 hover:!bg-red-50 focus-visible:!ring-red-500"
+        >
+          Delete
+        </Button>
       </div>
     </div>
   )

@@ -46,4 +46,30 @@ describe('CORS (non-preflight responses)', () => {
     expect(res.headers['access-control-allow-origin']).toBe('http://127.0.0.1:3005')
     await fastify.close()
   })
+
+  it('adds Access-Control-Allow-Origin for arbitrary Next dev port on loopback (e.g. 3007)', async () => {
+    const fastify = await buildServer()
+    const res = await fastify.inject({
+      method: 'GET',
+      url: '/api/v1/health',
+      headers: { origin: 'http://127.0.0.1:3007' },
+    })
+
+    expect(res.statusCode).toBe(200)
+    expect(res.headers['access-control-allow-origin']).toBe('http://127.0.0.1:3007')
+    await fastify.close()
+  })
+
+  it('does not allow non-loopback dev origins', async () => {
+    const fastify = await buildServer()
+    const res = await fastify.inject({
+      method: 'GET',
+      url: '/api/v1/health',
+      headers: { origin: 'http://192.168.1.10:3000' },
+    })
+
+    expect(res.statusCode).toBe(200)
+    expect(res.headers['access-control-allow-origin']).toBeUndefined()
+    await fastify.close()
+  })
 })

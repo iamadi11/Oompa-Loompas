@@ -1,9 +1,9 @@
-import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import type { Deal, Payment, Deliverable } from '@oompa/types'
 import { formatCurrency } from '@oompa/utils'
 import { StatusBadge } from '../../../components/ui/Badge'
 import { DealForm } from '../../../components/deals/DealForm'
+import { DealNotFoundContent } from '../../../components/deals/DealNotFoundContent'
 import { PaymentSection } from '../../../components/payments/PaymentSection'
 import { DeliverableSection } from '../../../components/deliverables/DeliverableSection'
 
@@ -61,7 +61,9 @@ export default async function DealDetailPage({ params }: Props) {
     getPayments(params.id),
     getDeliverables(params.id),
   ])
-  if (!deal) notFound()
+  if (!deal) {
+    return <DealNotFoundContent />
+  }
 
   return (
     <div className="max-w-2xl space-y-6">
