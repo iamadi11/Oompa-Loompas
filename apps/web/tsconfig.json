@@ -5,9 +5,11 @@
     "rootDir": ".",
     "noEmit": true,
     "baseUrl": ".",
+    "lib": ["dom", "dom.iterable", "ES2022"],
     "paths": {
       "@/*": ["./*"]
-    }
+    },
+    "exactOptionalPropertyTypes": false
   },
   "include": [
     "next-env.d.ts",

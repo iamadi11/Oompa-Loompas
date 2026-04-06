@@ -23,10 +23,10 @@ import type {
  * That way `credentials: 'include'` sends the session cookie issued for the **web** host — not a direct
  * `http://127.0.0.1:3001` origin, which would not receive that cookie on `:3000`.
  *
- * `NEXT_PUBLIC_API_URL` applies only outside `window` (e.g. Vitest, some tooling).
+ * `NEXT_PUBLIC_API_URL` applies only outside a browser `window` (e.g. Vitest, some tooling).
  */
 export function getBrowserApiBase(): string {
-  if (typeof window !== 'undefined') {
+  if ((globalThis as { window?: unknown }).window !== undefined) {
     return ''
   }
   const raw = process.env['NEXT_PUBLIC_API_URL']

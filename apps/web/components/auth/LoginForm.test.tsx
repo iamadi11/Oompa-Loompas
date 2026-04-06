@@ -41,9 +41,9 @@ describe('LoginForm', () => {
   })
 
   it('shows validation toast when email and password are missing (action)', async () => {
-    render(<LoginForm />)
-    const form = screen.getByRole('textbox', { name: /^email$/i }).closest('form')
-    expect(form).toBeTruthy()
+    const { container } = render(<LoginForm />)
+    const form = container.querySelector('form')
+    expect(form).not.toBeNull()
     fireEvent.submit(form!)
     await waitFor(() => {
       expect(toastError).toHaveBeenCalledWith('Enter your email and password.')

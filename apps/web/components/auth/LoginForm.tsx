@@ -30,7 +30,7 @@ function LoginSubmitButton({
     <button
       type="button"
       disabled={pending}
-      onClick={(e) => {
+      onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
         const form = e.currentTarget.form
         if (form) onPress(form)
       }}
@@ -66,7 +66,7 @@ export function LoginForm({ redirectFrom = null }: LoginFormProps) {
     [router, redirectFrom],
   )
 
-  const [, formAction, isPending] = useActionState(loginAction, {})
+  const [, formAction, isPending] = useActionState<LoginFormState, FormData>(loginAction, {})
   const [, startTransition] = useTransition()
 
   const runLogin = useCallback(
