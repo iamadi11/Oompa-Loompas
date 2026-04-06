@@ -1,9 +1,9 @@
 # Browser MCP UX checklist run
 
 **Date:** 2026-04-06  
-**Latest MCP run:** 2026-04-06 (Cursor browser MCP, **repeat**) — **`GET /` was 500** (`Cannot find module './958.js'`, stack via **`pages/_document`**) until **`rm -rf apps/web/.next`** + **`next dev -p 3005`** from **`apps/web`** with API env. Then **`/`, `/attention`, `/deals`, `/deals?needsAttention=true`, `/offline`, `/deals/new`** — **Pass**; manifest **`curl`** — **Pass**. **Recovery:** use **`pnpm dev:clean`** from **`apps/web`** (deletes **`.next`**, serves **3005**) + **`API_URL` / `NEXT_PUBLIC_API_URL`**.  
-**Environment:** Next.js dev (`next dev`), base URL `http://localhost:3005`  
-**Note:** `pnpm dev` from repo root may fail to bind `@oompa/web` on `:3000` (EADDRINUSE). Prefer **`apps/web`**: `API_URL=http://localhost:3001 NEXT_PUBLIC_API_URL=http://localhost:3001 pnpm dev:clean` or `pnpm exec next dev -p 3005` after a clean **`.next`** if you see **missing chunk** errors.
+**Latest MCP run:** 2026-04-06 (Cursor browser MCP, **third pass**) — **Web:** `http://127.0.0.1:3005` (`pnpm dev:clean` from **`apps/web`** with **`API_URL` / `NEXT_PUBLIC_API_URL` → `http://127.0.0.1:3001`). **API:** `http://127.0.0.1:3001`. **Ops:** An orphan **`node`** was already bound to **`:3005`** and served **`GET /` → 404** (App Router **NotFound** inside the shell). **Fix:** `kill` that PID (or free the port), then start **`pnpm dev:clean`** again — **`GET /` → 200**. **CORS fix shipped:** dev allowlist now includes **`:3005`** origins so browser **`fetch`** from forms/actions works (see **`apps/api/src/plugins/cors.ts`** + **`cors.test.ts`**).  
+**Environment:** Next.js dev, base URL **`http://127.0.0.1:3005`** (or `http://localhost:3005`)  
+**Note:** `pnpm dev` from repo root may fail to bind `@oompa/web` on `:3000` (EADDRINUSE). Prefer **`apps/web`**: `API_URL=http://127.0.0.1:3001 NEXT_PUBLIC_API_URL=http://127.0.0.1:3001 pnpm dev:clean` after a clean **`.next`** if you see **missing chunk** or **404 on `/`** errors.
 
 ## Sources
 
@@ -28,6 +28,9 @@
 | Focus visible: shell + text links + cards | deal-crud a11y / pwa testing §5 | **Fail → Fixed** | Added `focus-visible:ring-*` to header links, “View all”, `DealCard`, `RecentDealRow`, offline + not-found links |
 | Dev server **500** (missing chunk e.g. `./808.js`, `./958.js`) | — | **Fail → Fixed (ops)** | Stale **`.next`** after HMR/updates. **Fix:** remove **`apps/web/.next`**, restart dev from **`apps/web`** with API env; or **`pnpm dev:clean`** (same + **3005**). **`GET /` → 200** after this run. |
 | Deals list **document title** (tab / SR document name) | shell quality | **Fail → Fixed** | `/deals` and `/deals?needsAttention=true` used root default title; added `generateMetadata` on `app/deals/page.tsx` → **`Deals · Revenue`** / **`Needs attention · Revenue`**. |
+| **Dev CORS** for web on **:3005** (`Origin: http://127.0.0.1:3005`) | client `fetch` / deal-crud | **Fail → Fixed** | API dev CORS only listed **:3000**; **`Mark received`**, forms, etc. could fail from **`dev:clean`**. Extended **`developmentOrigins`** in [`cors.ts`](../../apps/api/src/plugins/cors.ts); test in [`cors.test.ts`](../../apps/api/src/__tests__/cors.test.ts). **Restart API** after pull. |
+| Orphan **Next** on **:3005** → **`GET /` 404** | ops | **Fail → Fixed (ops)** | Kill stale listener; run **`pnpm dev:clean`** from **`apps/web`**. |
+| React **hydration** warning **`data-cursor-ref`** on deal page | MCP / tooling | **N/A** | Injected by Cursor Browser MCP for snapshots; not present in production HTML. |
 
 ## Follow-ups
 

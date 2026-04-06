@@ -4,6 +4,10 @@ All notable changes to this repository are documented in this file.
 
 ## Unreleased
 
+### `@oompa/api`
+
+- **Dev CORS:** allow **`http://localhost:3005`** and **`http://127.0.0.1:3005`** alongside existing localhost origins so client-side **`fetch`** from **`pnpm dev:clean`** (`apps/web`) receives **`Access-Control-Allow-Origin`**. Regression test in [`cors.test.ts`](./apps/api/src/__tests__/cors.test.ts).
+
 ### `@oompa/web` / `@oompa/utils`
 
 - **Payment invoice UX (a11y):** **View invoice** link **focus-visible** ring; invoice HTML **`main`** landmark, table **`aria-label`**, human-readable **payment status** labels. Browser checklist: [docs/testing/browser-ux-checklist-payment-invoice-html-v1-2026-04-06.md](./docs/testing/browser-ux-checklist-payment-invoice-html-v1-2026-04-06.md).
