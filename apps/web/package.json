@@ -4,9 +4,9 @@
   "private": true,
   "description": "Oompa Loompas — Web App",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3000",
     "dev:clean": "node -e \"require('node:fs').rmSync('.next',{recursive:true,force:true})\" && next dev -p 3005",
-    "build": "next build",
+    "build": "NODE_ENV=production next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",

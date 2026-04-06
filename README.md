@@ -29,7 +29,9 @@ pnpm install
 pnpm dev
 ```
 
-The web app uses **Next.js 16** with the **default Turbopack** pipeline (`next dev`, `next build`). PWA is implemented with **Serwist** (`@serwist/turbopack`): worker source in `apps/web/app/sw.ts`, service worker URL **`/serwist/sw.js`**. Registration stays **off in development** for predictable fast refresh.
+The web app uses **Next.js 16** with the **default Turbopack** pipeline (`next dev`, `next build`). The **`@oompa/web` dev script binds port 3000** (`next dev -p 3000`) so a global **`PORT`** environment variable cannot move the app onto **3001** (where the API listens). PWA is implemented with **Serwist** (`@serwist/turbopack`): worker source in `apps/web/app/sw.ts`, service worker URL **`/serwist/sw.js`**. Registration stays **off in development** for predictable fast refresh.
+
+**Production builds** run with `NODE_ENV=production` in the web package `build` script. If your shell sets `NODE_ENV` to something else (for example `test`), `next build` / prerender can fail until you unset it or rely on that script.
 
 Point the browser at the API from `apps/web` (rewrites `/api/v1/*`): set **`API_URL`** for the Next server to proxy API routes. **Do not set `NEXT_PUBLIC_API_URL` for normal local dev** — the browser client must call same-origin `/api/v1` so the session cookie is stored for the web host (see `apps/web/.env.example`). Example:
 

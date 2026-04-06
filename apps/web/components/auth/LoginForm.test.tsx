@@ -1,5 +1,5 @@
 /** @vitest-environment happy-dom */
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { LoginForm } from './LoginForm'
@@ -41,10 +41,9 @@ describe('LoginForm', () => {
   })
 
   it('shows validation toast when email and password are missing (action)', async () => {
-    const { container } = render(<LoginForm />)
-    const form = container.querySelector('form')
-    expect(form).not.toBeNull()
-    fireEvent.submit(form!)
+    const user = userEvent.setup()
+    render(<LoginForm />)
+    await user.click(screen.getByRole('button', { name: /^sign in$/i }))
     await waitFor(() => {
       expect(toastError).toHaveBeenCalledWith('Enter your email and password.')
     })

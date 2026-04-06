@@ -1,6 +1,75 @@
 # UX / PWA checklist run log
 
-Date: **2026-04-06** — **Latest agent pass (Browser MCP + curl + `pnpm -r` test/lint/typecheck + login helper)**
+Date: **2026-04-07** — **QA pass (Browser MCP, curl API matrix, monorepo verify, production build spot-check)**
+
+**Environment:** API `http://127.0.0.1:3001`, web dev `http://127.0.0.1:3000` with `API_URL=http://127.0.0.1:3001`. [`apps/web/package.json`](../../apps/web/package.json) pins **`next dev -p 3000`** so a global `PORT` env variable cannot bind the web app to the API port. **Do not set `NEXT_PUBLIC_API_URL`** for normal local dev (same-origin session cookie on `:3000`).
+
+**Production spot-check:** `pnpm --filter @oompa/web build` then `pnpm exec next start -p 3020` from `apps/web` — `GET /manifest.webmanifest` and `GET /serwist/sw.js` returned **200**.
+
+### Engineering changes this pass
+
+| Item | Change |
+| ---- | ------ |
+| Web dev port | [`apps/web/package.json`](../../apps/web/package.json) — `dev`: `next dev -p 3000` |
+| Production build | `build`: `NODE_ENV=production next build` — avoids prerender/runtime errors when a parent shell sets a non-production `NODE_ENV` (e.g. `test`) |
+| Login UX / automation | [`LoginForm.tsx`](../../apps/web/components/auth/LoginForm.tsx) — `role="form"` + `type="button"` submit (no native `<form method="post">` document POST to `/login`); controlled email/password state |
+
+### Browser MCP vs [web-shell-pwa.md](../ux/web-shell-pwa.md)
+
+| Check | Result | Notes |
+| ----- | ------ | ----- |
+| Marketing `/` — skip link, hero, CTAs | **Pass** | Skip to main content, Log in, Open your workspace, How it works; outcome copy |
+| `/offline` — H1 + Try home | **Pass** | Title `Offline · Oompa` |
+| `/login` — shell | **Pass** | Email, Password, Sign in, Back to product page |
+| **Sign in** via MCP (fill + click) | **Partial** | No `POST /api/v1/auth/login` in MCP network log; **curl** session flow and **Vitest** [`LoginForm.test.tsx`](../../apps/web/components/auth/LoginForm.test.tsx) **Pass**. Confirm in **real Chrome**. |
+| Auth gate `/deals` logged out | **Pass** | `http://127.0.0.1:3000/deals` → `/login?from=%2Fdeals` |
+| Global 404 | **Pass** | Title `Page not found · Oompa`; MCP a11y on **dev** may show Next overlay controls (Show Details / Reload) — prefer `curl` or prod build for marketing copy only |
+
+### API matrix (curl, `127.0.0.1:3001` and rewrite via `:3000`)
+
+| Request | Expected | Result |
+| ------- | -------- | ------ |
+| `GET /api/v1/health` — `Cache-Control` | `public, max-age=5` | **Pass** |
+| `GET /health` — `Cache-Control` | `public, max-age=5` | **Pass** |
+| `GET /api/v1/deals` (no cookie) | 401 | **Pass** |
+| `POST /api/v1/auth/login` `{}` | 400 | **Pass** |
+| `POST /api/v1/auth/login` bad password | 401 | **Pass** |
+| `POST /api/v1/auth/login` valid user | 200 + `Set-Cookie` | **Pass** |
+| `GET /api/v1/deals` (with session) | 200 | **Pass** |
+| `GET /api/v1/auth/me` | 200 | **Pass** |
+| `GET /api/v1/admin/ping` (ADMIN session) | 200 | **Pass** |
+| `GET /api/v1/dashboard` | 200 | **Pass** (path is `/api/v1/dashboard`, not `/dashboard/summary`) |
+| `GET /api/v1/attention` | 200 | **Pass** |
+| `POST /api/v1/auth/logout` `{}` | 204 | **Pass** |
+| `GET /api/v1/deals` after logout | 401 | **Pass** |
+| `GET /api/v1/health` via `:3000` rewrite | 200 | **Pass** |
+| `GET /manifest.webmanifest` (`:3000` dev) | 200 | **Pass** |
+
+### [docs/testing/pwa-web-client.md](./pwa-web-client.md) (production server)
+
+| Check | Result | Notes |
+| ----- | ------ | ----- |
+| `pnpm --filter @oompa/web build` | **Pass** | After `NODE_ENV=production` in build script |
+| `GET /manifest.webmanifest` (`next start`) | **Pass** | 200 on port 3020 |
+| `GET /serwist/sw.js` | **Pass** | 200 |
+| DevTools / Lighthouse / offline money-truth | **Not run** | Human follow-up in real Chrome |
+
+### Automated
+
+| Command | Result |
+| ------- | ------ |
+| `pnpm -r test` / `lint` / `typecheck` | **Pass** |
+| `pnpm --filter @oompa/web verify:pwa` | **Pass** |
+
+### Follow-up (human)
+
+1. **Real Chrome:** Logged-in shell, deal CRUD, `confirm()` deletes, **View invoice** (`target=_blank`), full keyboard order from skip link.
+2. **Shell env:** If `next start` warns about non-standard `NODE_ENV`, use a clean terminal or `unset NODE_ENV` before starting.
+3. **Local login user:** Create or upsert your own dev user; do not rely on committed credentials.
+
+---
+
+Date: **2026-04-06** — **Earlier pass (Browser MCP + curl + `pnpm -r` test/lint/typecheck + login helper)**
 
 **This pass (Browser MCP on `http://127.0.0.1:3000`, curl, automated verify)**
 
