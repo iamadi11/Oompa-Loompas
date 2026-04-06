@@ -10,13 +10,13 @@
 | Manifest | `apps/web/app/manifest.ts` (Next.js App Router metadata convention) |
 | Icons | `apps/web/public/icons/` — PNG, maskable-safe (e.g. 192, 512) |
 | Root metadata | `apps/web/app/layout.tsx` — `themeColor`, `appleWebApp`, `icons` as needed |
-| Service worker | Generated into `public/` via `@ducanh2912/next-pwa` wrapped in `next.config.mjs` |
+| Service worker | **`@serwist/turbopack`:** `withSerwist` in `next.config.mjs`, worker `app/sw.ts`, App Router route `app/serwist/[path]/route.ts` serves **`/serwist/sw.js`** (build output, not committed). Client: `components/pwa/SerwistRegister.tsx` |
 | Offline UI | `apps/web/app/offline/page.tsx` — linked from SW fallback / navigation failure |
 
 ## Service worker
 
-- **Development:** SW generation disabled so dev servers behave normally.
-- **Production:** Precaches the app shell and static assets per the PWA plugin defaults, with **additional runtime rules** keeping `/api/*` on **network-only** (no cache-first financial data).
+- **Development:** SW **registration** disabled (`SerwistProvider` / `NODE_ENV !== 'production'`) so dev servers behave normally.
+- **Production:** Precaches the app shell and static assets via Serwist (including `defaultCache` from `@serwist/turbopack/worker`), with **runtime rules** keeping **`/api/v1`** on **network-only** (see `app/sw.ts` — no cache-first financial data).
 
 ## HTTPS
 

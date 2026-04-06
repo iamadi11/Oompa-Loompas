@@ -29,7 +29,7 @@ pnpm install
 pnpm dev
 ```
 
-The web app uses **Next.js 16** with **webpack** for dev and build (required for `@ducanh2912/next-pwa`). `apps/web` scripts already pass `--webpack`.
+The web app uses **Next.js 16** with the **default Turbopack** pipeline (`next dev`, `next build`). PWA is implemented with **Serwist** (`@serwist/turbopack`): worker source in `apps/web/app/sw.ts`, service worker URL **`/serwist/sw.js`**. Registration stays **off in development** for predictable fast refresh.
 
 Point the browser at the API from `apps/web` (rewrites `/api/v1/*`): set **`API_URL`** for the Next server to proxy API routes. **Do not set `NEXT_PUBLIC_API_URL` for normal local dev** — the browser client must call same-origin `/api/v1` so the session cookie is stored for the web host (see `apps/web/.env.example`). Example:
 
