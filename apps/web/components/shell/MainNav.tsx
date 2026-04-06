@@ -111,19 +111,21 @@ export function AppShellHeader() {
       </div>
       <div
         id={menuId}
+        hidden={!menuOpen}
         className={
           menuOpen
             ? 'md:hidden border-t border-line/70 bg-surface-raised/95 pb-4 pt-1 shadow-inner'
             : 'hidden'
         }
-        aria-hidden={!menuOpen}
       >
-        <nav className="flex flex-col gap-0.5 pt-2" aria-label="Main">
-          <NavLinks
-            onNavigate={() => setMenuOpen(false)}
-            className="!flex !w-full !justify-start"
-          />
-        </nav>
+        {menuOpen ? (
+          <nav className="flex flex-col gap-0.5 pt-2" aria-label="Main">
+            <NavLinks
+              onNavigate={() => setMenuOpen(false)}
+              className="!flex !w-full !justify-start"
+            />
+          </nav>
+        ) : null}
       </div>
     </div>
   )
