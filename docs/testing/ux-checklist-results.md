@@ -1,6 +1,6 @@
 # UX / PWA checklist run log
 
-Date: **2026-04-06** (re-run: Cursor IDE Browser MCP on `http://127.0.0.1:3000` after logout + nav fixes)
+Date: **2026-04-06** — latest MCP pass: same URL; **logged-out marketing**, **login**, **create deal** (form → redirect to detail), **logout → `/login`**; plus **curl API matrix** below.
 
 Environment: `pnpm --filter @oompa/api dev` + `pnpm --filter @oompa/web dev` (ports **3001** / **3000**). Prefer **`http://127.0.0.1:3000/`** for MCP (avoids odd history / client quirks vs `localhost`).
 
@@ -24,12 +24,13 @@ Environment: `pnpm --filter @oompa/api dev` + `pnpm --filter @oompa/web dev` (po
 
 | Flow | Result | Notes |
 |------|--------|--------|
-| Marketing `/` (logged out) | **Pass** | Hero, outcome copy, Log in / Open workspace / How it works. |
+| Marketing `/` (logged out) | **Pass** | Document title + hero; **Log in**, **Open your workspace**, **How it works**; skip link. |
+| Login page `/login` | **Pass** | Email, Password, **Sign in**, **Back to product page** (MCP after logout). |
 | Login → session | **Pass** | POST via same-origin `/api/v1/...` rewrite; redirect to `/dashboard`. |
-| Log out | **Pass** (after fix) | **Bug fixed:** `ApiClient` sent `Content-Type: application/json` with **no body**; Fastify returned **400** (`FST_ERR_CTP_EMPTY_JSON_BODY`), cookie never cleared. Logout now POSTs `{}`. **Navigation:** `window.location.assign('/login')` after logout for a full load + middleware cookie read. |
+| Log out | **Pass** | MCP: **Signing out…** → full navigation to `/login` with **Sign in** visible; API clears cookie (`POST` `{}` + `204` through `:3000` rewrite). |
 | Overview `/dashboard` | **Pass** | Summary cards, recent deals, New deal, View all; Admin + Log out when `ADMIN`. |
 | Deals list `/deals` | **Pass** | All / Needs attention, Add deal, deal cards. |
-| New deal `/deals/new` | **Pass** | Create → redirect to deal detail. |
+| New deal `/deals/new` | **Pass** | Required fields + currency + notes; **Create deal** → redirect to deal detail (MCP end-to-end smoke). |
 | Deal detail — payment | **Pass** | Add payment; Mark received; summary updates (Received / Outstanding). |
 | Deal detail — deliverable | **Pass** | Add deliverable (`scroll-padding-top` on `html` for sticky header). |
 | Payment delete | **Not run** | `confirm()` non-blocking in MCP — use real Chrome for dialog UX. |
@@ -82,12 +83,27 @@ Environment: `pnpm --filter @oompa/api dev` + `pnpm --filter @oompa/web dev` (po
 
 ---
 
+## API breaking points (curl smoke, `http://127.0.0.1:3001`)
+
+| Request | Expected | Result (2026-04-06) |
+|---------|----------|---------------------|
+| `GET /api/v1/deals` (no cookie) | **401** | **Pass** |
+| `GET /api/v1/health` | **200** | **Pass** |
+| `GET /api/v1/admin/ping` (no cookie) | **401** | **Pass** |
+| `POST /api/v1/auth/login` body `{}` | **400** | **Pass** |
+| `POST /api/v1/auth/login` wrong creds | **401** | **Pass** |
+| `GET /api/v1/deals` (valid session) | **200** | **Pass** |
+| `POST /api/v1/auth/logout` with `{}` via **Next `:3000`** rewrite | **204** | **Pass** |
+| `GET /api/v1/deals` after logout | **401** | **Pass** |
+
+---
+
 ## Automated / API
 
 | Area | Result |
 |------|--------|
-| `pnpm test` (monorepo) | **Pass** | After logout body + auth tests + coverage. |
-| Live API | **Pass** | Session + tenancy exercised via browser-driven flows; logout returns **204** with JSON body `{}` through `:3000` rewrite. |
+| `pnpm test` (monorepo) | **Pass** | Auth, deals, payments, coverage thresholds. |
+| Live API + browser | **Pass** | Session, CRUD create (MCP), logout **204** + cookie cleared through `:3000` rewrite. |
 
 ---
 
@@ -95,4 +111,5 @@ Environment: `pnpm --filter @oompa/api dev` + `pnpm --filter @oompa/web dev` (po
 
 1. Production: `pnpm --filter @oompa/web build && pnpm --filter @oompa/web start` → finish `docs/testing/pwa-web-client.md` DevTools checklist (Manifest, SW, Lighthouse).  
 2. Real Chrome: full Tab order from skip link through every primary CTA; **confirm()** flows for delete payment / delete deal.  
-3. Invoice HTML: open **View invoice** in a real tab and verify auth cookie + HTML payload (MCP often does not follow `target=_blank`).
+3. Invoice HTML: open **View invoice** in a real tab and verify auth cookie + HTML payload (MCP often does not follow `target=_blank`).  
+4. Optional DB cleanup: MCP smoke run may create a deal titled **MCP Smoke Deal 2026-04-06** — delete from the UI or DB if you do not want the fixture.
