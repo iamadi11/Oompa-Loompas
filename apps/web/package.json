@@ -12,12 +12,14 @@
     "lint": "eslint .",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
-    "verify:pwa": "node scripts/check-pwa-files.mjs"
+    "verify:pwa": "node scripts/check-pwa-files.mjs",
+    "bones:build": "node ./scripts/bones-build.mjs"
   },
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
     "@oompa/types": "workspace:*",
     "@oompa/utils": "workspace:*",
+    "boneyard-js": "^1.6.3",
     "motion": "^12.38.0",
     "next": "^16.2.2",
     "react": "^19.2.0",

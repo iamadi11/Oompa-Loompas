@@ -40,4 +40,13 @@ cd apps/web && API_URL=http://127.0.0.1:3001 pnpm dev
 
 Use the root and package `package.json` scripts for typecheck, lint, and tests. UX / PWA checklist runs are logged in [docs/testing/ux-checklist-results.md](./docs/testing/ux-checklist-results.md).
 
+### Workspace skeletons ([boneyard-js](https://github.com/0xGF/boneyard))
+
+Route-level `loading.tsx` under `apps/web/app/(workspace)/` uses pre-captured bones in [`apps/web/bones/`](./apps/web/bones/). Regenerate after changing capture fixtures or layout:
+
+1. `pnpm --filter @oompa/web build && pnpm --filter @oompa/web start -p 3020` (use a free port if needed).
+2. In another shell: `BONEYARD_BASE_URL=http://127.0.0.1:3020 pnpm --filter @oompa/web bones:build` (default base is `http://127.0.0.1:3020`).
+
+Capture routes (noindex) live under `/boneyard-capture/*`. **Production `next start`** is required for a faithful capture; `next dev` often produces empty layout metrics for the CLI.
+
 For a **fresh database**, apply migrations (`pnpm --filter @oompa/db exec prisma migrate deploy`) and seed or create a user (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` when there are no deals). See `apps/api/.env.example` and `docs/architecture/auth-and-rbac.md`.

@@ -1,4 +1,5 @@
 import Fastify from 'fastify'
+import compress from '@fastify/compress'
 import sensible from '@fastify/sensible'
 import cookie from '@fastify/cookie'
 import { corsPlugin } from './plugins/cors.js'
@@ -23,12 +24,16 @@ export async function buildServer() {
   })
 
   await fastify.register(sensible)
+  await fastify.register(compress)
   await fastify.register(cookie)
   await fastify.register(corsPlugin)
   await fastify.register(authPlugin)
 
   /** Legacy root probe (CORS tests, simple uptime). Prefer `GET /api/v1/health` for versioned monitoring. */
-  fastify.get('/health', async () => ({ status: 'ok', timestamp: new Date().toISOString() }))
+  fastify.get('/health', async (_request, reply) => {
+    void reply.header('Cache-Control', 'public, max-age=5')
+    return { status: 'ok', timestamp: new Date().toISOString() }
+  })
 
   await fastify.register(healthV1Routes, { prefix: '/api/v1' })
   await fastify.register(createAuthRoutes(fastify), { prefix: '/api/v1/auth' })

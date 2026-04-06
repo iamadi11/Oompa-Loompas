@@ -2,7 +2,7 @@
 
 import type { Route } from 'next'
 import { useRouter } from 'next/navigation'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../../lib/api'
 import { readNamedInput } from '../../lib/forms/read-named-input'
 
@@ -16,6 +16,17 @@ export function LoginForm({ redirectFrom = null }: LoginFormProps) {
   const formRef = useRef<HTMLFormElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
+
+  /** Block real document navigation (`POST /login`) if submit fires before/alongside React's handler (e.g. automation). */
+  useEffect(() => {
+    const form = formRef.current
+    if (!form) return
+    const blockDocumentSubmit = (e: Event) => {
+      e.preventDefault()
+    }
+    form.addEventListener('submit', blockDocumentSubmit, true)
+    return () => form.removeEventListener('submit', blockDocumentSubmit, true)
+  }, [])
 
   const runLogin = useCallback(async () => {
     const form = formRef.current
@@ -49,12 +60,6 @@ export function LoginForm({ redirectFrom = null }: LoginFormProps) {
   }, [router, redirectFrom])
 
   function onFormSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    void runLogin()
-  }
-
-  /** Separate path for button click: some automation tools fire click without a reliable `submit` event. */
-  function onSignInClick(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault()
     void runLogin()
   }
@@ -101,9 +106,8 @@ export function LoginForm({ redirectFrom = null }: LoginFormProps) {
         </p>
       ) : null}
       <button
-        type="button"
+        type="submit"
         disabled={pending}
-        onClick={onSignInClick}
         className="w-full rounded-xl bg-brand-700 text-white text-sm font-semibold py-3 shadow-sm border border-brand-800/20 hover:bg-brand-800 disabled:opacity-60 transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-raised"
       >
         {pending ? 'Signing in…' : 'Sign in'}

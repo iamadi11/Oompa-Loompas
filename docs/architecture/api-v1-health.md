@@ -37,3 +37,4 @@ O(1) CPU; no I/O. Safe under high probe frequency; rate-limit at edge if abused.
 - **Deploy:** standard API deploy; no migration.
 - **Rollback:** remove route registration; clients fall back to **`/health`**.
 - **Monitoring:** alert on non-200 or missing JSON fields in synthetic checks.
+- **Caching:** `GET /api/v1/health` and legacy `GET /health` send `Cache-Control: public, max-age=5` so edge probes can cache briefly without affecting authenticated JSON routes (which remain `no-store` on the web rewrite path where applicable).

@@ -5,13 +5,16 @@ import type { FastifyInstance } from 'fastify'
  * that only allow traffic to the API prefix.
  */
 export async function healthV1Routes(fastify: FastifyInstance): Promise<void> {
-  fastify.get('/health', async () => ({
-    data: {
-      status: 'ok' as const,
-      service: '@oompa/api',
-    },
-    meta: {
-      timestamp: new Date().toISOString(),
-    },
-  }))
+  fastify.get('/health', async (_request, reply) => {
+    void reply.header('Cache-Control', 'public, max-age=5')
+    return {
+      data: {
+        status: 'ok' as const,
+        service: '@oompa/api',
+      },
+      meta: {
+        timestamp: new Date().toISOString(),
+      },
+    }
+  })
 }

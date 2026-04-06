@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { cache } from 'react'
 import type { Deal, Payment, Deliverable } from '@oompa/types'
 import { formatCurrency } from '@oompa/utils'
 import { StatusBadge } from '../../../../components/ui/Badge'
@@ -15,7 +16,7 @@ interface Props {
 const panelClass =
   'rounded-2xl border border-line/90 bg-surface-raised p-5 sm:p-6 shadow-card'
 
-async function getDeal(id: string): Promise<Deal | null> {
+async function loadDeal(id: string): Promise<Deal | null> {
   try {
     const res = await serverApiFetch(`/api/v1/deals/${id}`)
     if (res.status === 404) return null
@@ -26,6 +27,9 @@ async function getDeal(id: string): Promise<Deal | null> {
     return null
   }
 }
+
+/** Dedupes `GET /deals/:id` when metadata + page both need the deal in one RSC request. */
+const getDeal = cache(loadDeal)
 
 async function getPayments(dealId: string): Promise<Payment[]> {
   try {

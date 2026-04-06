@@ -15,6 +15,7 @@ describe('GET /health', () => {
     )
     const ts = (body as { timestamp: string }).timestamp
     expect(() => new Date(ts).toISOString()).not.toThrow()
+    expect(response.headers['cache-control']).toBe('public, max-age=5')
     await fastify.close()
   })
 })
@@ -36,6 +37,7 @@ describe('GET /api/v1/health', () => {
     })
     const meta = (body as { meta: { timestamp: string } }).meta
     expect(() => new Date(meta.timestamp).toISOString()).not.toThrow()
+    expect(response.headers['cache-control']).toBe('public, max-age=5')
     await fastify.close()
   })
 })
