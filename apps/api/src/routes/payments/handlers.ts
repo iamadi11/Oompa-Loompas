@@ -10,6 +10,11 @@ import {
 } from '@oompa/types'
 import { buildPaymentInvoiceHtml, validate } from '@oompa/utils'
 import { NotFoundError, ValidationError, sendError } from '../../lib/errors.js'
+import {
+  readPaymentInvoiceDocumentLabel,
+  readPaymentInvoiceIssuerEnv,
+  readPaymentInvoicePlaceOfSupply,
+} from '../../lib/payment-invoice-env.js'
 
 type DbPayment = {
   id: string
@@ -165,41 +170,73 @@ export async function getPaymentInvoice(
 ): Promise<void> {
   const { dealId, paymentId } = request.params
 
-  const payment = await prisma.payment.findUnique({
-    where: { id: paymentId },
-    include: {
-      deal: {
-        select: {
-          id: true,
-          title: true,
-          brandName: true,
-          currency: true,
-          notes: true,
+  const nowIso = new Date().toISOString()
+
+  const assigned = await prisma.$transaction(async (tx) => {
+    await tx.$executeRaw(Prisma.sql`SELECT 1 FROM payments WHERE id = ${paymentId} FOR UPDATE`)
+
+    const row = await tx.payment.findUnique({
+      where: { id: paymentId },
+      include: {
+        deal: {
+          select: {
+            title: true,
+            brandName: true,
+            currency: true,
+            notes: true,
+          },
         },
       },
-    },
+    })
+
+    if (!row || row.dealId !== dealId) {
+      return null
+    }
+
+    let invoiceNumber = row.invoiceNumber
+    if (!invoiceNumber) {
+      const counter = await tx.invoiceCounter.upsert({
+        where: { id: 'singleton' },
+        create: { id: 'singleton', lastSeq: 1 },
+        update: { lastSeq: { increment: 1 } },
+      })
+      invoiceNumber = `INV-${String(counter.lastSeq).padStart(8, '0')}`
+      await tx.payment.update({
+        where: { id: paymentId },
+        data: { invoiceNumber },
+      })
+    }
+
+    return { row, invoiceNumber }
   })
 
-  if (!payment || payment.dealId !== dealId) {
+  if (!assigned) {
     return sendError(reply, new NotFoundError('Payment', paymentId))
   }
 
+  const { row, invoiceNumber } = assigned
+
   const html = buildPaymentInvoiceHtml({
-    generatedAtIso: new Date().toISOString(),
+    generatedAtIso: nowIso,
+    invoiceDateIso: nowIso,
+    invoiceNumber,
+    documentLabel: readPaymentInvoiceDocumentLabel(),
+    issuer: readPaymentInvoiceIssuerEnv(),
+    placeOfSupply: readPaymentInvoicePlaceOfSupply(),
     deal: {
-      title: payment.deal.title,
-      brandName: payment.deal.brandName,
-      currency: payment.deal.currency,
-      notes: payment.deal.notes,
+      title: row.deal.title,
+      brandName: row.deal.brandName,
+      currency: row.deal.currency,
+      notes: row.deal.notes,
     },
     payment: {
-      id: payment.id,
-      amount: Number(payment.amount),
-      currency: payment.currency,
-      status: payment.status,
-      dueDateIso: payment.dueDate?.toISOString() ?? null,
-      receivedAtIso: payment.receivedAt?.toISOString() ?? null,
-      notes: payment.notes,
+      id: row.id,
+      amount: Number(row.amount),
+      currency: row.currency,
+      status: row.status,
+      dueDateIso: row.dueDate?.toISOString() ?? null,
+      receivedAtIso: row.receivedAt?.toISOString() ?? null,
+      notes: row.notes,
     },
   })
 

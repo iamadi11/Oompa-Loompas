@@ -79,6 +79,7 @@ export function AddPaymentForm({ dealId, dealCurrency, onSuccess, onCancel }: Ad
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Input
+          id="deal-payment-amount"
           label="Amount"
           name="amount"
           type="number"
@@ -91,6 +92,7 @@ export function AddPaymentForm({ dealId, dealCurrency, onSuccess, onCancel }: Ad
           error={fieldErrors['amount']}
         />
         <Input
+          id="deal-payment-due-date"
           label="Due date"
           name="dueDate"
           type="date"
@@ -100,7 +102,8 @@ export function AddPaymentForm({ dealId, dealCurrency, onSuccess, onCancel }: Ad
         />
       </div>
       <Input
-        label="Notes"
+        id="deal-payment-notes"
+        label="Notes (optional)"
         name="notes"
         value={form.notes}
         onChange={(e) => setField('notes', e.target.value)}

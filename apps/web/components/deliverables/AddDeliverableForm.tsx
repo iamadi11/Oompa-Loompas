@@ -112,6 +112,7 @@ export function AddDeliverableForm({ dealId, onSuccess, onCancel }: AddDeliverab
       )}
 
       <Input
+        id="deal-deliverable-title"
         label="Title"
         name="title"
         type="text"
@@ -124,6 +125,7 @@ export function AddDeliverableForm({ dealId, onSuccess, onCancel }: AddDeliverab
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Select
+          id="deal-deliverable-platform"
           label="Platform"
           name="platform"
           value={form.platform}
@@ -134,6 +136,7 @@ export function AddDeliverableForm({ dealId, onSuccess, onCancel }: AddDeliverab
           error={fieldErrors['platform']}
         />
         <Select
+          id="deal-deliverable-type"
           label="Type"
           name="type"
           value={form.type}
@@ -147,6 +150,7 @@ export function AddDeliverableForm({ dealId, onSuccess, onCancel }: AddDeliverab
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Input
+          id="deal-deliverable-due-date"
           label="Due date"
           name="dueDate"
           type="date"
@@ -155,7 +159,8 @@ export function AddDeliverableForm({ dealId, onSuccess, onCancel }: AddDeliverab
           error={fieldErrors['dueDate']}
         />
         <Input
-          label="Notes"
+          id="deal-deliverable-notes"
+          label="Notes (optional)"
           name="notes"
           value={form.notes}
           onChange={(e) => setField('notes', e.target.value)}

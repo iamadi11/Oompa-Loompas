@@ -82,15 +82,16 @@ model Deal {
 }
 
 model Payment {
-  id         String        @id @default(uuid())
-  dealId     String        @map("deal_id")
-  deal       Deal          @relation(fields: [dealId], references: [id], onDelete: Cascade)
-  amount     Decimal       @db.Decimal(15, 2)
-  currency   Currency      @default(INR)
-  status     PaymentStatus @default(PENDING)
-  dueDate    DateTime?     @map("due_date")
-  receivedAt DateTime?     @map("received_at")
-  notes      String?       @db.Text
+  id            String        @id @default(uuid())
+  dealId        String        @map("deal_id")
+  deal          Deal          @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  amount        Decimal       @db.Decimal(15, 2)
+  currency      Currency      @default(INR)
+  status        PaymentStatus @default(PENDING)
+  dueDate       DateTime?     @map("due_date")
+  receivedAt    DateTime?     @map("received_at")
+  notes         String?       @db.Text
+  invoiceNumber String?       @unique @map("invoice_number") @db.VarChar(32)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -99,6 +100,13 @@ model Payment {
   @@index([status])
   @@index([dueDate])
   @@map("payments")
+}
+
+model InvoiceCounter {
+  id      String @id
+  lastSeq Int    @default(0) @map("last_seq")
+
+  @@map("invoice_counters")
 }
 
 model Deliverable {

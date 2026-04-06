@@ -11,6 +11,9 @@ const mockPrisma = prisma as typeof prisma & {
     update: ReturnType<typeof vi.fn>
     delete: ReturnType<typeof vi.fn>
   }
+  invoiceCounter: { upsert: ReturnType<typeof vi.fn> }
+  $transaction: ReturnType<typeof vi.fn>
+  $executeRaw: ReturnType<typeof vi.fn>
 }
 
 const DEAL_ID = '550e8400-e29b-41d4-a716-446655440000'
@@ -27,6 +30,7 @@ const mockPayment = {
   dueDate: null,
   receivedAt: null,
   notes: null,
+  invoiceNumber: null as string | null,
   createdAt: new Date('2026-04-04T00:00:00.000Z'),
   updatedAt: new Date('2026-04-04T00:00:00.000Z'),
 }
@@ -338,6 +342,27 @@ describe('GET /api/v1/deals/:dealId/payments/:paymentId/invoice', () => {
     expect(response.payload).toContain('Invoice')
     expect(response.payload).toContain('Acme Brand')
     expect(response.payload).toContain(PAYMENT_ID)
+    expect(response.payload).toContain('INV-00000001')
+    expect(mockPrisma.invoiceCounter.upsert).toHaveBeenCalled()
+    await fastify.close()
+  })
+
+  it('reuses stored invoice number and does not bump counter', async () => {
+    mockPrisma.invoiceCounter.upsert.mockClear()
+    mockPrisma.payment.findUnique.mockResolvedValue({
+      ...mockPaymentWithDeal,
+      invoiceNumber: 'INV-00000042',
+    })
+
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'GET',
+      url: `/api/v1/deals/${DEAL_ID}/payments/${PAYMENT_ID}/invoice`,
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(response.payload).toContain('INV-00000042')
+    expect(mockPrisma.invoiceCounter.upsert).not.toHaveBeenCalled()
     await fastify.close()
   })
 

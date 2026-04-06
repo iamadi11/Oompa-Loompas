@@ -23,7 +23,14 @@ export const prisma = {
     update: vi.fn(),
     delete: vi.fn(),
   },
+  invoiceCounter: {
+    upsert: vi.fn().mockResolvedValue({ id: 'singleton', lastSeq: 1 }),
+  },
+  $executeRaw: vi.fn().mockResolvedValue(undefined),
+  $transaction: vi.fn(),
 }
+
+prisma.$transaction.mockImplementation((fn: (tx: typeof prisma) => unknown) => Promise.resolve(fn(prisma)))
 
 export const Prisma = {
   Decimal: class Decimal {
@@ -38,4 +45,5 @@ export const Prisma = {
       return String(this.val)
     }
   },
+  sql: (strings: TemplateStringsArray, ...values: unknown[]) => ({ strings, values }),
 }

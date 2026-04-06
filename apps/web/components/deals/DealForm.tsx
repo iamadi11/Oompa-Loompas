@@ -167,12 +167,12 @@ export function DealForm({ deal, mode }: DealFormProps) {
       </div>
 
       <div>
-        <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1.5">
+        <label htmlFor="deal-notes" className="block text-sm font-medium text-gray-700 mb-1.5">
           Notes
           <span className="text-gray-400 font-normal ml-1">(optional)</span>
         </label>
         <textarea
-          id="notes"
+          id="deal-notes"
           name="notes"
           rows={3}
           value={form.notes}

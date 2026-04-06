@@ -4,6 +4,11 @@ import { buildPaymentInvoiceHtml } from '../payment-invoice-html.js'
 describe('buildPaymentInvoiceHtml', () => {
   const base = {
     generatedAtIso: '2026-04-06T12:00:00.000Z',
+    invoiceDateIso: '2026-04-06T12:00:00.000Z',
+    invoiceNumber: 'INV-00000001',
+    documentLabel: 'Invoice',
+    issuer: null,
+    placeOfSupply: null,
     deal: {
       title: 'Sponsored reel series',
       brandName: 'Acme Co',
@@ -26,21 +31,22 @@ describe('buildPaymentInvoiceHtml', () => {
       ...base,
       deal: { ...base.deal, brandName: '<script>', title: 'A & B' },
     })
-    expect(html).toContain('&lt;script&gt;')
+    expect(html).toContain('<strong>&lt;script&gt;</strong>')
     expect(html).toContain('A &amp; B')
-    expect(html).not.toContain('<script>')
   })
 
-  it('includes formatted amount and payment id reference', () => {
+  it('includes formatted amount, invoice number, and internal reference', () => {
     const html = buildPaymentInvoiceHtml(base)
+    expect(html).toContain('INV-00000001')
     expect(html).toContain(base.payment.id)
     expect(html).toMatch(/40|000|₹/)
   })
 
-  it('uses a main landmark and human-readable status', () => {
+  it('uses a main landmark, line items table, and human-readable status', () => {
     const html = buildPaymentInvoiceHtml(base)
     expect(html).toContain('<main id="invoice-content">')
-    expect(html).toContain('aria-label="Payment milestone details"')
+    expect(html).toContain('Description of supply')
+    expect(html).toContain('aria-label="Totals"')
     expect(html).toContain('>Pending</td>')
     expect(html).not.toContain('>PENDING</td>')
   })
@@ -50,7 +56,7 @@ describe('buildPaymentInvoiceHtml', () => {
       ...base,
       payment: { ...base.payment, dueDateIso: null },
     })
-    expect(html).not.toContain('>Due</th>')
+    expect(html).not.toContain('>Due date</th>')
   })
 
   it('renders payment and deal notes when present', () => {
@@ -70,5 +76,69 @@ describe('buildPaymentInvoiceHtml', () => {
     })
     expect(html).toContain('₹')
     expect(html).toContain('100')
+  })
+
+  it('renders issuer block when issuer is provided', () => {
+    const html = buildPaymentInvoiceHtml({
+      ...base,
+      issuer: {
+        legalName: 'Creator LLC',
+        addressLines: ['1 Main St', 'London'],
+        taxIdLines: ['VAT: GB123'],
+        email: 'billing@example.com',
+      },
+    })
+    expect(html).toContain('Creator LLC')
+    expect(html).toContain('1 Main St')
+    expect(html).toContain('VAT: GB123')
+    expect(html).toContain('billing@example.com')
+  })
+
+  it('renders issuer with legal name only when address, tax lines, and email are empty', () => {
+    const html = buildPaymentInvoiceHtml({
+      ...base,
+      issuer: {
+        legalName: 'Solo Creator',
+        addressLines: [],
+        taxIdLines: [],
+        email: null,
+      },
+    })
+    expect(html).toContain('Solo Creator')
+    expect(html).not.toMatch(/<p class="party-address"/)
+    expect(html).not.toMatch(/<ul class="tax-ids"/)
+    expect(html).not.toMatch(/<p class="party-email"/)
+  })
+
+  it('includes share and download controls', () => {
+    const html = buildPaymentInvoiceHtml(base)
+    expect(html).toContain('id="inv-print"')
+    expect(html).toContain('id="inv-copy"')
+    expect(html).toContain('id="inv-share"')
+    expect(html).toContain('id="inv-download"')
+  })
+
+  it('includes place of supply when set', () => {
+    const html = buildPaymentInvoiceHtml({
+      ...base,
+      placeOfSupply: 'Maharashtra, India',
+    })
+    expect(html).toContain('Maharashtra, India')
+  })
+
+  it('uses default line description when deal title is blank', () => {
+    const html = buildPaymentInvoiceHtml({
+      ...base,
+      deal: { ...base.deal, title: '   ' },
+    })
+    expect(html).toContain('Creator services (per deal)')
+  })
+
+  it('shows invalid date label when invoice date ISO is not parseable', () => {
+    const html = buildPaymentInvoiceHtml({
+      ...base,
+      invoiceDateIso: 'not-a-date',
+    })
+    expect(html).toContain('Invalid date')
   })
 })
