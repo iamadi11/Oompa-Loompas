@@ -2,11 +2,35 @@
 
 All notable changes to this repository are documented in this file.
 
-## Unreleased
+## [0.2.0] - 2026-04-06
 
-### `@oompa/db`
+### `@oompa/types` **0.2.0**
 
-- **`db:seed`:** implement [`packages/db/src/seed.ts`](./packages/db/src/seed.ts) (idempotent: skips when any deal exists). Fixes broken **`pnpm db:seed`** script that pointed at a missing file.
+- **Auth contracts:** `Role`, `AuthUser`, `LoginBody`, `MeResponse`, Zod schemas; `DEAL_STATUS_TRANSITIONS` consumed by the web deal form for **valid status edits**.
+
+### `@oompa/db` **0.2.0**
+
+- **Tenancy:** `User`, `Session`, `Deal.userId`, roles; migration [`20260407120000_users_sessions_deal_tenancy`](./packages/db/prisma/migrations/20260407120000_users_sessions_deal_tenancy/migration.sql).
+- **`db:seed`:** [`packages/db/src/seed.ts`](./packages/db/src/seed.ts) — idempotent (skips when any deal exists); **`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`** required when seeding an empty DB.
+
+### `@oompa/api` **0.2.0**
+
+- **Auth:** `POST /api/v1/auth/login`, `POST /api/v1/auth/logout`, `GET /api/v1/auth/me`; HTTP-only session cookie; **`clearCookie` attributes match `setCookie`** (logout reliably clears session).
+- **Guards:** Authenticated **`/api/v1/*`** (except public health + auth routes); domain handlers scoped by **`userId`** / deal ownership.
+- **RBAC probe:** `GET /api/v1/admin/ping` (**ADMIN** only).
+- **Env:** `SESSION_SECRET`, `SESSION_COOKIE_NAME`, `SESSION_TTL_DAYS`, seed vars — see [`apps/api/.env.example`](./apps/api/.env.example).
+
+### `@oompa/web` **0.2.0**
+
+- **Marketing vs app:** `/` landing; **`(workspace)`** shell for `/dashboard`, `/deals`, `/attention`, `/admin`; **`middleware.ts`** session gate + redirects.
+- **Login** and **RBAC UI** (Admin / Log out via `/me`); **Next rewrites** `/api/v1/*` → Fastify; client **`credentials: 'include'`**; **`serverApiFetch`** forwards cookies for RSC.
+- **Deal form (edit):** status dropdown limited to **allowed transitions** (matches API rules).
+- **UX:** `scroll-padding-top` on `html` for sticky shell; invoice links via **`paymentInvoiceHref`**.
+
+### Documentation / process
+
+- [Auth & RBAC](./docs/architecture/auth-and-rbac.md), [docs README](./docs/README.md), [UX checklist run](./docs/testing/ux-checklist-results.md).
+- **Release:** [RELEASE-0.2.0.md](./docs/releases/RELEASE-0.2.0.md) · **Decision:** [2026-04-06-auth-tenancy-release-0.2.0.md](./docs/decisions/2026-04-06-auth-tenancy-release-0.2.0.md) · **Ship gates:** [ship-gates-release-0.2.0-2026-04-06.md](./docs/testing/ship-gates-release-0.2.0-2026-04-06.md) · **Instrumentation:** [auth-tenancy-release-0.2.0.md](./docs/instrumentation/auth-tenancy-release-0.2.0.md) · **Retro:** [2026-04-06-auth-tenancy-release-0.2.0.md](./docs/retros/2026-04-06-auth-tenancy-release-0.2.0.md)
 
 ## [0.1.9] - 2026-04-06
 

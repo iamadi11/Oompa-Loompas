@@ -4,10 +4,7 @@ import { ForbiddenError, sendError } from '../../lib/errors.js'
 /**
  * RBAC probe: ADMIN-only. Documents the permission pattern for integration tests.
  */
-export async function getAdminPing(
-  request: FastifyRequest,
-  reply: FastifyReply,
-): Promise<void> {
+export function getAdminPing(request: FastifyRequest, reply: FastifyReply): void {
   const u = request.authUser
   if (!u?.roles.includes('ADMIN')) {
     sendError(reply, new ForbiddenError())

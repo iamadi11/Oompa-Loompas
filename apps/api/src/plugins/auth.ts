@@ -37,6 +37,7 @@ async function authenticate(
 
 export const authPlugin = fp(
   async function oompaAuth(fastify: FastifyInstance) {
+    await Promise.resolve()
     fastify.decorate('authenticate', authenticate)
   },
   { name: 'oompa-auth' },

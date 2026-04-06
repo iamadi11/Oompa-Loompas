@@ -91,10 +91,7 @@ export async function postLogout(
     .send()
 }
 
-export async function getMe(
-  request: FastifyRequest,
-  reply: FastifyReply,
-): Promise<void> {
+export function getMe(request: FastifyRequest, reply: FastifyReply): void {
   const u = request.authUser
   if (!u) {
     sendError(reply, new UnauthorizedError())

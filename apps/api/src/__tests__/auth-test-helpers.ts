@@ -30,15 +30,13 @@ export function mockSessionFindUnique(
 ): void {
   const { userId, email = 'creator@test.dev', roles = ['MEMBER'], expired = false } = options
   const hash = expectedSessionTokenHash()
-  findUnique.mockImplementation(
-    async (args: { where: { tokenHash: string }; include?: unknown }) => {
-      if (args.where.tokenHash !== hash) {
-        return null
-      }
-      return {
-        user: { id: userId, email, roles },
-        expiresAt: expired ? new Date(0) : new Date(Date.now() + 86_400_000),
-      }
-    },
-  )
+  findUnique.mockImplementation((args: { where: { tokenHash: string }; include?: unknown }) => {
+    if (args.where.tokenHash !== hash) {
+      return null
+    }
+    return {
+      user: { id: userId, email, roles },
+      expiresAt: expired ? new Date(0) : new Date(Date.now() + 86_400_000),
+    }
+  })
 }
