@@ -1,7 +1,7 @@
 # Browser MCP UX checklist — home overview unavailable state
 
 **Date:** 2026-04-06  
-**Latest MCP run:** 2026-04-06 (Cursor browser MCP) — **ports 3035 / 3036**; **`@oompa/api`** started on **:3001** before success-profile checks.  
+**Latest MCP run:** 2026-04-06 (Cursor browser MCP) — **`http://127.0.0.1:3040`** / **`http://127.0.0.1:3041`**; **`@oompa/api`** on **:3001** (dashboard **200**).  
 **Source:** [docs/ux/home-overview-unavailable-state.md](../ux/home-overview-unavailable-state.md)  
 **Reference:** [docs/ux/web-shell-pwa.md](../ux/web-shell-pwa.md) (global nav)
 
@@ -9,10 +9,10 @@
 
 | Profile | Next URL | `API_URL` / `NEXT_PUBLIC_API_URL` | Purpose |
 |--------|----------|-----------------------------------|---------|
-| **A — error** | `http://localhost:3035` | `http://127.0.0.1:59999` (no server) | Force `getDashboardData()` → `null` |
-| **B — success** | `http://localhost:3036` | `http://127.0.0.1:3001` (live `@oompa/api`) | Dashboard with data |
+| **A — error** | `http://127.0.0.1:3040` | `http://127.0.0.1:59999` (no server) | Force `getDashboardData()` → `null` |
+| **B — success** | `http://127.0.0.1:3041` | `http://127.0.0.1:3001` (live `@oompa/api`) | Dashboard with data |
 
-Use **two free ports** if **3020/3021** or **3000** are already taken (`EADDRINUSE`).
+**Embedded browser:** `http://localhost:<port>/` may resolve to **`about:blank`** in this environment; use **`http://127.0.0.1:<port>/`** for MCP (see **Fixes applied**).
 
 ### Commands (repeat this run)
 
@@ -20,14 +20,16 @@ Use **two free ports** if **3020/3021** or **3000** are already taken (`EADDRINU
 # Terminal 1 — API (required for profile B)
 cd apps/api && pnpm dev
 
-# Terminal 2 — success profile (example port 3036)
-cd apps/web && API_URL=http://127.0.0.1:3001 NEXT_PUBLIC_API_URL=http://127.0.0.1:3001 pnpm exec next dev -p 3036
+# Terminal 2 — success profile
+cd apps/web && API_URL=http://127.0.0.1:3001 NEXT_PUBLIC_API_URL=http://127.0.0.1:3001 pnpm exec next dev -p 3041
 
-# Terminal 3 — error profile (example port 3035)
-cd apps/web && API_URL=http://127.0.0.1:59999 NEXT_PUBLIC_API_URL=http://127.0.0.1:59999 pnpm exec next dev -p 3035
+# Terminal 3 — error profile
+cd apps/web && API_URL=http://127.0.0.1:59999 NEXT_PUBLIC_API_URL=http://127.0.0.1:59999 pnpm exec next dev -p 3040
 ```
 
-## Results (vs UX doc) — error path (profile **A**, `/` on **3035**)
+**Browser MCP:** open **`http://127.0.0.1:3040/`** and **`http://127.0.0.1:3041/`** (not `localhost` if you see a blank document).
+
+## Results (vs UX doc) — error path (profile **A**, `/` on **3040**)
 
 | Item | UX doc section | Result | Notes |
 |------|----------------|--------|-------|
@@ -42,7 +44,7 @@ cd apps/web && API_URL=http://127.0.0.1:59999 NEXT_PUBLIC_API_URL=http://127.0.0
 | **`nav` `aria-label="Main"`** | web shell | **Pass** | `role: navigation`, `name: Main`. |
 | **Attention** / **Deals** links | web shell | **Pass** | Present; no erroneous `current` on those routes. |
 
-## Results — success path sanity (profile **B**, `/` on **3036**)
+## Results — success path sanity (profile **B**, `/` on **3041**)
 
 | Item | UX doc section | Result | Notes |
 |------|----------------|--------|-------|
@@ -59,9 +61,9 @@ cd apps/web && API_URL=http://127.0.0.1:59999 NEXT_PUBLIC_API_URL=http://127.0.0
 
 ## Fixes applied from this checklist pass
 
-_None this run — all checked rows **Pass**._
+1. **MCP + `localhost`:** **`browser_navigate` to `http://localhost:3040/`** produced **`about:blank`** (no interactive tree). **Retry with `http://127.0.0.1:3040/`** — **Pass**. Checklist commands and URLs updated to prefer **`127.0.0.1`** for automated browser runs.
 
-Prior pass: **`OverviewFetchError`** **`section`** + **`aria-labelledby` / `aria-describedby`**, **`aria-live="polite"`**, **`aria-busy`**.
+Prior: **`OverviewFetchError`** **`section`** + **`aria-labelledby` / `aria-describedby`**, **`aria-live="polite"`**, **`aria-busy`**.
 
 ## Follow-ups
 
@@ -70,4 +72,4 @@ Prior pass: **`OverviewFetchError`** **`section`** + **`aria-labelledby` / `aria
 
 ## MCP environment note
 
-If the embedded browser shows only **Reload** / **Show Details** for `http://localhost:<port>/`, the dev server is not reachable from that browser context (wrong port, server stopped, or isolation). Confirm **Next** logs show **Ready** and try another free port.
+If the embedded browser shows **`about:blank`** or only **Reload** / **Show Details**, try **`127.0.0.1`** instead of **`localhost`**, confirm **Next** logs show **Ready**, and pick unused ports (e.g. **3040** / **3041**) if **EADDRINUSE**.
