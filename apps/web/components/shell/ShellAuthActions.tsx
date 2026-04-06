@@ -42,7 +42,7 @@ export function ShellAuthActions({ className = '', variant = 'inline', onNavigat
     } finally {
       setLoggingOut(false)
       onNavigate?.()
-      // Full navigation so middleware re-reads cookies (client transition can leave stale session in some embeds).
+      // Full navigation so Next proxy re-reads cookies (client transition can leave stale session in some embeds).
       window.location.assign('/login')
     }
   }

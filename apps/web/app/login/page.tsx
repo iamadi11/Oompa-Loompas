@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Suspense } from 'react'
 import { LoginForm } from '../../components/auth/LoginForm'
 import { APP_DISPLAY_NAME } from '../../lib/product-meta'
 
@@ -8,7 +7,15 @@ export const metadata: Metadata = {
   title: 'Log in',
 }
 
-export default function LoginPage() {
+interface LoginPageProps {
+  searchParams: Promise<{ from?: string | string[] }>
+}
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const sp = await searchParams
+  const rawFrom = sp['from']
+  const redirectFrom = typeof rawFrom === 'string' ? rawFrom : null
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-mesh-page bg-canvas">
       <div className="w-full max-w-md space-y-8">
@@ -22,9 +29,7 @@ export default function LoginPage() {
           <p className="text-sm text-stone-600">Sign in to your workspace</p>
         </div>
         <div className="rounded-2xl border border-line/90 bg-surface-raised p-6 sm:p-8 shadow-card">
-          <Suspense fallback={<p className="text-sm text-stone-500 text-center">Loading…</p>}>
-            <LoginForm />
-          </Suspense>
+          <LoginForm redirectFrom={redirectFrom} />
         </div>
         <p className="text-center text-xs text-stone-500">
           <Link href="/" className="text-brand-800 hover:text-brand-900 font-medium">

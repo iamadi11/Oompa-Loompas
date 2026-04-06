@@ -300,6 +300,7 @@ describe('getBrowserApiBase and paymentInvoiceHref', () => {
   })
   afterEach(() => {
     vi.unstubAllEnvs()
+    vi.unstubAllGlobals()
   })
 
   it('getBrowserApiBase trims trailing slash from env', () => {
@@ -316,5 +317,12 @@ describe('getBrowserApiBase and paymentInvoiceHref', () => {
   it('paymentInvoiceHref is relative when base is empty', () => {
     vi.unstubAllEnvs()
     expect(paymentInvoiceHref('d1', 'p1')).toBe('/api/v1/deals/d1/payments/p1/invoice')
+  })
+
+  it('getBrowserApiBase ignores NEXT_PUBLIC_API_URL in browser (same-origin session cookies)', () => {
+    vi.stubGlobal('window', {})
+    expect(getBrowserApiBase()).toBe('')
+    expect(paymentInvoiceHref('d1', 'p1')).toBe('/api/v1/deals/d1/payments/p1/invoice')
+    vi.unstubAllGlobals()
   })
 })

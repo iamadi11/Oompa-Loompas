@@ -17,10 +17,18 @@ import type {
 } from '@oompa/types'
 
 /**
- * Browser JSON + invoice link base. Empty string = same-origin `/api/v1` via Next rewrites (cookies on web host).
- * Set `NEXT_PUBLIC_API_URL` when the API is on another origin.
+ * Base URL for browser `fetch` and invoice links.
+ *
+ * In a real browser we always return `''` so calls use same-origin `/api/v1/*` (Next rewrites to `API_URL`).
+ * That way `credentials: 'include'` sends the session cookie issued for the **web** host — not a direct
+ * `http://127.0.0.1:3001` origin, which would not receive that cookie on `:3000`.
+ *
+ * `NEXT_PUBLIC_API_URL` applies only outside `window` (e.g. Vitest, some tooling).
  */
 export function getBrowserApiBase(): string {
+  if (typeof window !== 'undefined') {
+    return ''
+  }
   const raw = process.env['NEXT_PUBLIC_API_URL']
   if (typeof raw === 'string' && raw.trim().length > 0) {
     return raw.replace(/\/$/, '')

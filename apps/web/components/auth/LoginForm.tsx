@@ -1,14 +1,18 @@
 'use client'
 
 import type { Route } from 'next'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useCallback, useRef, useState } from 'react'
 import { api } from '../../lib/api'
 import { readNamedInput } from '../../lib/forms/read-named-input'
 
-export function LoginForm() {
+export interface LoginFormProps {
+  /** Post-login path from `?from=` (passed from server page — avoids `useSearchParams` suspend/hydration gaps). */
+  redirectFrom?: string | null
+}
+
+export function LoginForm({ redirectFrom = null }: LoginFormProps) {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const formRef = useRef<HTMLFormElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
@@ -32,7 +36,7 @@ export function LoginForm() {
     setPending(true)
     try {
       await api.login({ email, password })
-      const from = searchParams.get('from')
+      const from = redirectFrom?.trim() || null
       const dest: Route =
         from && from.startsWith('/') && !from.startsWith('//') ? (from as Route) : '/dashboard'
       router.push(dest)
@@ -42,7 +46,7 @@ export function LoginForm() {
     } finally {
       setPending(false)
     }
-  }, [router, searchParams])
+  }, [router, redirectFrom])
 
   function onFormSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -56,7 +60,12 @@ export function LoginForm() {
   }
 
   return (
-    <form ref={formRef} onSubmit={onFormSubmit} className="space-y-5">
+    <form
+      ref={formRef}
+      method="post"
+      onSubmit={onFormSubmit}
+      className="space-y-5"
+    >
       <div className="space-y-2">
         <label htmlFor="login-email" className="block text-sm font-medium text-stone-800">
           Email
@@ -92,7 +101,7 @@ export function LoginForm() {
         </p>
       ) : null}
       <button
-        type="submit"
+        type="button"
         disabled={pending}
         onClick={onSignInClick}
         className="w-full rounded-xl bg-brand-700 text-white text-sm font-semibold py-3 shadow-sm border border-brand-800/20 hover:bg-brand-800 disabled:opacity-60 transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-raised"

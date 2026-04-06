@@ -10,7 +10,7 @@ Protect tenant data with **seed-only accounts**, **server-side sessions**, and *
 |-------|----------------|
 | PostgreSQL | `User`, `Session`, `Deal.userId`, `roles[]` on user |
 | API (`apps/api`) | Login/logout/me, session cookie, `authenticate` pre-handler on `/api/v1/*` (except public health + `/api/v1/auth/*` registration order) |
-| Web (`apps/web`) | `middleware.ts` gate for workspace routes, `credentials: 'include'` on client fetch, `serverApiFetch` forwards `Cookie` in RSC |
+| Web (`apps/web`) | `proxy.ts` gate for workspace routes, `credentials: 'include'` on client fetch, `serverApiFetch` forwards `Cookie` in RSC |
 
 ## Session flow
 
@@ -37,7 +37,7 @@ Protect tenant data with **seed-only accounts**, **server-side sessions**, and *
 |----------|--------|
 | `API_URL` | Upstream for `next.config` rewrites to Fastify |
 | `NEXT_PUBLIC_API_URL` | Optional; if set, client fetch + invoice links use this origin instead of same-origin rewrites |
-| `NEXT_PUBLIC_SESSION_COOKIE_NAME` | Optional; must match API cookie name for `middleware` |
+| `NEXT_PUBLIC_SESSION_COOKIE_NAME` | Optional; must match API cookie name for `proxy` |
 
 ## RBAC
 
@@ -49,7 +49,7 @@ Protect tenant data with **seed-only accounts**, **server-side sessions**, and *
 
 | Scenario | Behavior |
 |----------|----------|
-| Missing/invalid cookie | `401` on protected API routes; web middleware redirects to `/login?from=...` |
+| Missing/invalid cookie | `401` on protected API routes; web `proxy` redirects to `/login?from=...` |
 | Wrong role | `403` on admin-only routes |
 | Session expired or revoked | Same as missing cookie |
 | `SESSION_SECRET` missing in production | API fails fast at startup (auth env validation) |
