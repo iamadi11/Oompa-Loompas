@@ -9,7 +9,7 @@ export function OverviewFetchError() {
   const [pending, startTransition] = useTransition()
 
   return (
-    <div className="flex flex-col items-start gap-6 py-12">
+    <div className="flex flex-col items-start gap-8 py-10 sm:py-14 max-w-xl">
       <section
         aria-labelledby="overview-error-heading"
         aria-describedby="overview-error-body"
@@ -17,13 +17,14 @@ export function OverviewFetchError() {
         aria-busy={pending}
       >
         <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">Connection</p>
           <h1
             id="overview-error-heading"
-            className="text-3xl font-bold tracking-tight text-gray-900"
+            className="mt-2 font-display text-3xl sm:text-4xl font-semibold tracking-tight text-stone-900 leading-tight"
           >
             We could not load your overview
           </h1>
-          <p id="overview-error-body" className="mt-2 text-lg text-gray-600">
+          <p id="overview-error-body" className="mt-4 text-base sm:text-lg text-stone-600 leading-relaxed">
             Your deals are not gone — we could not reach the server. Check your connection, confirm the API is
             running, then try again.
           </p>

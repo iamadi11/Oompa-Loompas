@@ -56,18 +56,18 @@ export function PaymentRow({ dealId, payment, onUpdate }: PaymentRowProps) {
 
   return (
     <div
-      className={`flex items-center justify-between gap-4 px-4 py-3 rounded-lg border ${
-        payment.isOverdue ? 'border-red-200 bg-red-50' : 'border-gray-100 bg-white'
+      className={`flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 px-4 py-3 rounded-xl border shadow-sm ${
+        payment.isOverdue ? 'border-red-200/90 bg-red-50/80' : 'border-line/70 bg-surface-raised'
       }`}
     >
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-3 flex-wrap">
-          <span className="font-semibold text-gray-900 text-sm">
+          <span className="font-semibold text-stone-900 text-sm tabular-nums">
             {formatCurrency(payment.amount, payment.currency as 'INR' | 'USD' | 'EUR' | 'GBP')}
           </span>
           <PaymentStatusBadge status={payment.status} isOverdue={payment.isOverdue} />
         </div>
-        <div className="mt-0.5 flex items-center gap-4 text-xs text-gray-500">
+        <div className="mt-0.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-stone-500">
           {payment.dueDate && (
             <span>
               Due {formatDate(payment.dueDate, { day: 'numeric', month: 'short', year: 'numeric' })}
@@ -82,12 +82,12 @@ export function PaymentRow({ dealId, payment, onUpdate }: PaymentRowProps) {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 shrink-0">
+      <div className="flex flex-wrap items-center gap-2 shrink-0 border-t border-line/50 sm:border-0 pt-2 sm:pt-0">
         <a
           href={`${PUBLIC_API_BASE_URL}/api/v1/deals/${dealId}/payments/${payment.id}/invoice`}
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded text-sm font-medium text-brand-600 underline underline-offset-2 hover:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+          className="rounded-md text-sm font-semibold text-brand-800 underline underline-offset-2 hover:text-brand-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
           aria-label={`View printable invoice for ${formatCurrency(payment.amount, payment.currency as 'INR' | 'USD' | 'EUR' | 'GBP')} payment`}
         >
           View invoice

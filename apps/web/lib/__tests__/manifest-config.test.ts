@@ -9,8 +9,8 @@ describe('buildWebManifest', () => {
     expect(m.start_url).toBe('/')
     expect(m.display).toBe('standalone')
     expect(m.orientation).toBe('portrait-primary')
-    expect(m.background_color).toBe('#f9fafb')
-    expect(m.theme_color).toBe('#111827')
+    expect(m.background_color).toBe('#e9e4d9')
+    expect(m.theme_color).toBe('#1f3832')
     expect(m.description).toContain('creators')
   })
 

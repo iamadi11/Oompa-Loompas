@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: 'Attention',
 }
 
+const linkClass =
+  'text-sm font-semibold text-brand-800 hover:text-brand-900 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas'
+
 async function getAttentionQueue(): Promise<AttentionQueue | null> {
   try {
     const res = await fetch(`${API_BASE}/api/v1/attention`, { cache: 'no-store' })
@@ -25,20 +28,17 @@ export default async function AttentionPage() {
 
   if (!data) {
     return (
-      <div className="py-12 space-y-4">
+      <div className="py-12 space-y-5 max-w-lg">
         <h1
-          className="text-2xl font-bold tracking-tight text-gray-900"
+          className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-stone-900"
           aria-describedby="attention-error-desc"
         >
           Attention
         </h1>
-        <p id="attention-error-desc" className="text-gray-600">
+        <p id="attention-error-desc" className="text-stone-600 leading-relaxed">
           We could not load your queue. Check your connection and try again.
         </p>
-        <Link
-          href="/"
-          className="inline-flex text-sm font-medium text-brand-600 hover:text-brand-700 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
-        >
+        <Link href="/" className={`inline-flex ${linkClass}`}>
           Back to overview
         </Link>
       </div>
@@ -47,21 +47,18 @@ export default async function AttentionPage() {
 
   if (data.actions.length === 0) {
     return (
-      <div className="py-12 space-y-4 max-w-lg">
+      <div className="py-12 space-y-5 max-w-lg">
         <h1
-          className="text-2xl font-bold tracking-tight text-gray-900"
+          className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-stone-900"
           aria-describedby="attention-empty-desc"
         >
           You are caught up
         </h1>
-        <p id="attention-empty-desc" className="text-gray-600">
+        <p id="attention-empty-desc" className="text-stone-600 leading-relaxed">
           No overdue payments or deliverables right now. When something slips, it will show up here and on your
           overview.
         </p>
-        <Link
-          href="/"
-          className="inline-flex text-sm font-medium text-brand-600 hover:text-brand-700 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
-        >
+        <Link href="/" className={`inline-flex ${linkClass}`}>
           Back to overview
         </Link>
       </div>
@@ -69,30 +66,28 @@ export default async function AttentionPage() {
   }
 
   return (
-    <div className="space-y-6 py-6">
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-6 sm:space-y-8 py-2 sm:py-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">Queue</p>
           <h1
-            className="text-2xl font-bold tracking-tight text-gray-900"
+            className="mt-1 font-display text-2xl sm:text-3xl font-semibold tracking-tight text-stone-900"
             aria-describedby="attention-queue-summary"
           >
             Needs your attention
           </h1>
-          <p id="attention-queue-summary" className="mt-1 text-sm text-gray-600">
+          <p id="attention-queue-summary" className="mt-2 text-sm text-stone-600">
             {data.actions.length} overdue {data.actions.length === 1 ? 'item' : 'items'} — most overdue first.
           </p>
         </div>
-        <Link
-          href="/"
-          className="text-sm font-medium text-brand-600 hover:text-brand-700 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 sm:shrink-0"
-        >
+        <Link href="/" className={`${linkClass} sm:shrink-0 w-fit`}>
           ← Overview
         </Link>
       </div>
 
       <section
         aria-labelledby="attention-queue-list-heading"
-        className="rounded-xl border border-amber-200 bg-amber-50/80 p-4"
+        className="rounded-2xl border border-amber-300/50 bg-gradient-to-br from-amber-50/95 via-surface-raised to-amber-50/40 p-4 sm:p-5 shadow-card"
       >
         <h2 id="attention-queue-list-heading" className="sr-only">
           Overdue items
@@ -100,14 +95,11 @@ export default async function AttentionPage() {
         <PriorityActionList actions={data.actions} className="flex flex-col gap-2" />
       </section>
 
-      <p className="text-sm text-gray-600">
-        <Link
-          href="/deals?needsAttention=true"
-          className="font-medium text-brand-600 hover:text-brand-700 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
-        >
+      <p className="text-sm text-stone-600 leading-relaxed">
+        <Link href="/deals?needsAttention=true" className={linkClass}>
           Browse deals with overdue work
         </Link>
-        <span className="text-gray-500"> — same filter as the deal list.</span>
+        <span className="text-stone-500"> — same filter as the deal list.</span>
       </p>
     </div>
   )

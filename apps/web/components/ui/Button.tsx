@@ -8,18 +8,19 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const VARIANT_STYLES = {
   primary:
-    'bg-brand-600 text-white hover:bg-brand-700 focus-visible:ring-brand-500 disabled:bg-brand-300',
+    'bg-brand-700 text-white shadow-sm hover:bg-brand-800 focus-visible:ring-brand-600 disabled:bg-brand-300 border border-brand-800/20',
   secondary:
-    'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus-visible:ring-gray-400',
+    'bg-surface-raised text-stone-800 border border-line-strong/90 hover:bg-surface focus-visible:ring-stone-400 shadow-sm',
   danger:
-    'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500 disabled:bg-red-300',
-  ghost: 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus-visible:ring-gray-400',
+    'bg-red-700 text-white hover:bg-red-800 focus-visible:ring-red-600 disabled:bg-red-300 shadow-sm',
+  ghost:
+    'text-stone-600 hover:text-stone-900 hover:bg-surface-raised/80 focus-visible:ring-stone-400',
 }
 
 const SIZE_STYLES = {
   sm: 'px-3 py-1.5 text-sm',
-  md: 'px-4 py-2 text-sm',
-  lg: 'px-5 py-2.5 text-base',
+  md: 'px-4 py-2.5 text-sm',
+  lg: 'px-5 py-3 text-base',
 }
 
 export function Button({
@@ -35,8 +36,9 @@ export function Button({
     <button
       disabled={disabled ?? loading}
       className={`
-        inline-flex items-center justify-center gap-2 rounded-lg font-medium
-        transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+        inline-flex items-center justify-center gap-2 rounded-xl font-semibold tracking-tight
+        transition-colors duration-200 motion-reduce:transition-none
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas
         disabled:cursor-not-allowed disabled:opacity-60
         ${VARIANT_STYLES[variant]} ${SIZE_STYLES[size]} ${className}
       `.trim()}

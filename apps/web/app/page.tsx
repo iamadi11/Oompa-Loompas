@@ -30,18 +30,20 @@ export default async function HomePage() {
 
   if (state.kind === 'empty') {
     return (
-      <div className="flex flex-col items-start gap-6 py-12">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-            Your revenue, under control.
+      <div className="flex flex-col gap-8 py-8 sm:py-14 max-w-xl">
+        <div className="space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-800/90">Start here</p>
+          <h1 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-stone-900 leading-[1.15]">
+            Your revenue, composed — not just counted.
           </h1>
-          <p className="mt-2 text-lg text-gray-500">
-            Track deals, monitor payments, and never miss a rupee.
+          <p className="text-base sm:text-lg text-stone-600 leading-relaxed">
+            Track deals and payments in one calm surface. Built for creators who treat their work like a studio, not a
+            spreadsheet.
           </p>
         </div>
         <Link
           href="/deals/new"
-          className="inline-flex items-center px-5 py-2.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+          className="inline-flex w-fit items-center px-5 py-3 rounded-xl bg-brand-700 text-white text-sm font-semibold shadow-sm border border-brand-800/20 hover:bg-brand-800 transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
         >
           Add your first deal
         </Link>
@@ -53,15 +55,22 @@ export default async function HomePage() {
   const currency = dashboard.dominantCurrency
 
   return (
-    <div className="space-y-8 py-6">
-      {/* Page header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900">Overview</h1>
+    <div className="space-y-8 sm:space-y-10 py-2 sm:py-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">Today</p>
+          <h1 className="mt-1 font-display text-2xl sm:text-3xl font-semibold tracking-tight text-stone-900">
+            Overview
+          </h1>
+        </div>
         <Link
           href="/deals/new"
-          className="inline-flex items-center px-4 py-2 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+          className="inline-flex w-fit items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-700 text-white text-sm font-semibold shadow-sm border border-brand-800/20 hover:bg-brand-800 transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
         >
-          + New deal
+          <span className="text-lg leading-none" aria-hidden="true">
+            +
+          </span>
+          New deal
         </Link>
       </div>
 
@@ -70,10 +79,11 @@ export default async function HomePage() {
         totalCount={dashboard.priorityActionsTotalCount}
       />
 
-      {/* Summary cards */}
       <section aria-labelledby="summary-heading">
-        <h2 id="summary-heading" className="sr-only">Financial summary</h2>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <h2 id="summary-heading" className="sr-only">
+          Financial summary
+        </h2>
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           <SummaryCard
             label="Contracted"
             value={formatCurrency(dashboard.totalContractedValue, currency)}
@@ -106,15 +116,14 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Recent deals */}
       <section aria-labelledby="recent-deals-heading">
-        <div className="flex items-center justify-between mb-3">
-          <h2 id="recent-deals-heading" className="text-base font-semibold text-gray-900">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
+          <h2 id="recent-deals-heading" className="font-display text-lg font-semibold text-stone-900">
             Recent deals
           </h2>
           <Link
             href="/deals"
-            className="text-sm text-brand-600 hover:text-brand-700 font-medium rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+            className="text-sm font-semibold text-brand-800 hover:text-brand-900 w-fit rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
           >
             View all
           </Link>

@@ -42,8 +42,8 @@ export function PaymentSection({
 
   return (
     <section aria-labelledby="payments-heading">
-      <div className="flex items-center justify-between mb-4">
-        <h2 id="payments-heading" className="text-base font-semibold text-gray-900">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+        <h2 id="payments-heading" className="font-display text-lg font-semibold text-stone-900">
           Payments
         </h2>
         {!showAddForm && (
@@ -59,33 +59,33 @@ export function PaymentSection({
 
       {/* Summary row */}
       <div
-        className={`grid grid-cols-3 gap-3 mb-5 p-4 rounded-xl border ${
-          summary.hasOverdue ? 'border-red-200 bg-red-50' : 'border-gray-100 bg-gray-50'
+        className={`grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5 p-4 sm:p-5 rounded-2xl border shadow-sm ${
+          summary.hasOverdue ? 'border-red-200/90 bg-red-50/80' : 'border-line/80 bg-surface/80'
         }`}
       >
         <div>
-          <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Contracted</p>
-          <p className="text-lg font-bold text-gray-900 mt-0.5">
+          <p className="text-[0.65rem] text-stone-500 font-semibold uppercase tracking-[0.12em]">Contracted</p>
+          <p className="text-lg font-bold tabular-nums text-stone-900 mt-1">
             {formatCurrency(summary.totalContracted, dealCurrency)}
           </p>
         </div>
         <div>
-          <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Received</p>
-          <p className="text-lg font-bold text-green-700 mt-0.5">
+          <p className="text-[0.65rem] text-stone-500 font-semibold uppercase tracking-[0.12em]">Received</p>
+          <p className="text-lg font-bold tabular-nums text-emerald-800 mt-1">
             {formatCurrency(summary.totalReceived, dealCurrency)}
           </p>
         </div>
         <div>
           <p
-            className={`text-xs font-medium uppercase tracking-wide ${
-              summary.hasOverdue ? 'text-red-600' : 'text-gray-500'
+            className={`text-[0.65rem] font-semibold uppercase tracking-[0.12em] ${
+              summary.hasOverdue ? 'text-red-700' : 'text-stone-500'
             }`}
           >
             {summary.hasOverdue ? 'Overdue' : 'Outstanding'}
           </p>
           <p
-            className={`text-lg font-bold mt-0.5 ${
-              summary.hasOverdue ? 'text-red-700' : 'text-gray-900'
+            className={`text-lg font-bold tabular-nums mt-1 ${
+              summary.hasOverdue ? 'text-red-800' : 'text-stone-900'
             }`}
           >
             {formatCurrency(summary.totalOutstanding, dealCurrency)}
@@ -95,11 +95,12 @@ export function PaymentSection({
 
       {/* Payment list */}
       {payments.length === 0 && !showAddForm && (
-        <div className="flex flex-col items-center py-8 text-center">
-          <p className="text-sm text-gray-500">No payment milestones recorded yet.</p>
+        <div className="flex flex-col items-center py-8 text-center rounded-xl border border-dashed border-line-strong/60 bg-surface/50">
+          <p className="text-sm text-stone-600">No payment milestones recorded yet.</p>
           <button
+            type="button"
             onClick={() => setShowAddForm(true)}
-            className="mt-2 text-sm text-brand-600 hover:text-brand-700 font-medium underline underline-offset-2"
+            className="mt-3 text-sm font-semibold text-brand-800 hover:text-brand-900 underline underline-offset-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
           >
             Add your first payment milestone
           </button>

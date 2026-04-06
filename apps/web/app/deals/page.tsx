@@ -39,28 +39,31 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   }
 }
 
+const filterPillBase =
+  'rounded-xl px-3.5 py-2 text-sm font-semibold transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas'
+
 export default async function DealsPage({ searchParams }: Props) {
   const needsAttention = isDealsNeedsAttentionFilter(searchParams)
   const { deals, loadError } = await getDeals(needsAttention)
 
   return (
-    <div>
+    <div className="py-1 sm:py-2">
       {loadError && (
         <div
-          className="mb-6 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-900"
+          className="mb-6 rounded-2xl bg-amber-50/90 border border-amber-200/80 px-4 py-3 text-sm text-amber-950 shadow-sm"
           role="status"
           aria-live="polite"
         >
           {loadError}
         </div>
       )}
-      <nav className="flex flex-wrap items-center gap-2 text-sm mb-4" aria-label="Deal filters">
+      <nav className="flex flex-wrap items-center gap-2 text-sm mb-5" aria-label="Deal filters">
         <Link
           href="/deals"
-          className={`rounded-md px-3 py-1.5 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 ${
+          className={`${filterPillBase} ${
             !needsAttention
-              ? 'bg-gray-900 text-white'
-              : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+              ? 'bg-brand-900 text-white shadow-sm border border-brand-800'
+              : 'bg-surface-raised text-stone-700 border border-line/90 hover:bg-surface shadow-sm'
           }`}
           aria-current={!needsAttention ? 'page' : undefined}
         >
@@ -68,10 +71,10 @@ export default async function DealsPage({ searchParams }: Props) {
         </Link>
         <Link
           href="/deals?needsAttention=true"
-          className={`rounded-md px-3 py-1.5 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 ${
+          className={`${filterPillBase} ${
             needsAttention
-              ? 'bg-amber-900 text-white'
-              : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+              ? 'bg-amber-900 text-white shadow-sm border border-amber-950/30'
+              : 'bg-surface-raised text-stone-700 border border-line/90 hover:bg-surface shadow-sm'
           }`}
           aria-current={needsAttention ? 'page' : undefined}
         >
@@ -79,10 +82,11 @@ export default async function DealsPage({ searchParams }: Props) {
         </Link>
       </nav>
 
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Deals</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">Pipeline</p>
+          <h1 className="mt-1 font-display text-2xl sm:text-3xl font-semibold tracking-tight text-stone-900">Deals</h1>
+          <p className="text-sm text-stone-600 mt-1">
             {needsAttention
               ? deals.length === 1
                 ? '1 deal with overdue work'
@@ -95,7 +99,7 @@ export default async function DealsPage({ searchParams }: Props) {
         {!loadError && (needsAttention || deals.length > 0) && (
           <Link
             href="/deals/new"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+            className="inline-flex w-fit items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-700 text-white text-sm font-semibold shadow-sm border border-brand-800/20 hover:bg-brand-800 transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
           >
             <svg
               className="w-4 h-4"

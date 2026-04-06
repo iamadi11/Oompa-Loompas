@@ -11,7 +11,7 @@ export function Input({ label, error, hint, id, className = '', ...props }: Inpu
 
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={inputId} className="text-sm font-medium text-gray-700">
+      <label htmlFor={inputId} className="text-sm font-medium text-stone-700">
         {label}
         {props.required && <span className="text-red-500 ml-0.5" aria-hidden="true">*</span>}
       </label>
@@ -20,11 +20,11 @@ export function Input({ label, error, hint, id, className = '', ...props }: Inpu
         aria-describedby={error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined}
         aria-invalid={error ? true : undefined}
         className={`
-          block w-full rounded-lg border px-3 py-2 text-sm shadow-sm
-          placeholder-gray-400 transition-colors
-          focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500
-          disabled:bg-gray-50 disabled:cursor-not-allowed
-          ${error ? 'border-red-400 focus:ring-red-400' : 'border-gray-300'}
+          block w-full rounded-xl border px-3 py-2.5 text-sm shadow-sm
+          placeholder-stone-400 transition-colors bg-surface-raised
+          focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-brand-500
+          disabled:bg-surface disabled:cursor-not-allowed
+          ${error ? 'border-red-400 focus:ring-red-400' : 'border-line-strong/80'}
           ${className}
         `.trim()}
         {...props}
@@ -35,7 +35,7 @@ export function Input({ label, error, hint, id, className = '', ...props }: Inpu
         </p>
       )}
       {hint && !error && (
-        <p id={`${inputId}-hint`} className="text-xs text-gray-500">
+        <p id={`${inputId}-hint`} className="text-xs text-stone-500">
           {hint}
         </p>
       )}

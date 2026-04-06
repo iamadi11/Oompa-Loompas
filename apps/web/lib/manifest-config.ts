@@ -9,8 +9,8 @@ export function buildWebManifest(): MetadataRoute.Manifest {
     start_url: '/',
     display: 'standalone',
     orientation: 'portrait-primary',
-    background_color: '#f9fafb',
-    theme_color: '#111827',
+    background_color: '#e9e4d9',
+    theme_color: '#1f3832',
     icons: [
       {
         src: '/icons/icon-192.png',

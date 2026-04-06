@@ -13,6 +13,9 @@ interface Props {
 
 const API_BASE = process.env['API_URL'] ?? 'http://localhost:3001'
 
+const panelClass =
+  'rounded-2xl border border-line/90 bg-surface-raised p-5 sm:p-6 shadow-card'
+
 async function getDeal(id: string): Promise<Deal | null> {
   try {
     const res = await fetch(`${API_BASE}/api/v1/deals/${id}`, { cache: 'no-store' })
@@ -66,28 +69,25 @@ export default async function DealDetailPage({ params }: Props) {
   }
 
   return (
-    <div className="max-w-2xl space-y-6">
-      <div className="mb-6">
-        <p className="text-sm font-medium text-gray-400 uppercase tracking-wide">{deal.brandName}</p>
-        <div className="flex items-center gap-3 mt-1">
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 flex-1">
+    <div className="max-w-2xl space-y-6 pb-8">
+      <div className="mb-2">
+        <p className="text-[0.65rem] font-semibold text-stone-500 uppercase tracking-[0.14em]">{deal.brandName}</p>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mt-2">
+          <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-stone-900 flex-1 leading-tight">
             {deal.title}
           </h1>
           <StatusBadge status={deal.status} />
         </div>
-        <p className="text-3xl font-bold text-gray-900 mt-3">
+        <p className="text-2xl sm:text-3xl font-bold tabular-nums text-stone-900 mt-4 tracking-tight">
           {formatCurrency(deal.value, deal.currency)}
         </p>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <DeliverableSection
-          dealId={deal.id}
-          initialDeliverables={deliverables}
-        />
+      <div className={panelClass}>
+        <DeliverableSection dealId={deal.id} initialDeliverables={deliverables} />
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className={panelClass}>
         <PaymentSection
           dealId={deal.id}
           dealValue={deal.value}
@@ -96,8 +96,8 @@ export default async function DealDetailPage({ params }: Props) {
         />
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="text-base font-semibold text-gray-900 mb-5">Edit deal</h2>
+      <div className={panelClass}>
+        <h2 className="font-display text-lg font-semibold text-stone-900 mb-5">Edit deal</h2>
         <DealForm deal={deal} mode="edit" />
       </div>
     </div>

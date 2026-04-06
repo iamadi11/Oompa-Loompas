@@ -13,10 +13,10 @@ export function DealList({ deals, emptyVariant = 'all' }: DealListProps) {
   if (deals.length === 0) {
     const copy = getDealListEmptyContent(emptyVariant)
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center px-4">
-        <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
+      <div className="flex flex-col items-center justify-center py-16 sm:py-24 text-center px-4 rounded-2xl border border-dashed border-line-strong/70 bg-surface-raised/50">
+        <div className="w-16 h-16 rounded-2xl bg-brand-100/80 border border-brand-200/60 flex items-center justify-center mb-5 shadow-sm">
           <svg
-            className="w-7 h-7 text-gray-400"
+            className="w-8 h-8 text-brand-800"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -30,18 +30,18 @@ export function DealList({ deals, emptyVariant = 'all' }: DealListProps) {
             />
           </svg>
         </div>
-        <h3 className="text-base font-semibold text-gray-900">{copy.title}</h3>
-        <p className="mt-1 text-sm text-gray-500 max-w-md">{copy.description}</p>
-        <div className="mt-5 flex flex-col sm:flex-row items-center gap-3">
+        <h3 className="font-display text-lg font-semibold text-stone-900">{copy.title}</h3>
+        <p className="mt-2 text-sm text-stone-600 max-w-md leading-relaxed">{copy.description}</p>
+        <div className="mt-8 flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
           <Link
             href={copy.primaryHref}
-            className="inline-flex items-center px-4 py-2 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+            className="inline-flex items-center justify-center w-full sm:w-auto px-5 py-2.5 rounded-xl bg-brand-700 text-white text-sm font-semibold shadow-sm border border-brand-800/20 hover:bg-brand-800 transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
           >
             {copy.primaryLabel}
           </Link>
           <Link
             href={copy.secondaryHref}
-            className="text-sm font-medium text-brand-600 hover:text-brand-700 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+            className="text-sm font-semibold text-brand-800 hover:text-brand-900 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
           >
             {copy.secondaryLabel}
           </Link>
@@ -51,7 +51,7 @@ export function DealList({ deals, emptyVariant = 'all' }: DealListProps) {
   }
 
   return (
-    <div className="grid gap-3">
+    <div className="grid gap-3 sm:gap-4">
       {deals.map((deal) => (
         <DealCard key={deal.id} deal={deal} />
       ))}

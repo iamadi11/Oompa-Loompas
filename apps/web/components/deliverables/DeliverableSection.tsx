@@ -29,13 +29,13 @@ export function DeliverableSection({ dealId, initialDeliverables }: DeliverableS
 
   return (
     <section aria-labelledby="deliverables-heading">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <h2 id="deliverables-heading" className="text-base font-semibold text-gray-900">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <h2 id="deliverables-heading" className="font-display text-lg font-semibold text-stone-900">
             Deliverables
           </h2>
           {deliverables.length > 0 && (
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-stone-500">
               {completedCount}/{deliverables.length} done
               {overdueCount > 0 && (
                 <span className="ml-2 text-red-600 font-medium">
@@ -59,9 +59,9 @@ export function DeliverableSection({ dealId, initialDeliverables }: DeliverableS
       {/* Progress indicator when there are deliverables */}
       {deliverables.length > 0 && (
         <div className="mb-4">
-          <div className="w-full bg-gray-100 rounded-full h-1.5">
+          <div className="w-full bg-line/60 rounded-full h-1.5 overflow-hidden">
             <div
-              className="bg-green-500 h-1.5 rounded-full transition-all"
+              className="bg-brand-600 h-1.5 rounded-full transition-all motion-reduce:transition-none"
               style={{
                 width: `${deliverables.length > 0 ? (completedCount / deliverables.length) * 100 : 0}%`,
               }}
@@ -72,7 +72,7 @@ export function DeliverableSection({ dealId, initialDeliverables }: DeliverableS
               aria-label={`${completedCount} of ${deliverables.length} deliverables completed`}
             />
           </div>
-          <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-2 text-xs text-stone-500">
             <span>{pendingCount} pending</span>
             <span>{completedCount} completed</span>
             {overdueCount > 0 && (
@@ -84,12 +84,12 @@ export function DeliverableSection({ dealId, initialDeliverables }: DeliverableS
 
       {/* Zero state */}
       {deliverables.length === 0 && !showAddForm && (
-        <div className="flex flex-col items-center py-8 text-center">
-          <p className="text-sm text-gray-500">No deliverables added.</p>
+        <div className="flex flex-col items-center py-8 text-center rounded-xl border border-dashed border-line-strong/60 bg-surface/50">
+          <p className="text-sm text-stone-600">No deliverables added.</p>
           <button
             type="button"
             onClick={() => setShowAddForm(true)}
-            className="mt-2 text-sm text-brand-600 hover:text-brand-700 font-medium underline underline-offset-2"
+            className="mt-3 text-sm font-semibold text-brand-800 hover:text-brand-900 underline underline-offset-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
             aria-label="Add deliverable"
           >
             Add the content you have committed to deliver

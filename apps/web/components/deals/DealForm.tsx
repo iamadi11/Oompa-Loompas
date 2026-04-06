@@ -129,7 +129,7 @@ export function DealForm({ deal, mode }: DealFormProps) {
     <form onSubmit={(e) => void handleSubmit(e)} noValidate className="flex flex-col gap-6">
       {serverError && (
         <div
-          className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700"
+          className="rounded-xl bg-red-50 border border-red-200/90 px-4 py-3 text-sm text-red-800 shadow-sm"
           role="alert"
           aria-live="assertive"
         >
@@ -190,9 +190,9 @@ export function DealForm({ deal, mode }: DealFormProps) {
       </div>
 
       <div>
-        <label htmlFor="deal-notes" className="block text-sm font-medium text-gray-700 mb-1.5">
+        <label htmlFor="deal-notes" className="block text-sm font-medium text-stone-700 mb-1.5">
           Notes
-          <span className="text-gray-400 font-normal ml-1">(optional)</span>
+          <span className="text-stone-500 font-normal ml-1">(optional)</span>
         </label>
         <textarea
           id="deal-notes"
@@ -201,11 +201,11 @@ export function DealForm({ deal, mode }: DealFormProps) {
           value={form.notes}
           onChange={(e) => setField('notes', e.target.value)}
           placeholder="Deliverables, payment terms, or anything else..."
-          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+          className="block w-full rounded-xl border border-line-strong/80 bg-surface-raised px-3 py-2.5 text-sm shadow-sm placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-brand-500"
         />
       </div>
 
-      <div className="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">
+      <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-3 pt-4 border-t border-line/70">
         <Button
           type="button"
           variant="secondary"
@@ -222,7 +222,7 @@ export function DealForm({ deal, mode }: DealFormProps) {
       {mode === 'edit' && deal && (
         <div className="pt-8 mt-2 border-t border-red-100 rounded-b-xl">
           <h3 className="text-sm font-semibold text-red-900">Danger zone</h3>
-          <p className="text-sm text-gray-600 mt-1 mb-4">
+          <p className="text-sm text-stone-600 mt-1 mb-4 leading-relaxed">
             Delete this deal and all of its payment milestones and deliverables. This cannot be undone.
           </p>
           <Button

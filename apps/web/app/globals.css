@@ -9,11 +9,11 @@
   }
 
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-canvas text-stone-900 bg-mesh-page min-h-screen;
   }
 
   *:focus-visible {
-    @apply outline-2 outline-offset-2 outline-brand-500;
+    @apply outline-2 outline-offset-2 outline-brand-600;
   }
 
   @media (prefers-reduced-motion: reduce) {
