@@ -5,13 +5,12 @@ import { OverviewFetchError } from '../components/dashboard/OverviewFetchError'
 import { PriorityActionsSection } from '../components/dashboard/PriorityActionsSection'
 import { RecentDealRow } from '../components/dashboard/RecentDealRow'
 import { SummaryCard } from '../components/dashboard/SummaryCard'
+import { getServerApiBaseUrl } from '../lib/get-server-api-base-url'
 import { resolveHomeOverviewState } from '../lib/home-page'
-
-const API_BASE = process.env['API_URL'] ?? 'http://localhost:3001'
 
 async function getDashboardData(): Promise<DashboardSummary | null> {
   try {
-    const res = await fetch(`${API_BASE}/api/v1/dashboard`, { cache: 'no-store' })
+    const res = await fetch(`${getServerApiBaseUrl()}/api/v1/dashboard`, { cache: 'no-store' })
     if (!res.ok) return null
     const body = (await res.json()) as { data: DashboardSummary }
     return body.data

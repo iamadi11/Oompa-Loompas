@@ -139,6 +139,7 @@ export function DeliverableRow({ deliverable, onUpdate }: DeliverableRowProps) {
           </Button>
         )}
         <button
+          type="button"
           onClick={() => void handleDelete()}
           disabled={updating}
           className="text-xs font-medium text-stone-400 hover:text-red-600 transition-colors duration-200 motion-reduce:transition-none disabled:opacity-40 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"

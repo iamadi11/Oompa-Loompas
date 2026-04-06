@@ -2,8 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import type { AttentionQueue } from '@oompa/types'
 import { PriorityActionList } from '../../components/dashboard/PriorityActionList'
-
-const API_BASE = process.env['API_URL'] ?? 'http://localhost:3001'
+import { getServerApiBaseUrl } from '../../lib/get-server-api-base-url'
 
 export const metadata: Metadata = {
   title: 'Attention',
@@ -14,7 +13,7 @@ const linkClass =
 
 async function getAttentionQueue(): Promise<AttentionQueue | null> {
   try {
-    const res = await fetch(`${API_BASE}/api/v1/attention`, { cache: 'no-store' })
+    const res = await fetch(`${getServerApiBaseUrl()}/api/v1/attention`, { cache: 'no-store' })
     if (!res.ok) return null
     const body = (await res.json()) as { data: AttentionQueue }
     return body.data

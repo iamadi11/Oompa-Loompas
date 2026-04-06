@@ -6,19 +6,18 @@ import { DealForm } from '../../../components/deals/DealForm'
 import { DealNotFoundContent } from '../../../components/deals/DealNotFoundContent'
 import { PaymentSection } from '../../../components/payments/PaymentSection'
 import { DeliverableSection } from '../../../components/deliverables/DeliverableSection'
+import { getServerApiBaseUrl } from '../../../lib/get-server-api-base-url'
 
 interface Props {
   params: { id: string }
 }
-
-const API_BASE = process.env['API_URL'] ?? 'http://localhost:3001'
 
 const panelClass =
   'rounded-2xl border border-line/90 bg-surface-raised p-5 sm:p-6 shadow-card'
 
 async function getDeal(id: string): Promise<Deal | null> {
   try {
-    const res = await fetch(`${API_BASE}/api/v1/deals/${id}`, { cache: 'no-store' })
+    const res = await fetch(`${getServerApiBaseUrl()}/api/v1/deals/${id}`, { cache: 'no-store' })
     if (res.status === 404) return null
     if (!res.ok) return null
     const body = (await res.json()) as { data: Deal }
@@ -30,7 +29,7 @@ async function getDeal(id: string): Promise<Deal | null> {
 
 async function getPayments(dealId: string): Promise<Payment[]> {
   try {
-    const res = await fetch(`${API_BASE}/api/v1/deals/${dealId}/payments`, { cache: 'no-store' })
+    const res = await fetch(`${getServerApiBaseUrl()}/api/v1/deals/${dealId}/payments`, { cache: 'no-store' })
     if (!res.ok) return []
     const body = (await res.json()) as { data: Payment[] }
     return body.data
@@ -41,7 +40,7 @@ async function getPayments(dealId: string): Promise<Payment[]> {
 
 async function getDeliverables(dealId: string): Promise<Deliverable[]> {
   try {
-    const res = await fetch(`${API_BASE}/api/v1/deals/${dealId}/deliverables`, { cache: 'no-store' })
+    const res = await fetch(`${getServerApiBaseUrl()}/api/v1/deals/${dealId}/deliverables`, { cache: 'no-store' })
     if (!res.ok) return []
     const body = (await res.json()) as { data: Deliverable[] }
     return body.data

@@ -3,9 +3,10 @@ import type { Metadata } from 'next'
 import type { Deal } from '@oompa/types'
 import { DealList } from '../../components/deals/DealList'
 import { isDealsNeedsAttentionFilter } from '../../lib/deals-page'
+import { getServerApiBaseUrl } from '../../lib/get-server-api-base-url'
 
 async function getDeals(needsAttention: boolean): Promise<{ deals: Deal[]; loadError: string | null }> {
-  const apiBase = process.env['API_URL'] ?? 'http://localhost:3001'
+  const apiBase = getServerApiBaseUrl()
   const qs = new URLSearchParams({ limit: '100', sortOrder: 'desc' })
   if (needsAttention) qs.set('needsAttention', 'true')
   try {
