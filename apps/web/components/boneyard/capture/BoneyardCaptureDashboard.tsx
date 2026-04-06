@@ -1,7 +1,7 @@
 'use client'
 
 import { Skeleton } from 'boneyard-js/react'
-import { DashboardFixture } from '../fixtures/DashboardFixture'
+import { DashboardFixture } from '@/components/boneyard/fixtures/DashboardFixture'
 
 export function BoneyardCaptureDashboard() {
   return (

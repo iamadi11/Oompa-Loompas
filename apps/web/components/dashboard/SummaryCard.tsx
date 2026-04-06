@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'motion/react'
-import { useAllowEntranceMotion, usePrefersReducedMotion } from '../../lib/motion/use-prefers-motion'
+import { useAllowEntranceMotion, usePrefersReducedMotion } from '@/lib/motion/use-prefers-motion'
 
 interface SummaryCardProps {
   label: string

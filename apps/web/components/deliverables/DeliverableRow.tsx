@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import type { Deliverable } from '@oompa/types'
 import { formatDate } from '@oompa/utils'
-import { api } from '../../lib/api'
-import { Button } from '../ui/Button'
+import { api } from '@/lib/api'
+import { Button } from '@/components/ui/Button'
 
 interface DeliverableRowProps {
   deliverable: Deliverable

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { postLoginDestination } from '../post-login-destination'
+import { postLoginDestination } from '@/lib/post-login-destination'
 
 describe('postLoginDestination', () => {
   it('returns dashboard when from is empty', () => {

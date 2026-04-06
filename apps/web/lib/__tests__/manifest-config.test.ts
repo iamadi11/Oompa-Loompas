@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildWebManifest } from '../manifest-config'
+import { buildWebManifest } from '@/lib/manifest-config'
 
 describe('buildWebManifest', () => {
   it('returns installable PWA manifest fields', () => {

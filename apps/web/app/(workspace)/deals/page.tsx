@@ -1,10 +1,10 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import type { Deal } from '@oompa/types'
-import { DealList } from '../../../components/deals/DealList'
-import { isDealsNeedsAttentionFilter } from '../../../lib/deals-page'
-import { getServerApiBaseUrl } from '../../../lib/get-server-api-base-url'
-import { serverApiFetch } from '../../../lib/server-api-fetch'
+import { DealList } from '@/components/deals/DealList'
+import { isDealsNeedsAttentionFilter } from '@/lib/deals-page'
+import { getServerApiBaseUrl } from '@/lib/get-server-api-base-url'
+import { serverApiFetch } from '@/lib/server-api-fetch'
 
 async function getDeals(needsAttention: boolean): Promise<{ deals: Deal[]; loadError: string | null }> {
   const apiBase = getServerApiBaseUrl()

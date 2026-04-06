@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isMainNavCurrent } from '../main-nav'
+import { isMainNavCurrent } from '@/lib/main-nav'
 
 describe('isMainNavCurrent', () => {
   it('marks overview on /dashboard', () => {

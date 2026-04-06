@@ -1,7 +1,7 @@
 'use client'
 
 import { Skeleton } from 'boneyard-js/react'
-import { GenericWorkspaceFixture } from '../fixtures/GenericWorkspaceFixture'
+import { GenericWorkspaceFixture } from '@/components/boneyard/fixtures/GenericWorkspaceFixture'
 
 export function BoneyardCaptureGeneric() {
   return (

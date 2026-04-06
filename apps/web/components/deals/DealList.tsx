@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { Deal } from '@oompa/types'
-import { getDealListEmptyContent, type DealListEmptyVariant } from '../../lib/deal-list-empty'
+import { getDealListEmptyContent, type DealListEmptyVariant } from '@/lib/deal-list-empty'
 import { DealCard } from './DealCard'
 
 interface DealListProps {

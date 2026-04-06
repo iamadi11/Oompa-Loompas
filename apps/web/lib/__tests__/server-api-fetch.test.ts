@@ -4,7 +4,7 @@ vi.mock('next/headers', () => ({
   cookies: vi.fn(),
 }))
 
-vi.mock('../get-server-api-base-url', () => ({
+vi.mock('@/lib/get-server-api-base-url', () => ({
   getServerApiBaseUrl: () => 'http://127.0.0.1:3001',
 }))
 
@@ -25,7 +25,7 @@ describe('serverApiFetch', () => {
 
   it('normalizes path, forwards cookies, and uses no-store', async () => {
     fetchMock.mockResolvedValue(new Response('{}'))
-    const { serverApiFetch } = await import('../server-api-fetch')
+    const { serverApiFetch } = await import('@/lib/server-api-fetch')
     await serverApiFetch('api/v1/auth/me')
     expect(fetchMock).toHaveBeenCalledWith(
       'http://127.0.0.1:3001/api/v1/auth/me',
@@ -45,7 +45,7 @@ describe('serverApiFetch', () => {
     } as never)
     fetchMock.mockResolvedValue(new Response('{}'))
     vi.resetModules()
-    const { serverApiFetch } = await import('../server-api-fetch')
+    const { serverApiFetch } = await import('@/lib/server-api-fetch')
     await serverApiFetch('/api/v1/dashboard')
     expect(fetchMock).toHaveBeenCalledWith(
       'http://127.0.0.1:3001/api/v1/dashboard',

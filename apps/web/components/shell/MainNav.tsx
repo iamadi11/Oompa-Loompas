@@ -2,11 +2,11 @@
 
 import Link from 'next/link'
 import { motion } from 'motion/react'
-import { usePrefersReducedMotion } from '../../lib/motion/use-prefers-motion'
+import { usePrefersReducedMotion } from '@/lib/motion/use-prefers-motion'
 import { useEffect, useId, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { isMainNavCurrent } from '../../lib/main-nav'
-import { APP_DISPLAY_NAME } from '../../lib/product-meta'
+import { isMainNavCurrent } from '@/lib/main-nav'
+import { APP_DISPLAY_NAME } from '@/lib/product-meta'
 import { ShellAuthActions } from './ShellAuthActions'
 
 const linkBase =

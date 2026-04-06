@@ -12,7 +12,7 @@ coverage
 prisma/migrations/*.sql
 *.log
 
-# PWA build output (apps/web — regenerated each `next build`)
+# Legacy PWA output from @ducanh2912/next-pwa (Serwist serves SW from /serwist/*)
 apps/web/public/sw.js
 apps/web/public/workbox-*.js
 apps/web/public/fallback-*.js

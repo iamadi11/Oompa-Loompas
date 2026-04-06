@@ -2,12 +2,12 @@ import type { Metadata } from 'next'
 import { cache } from 'react'
 import type { Deal, Payment, Deliverable } from '@oompa/types'
 import { formatCurrency } from '@oompa/utils'
-import { StatusBadge } from '../../../../components/ui/Badge'
-import { DealForm } from '../../../../components/deals/DealForm'
-import { DealNotFoundContent } from '../../../../components/deals/DealNotFoundContent'
-import { PaymentSection } from '../../../../components/payments/PaymentSection'
-import { DeliverableSection } from '../../../../components/deliverables/DeliverableSection'
-import { serverApiFetch } from '../../../../lib/server-api-fetch'
+import { StatusBadge } from '@/components/ui/Badge'
+import { DealForm } from '@/components/deals/DealForm'
+import { DealNotFoundContent } from '@/components/deals/DealNotFoundContent'
+import { PaymentSection } from '@/components/payments/PaymentSection'
+import { DeliverableSection } from '@/components/deliverables/DeliverableSection'
+import { serverApiFetch } from '@/lib/server-api-fetch'
 
 interface Props {
   params: Promise<{ id: string }>

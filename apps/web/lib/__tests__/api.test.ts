@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { api, getBrowserApiBase, paymentInvoiceHref } from '../api'
+import { api, getBrowserApiBase, paymentInvoiceHref } from '@/lib/api'
 
 function jsonResponse(
   body: unknown,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { DashboardSummary } from '@oompa/types'
-import { resolveHomeOverviewState } from '../home-page'
+import { resolveHomeOverviewState } from '@/lib/home-page'
 
 const minimalDashboard = (overrides: Partial<DashboardSummary>): DashboardSummary => ({
   totalContractedValue: 0,

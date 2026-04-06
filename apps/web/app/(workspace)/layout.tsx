@@ -1,5 +1,5 @@
-import { WorkspacePageMotion } from '../../components/motion/WorkspacePageMotion'
-import { AppShellHeader } from '../../components/shell/MainNav'
+import { WorkspacePageMotion } from '@/components/motion/WorkspacePageMotion'
+import { AppShellHeader } from '@/components/shell/MainNav'
 
 export default function WorkspaceLayout({
   children,

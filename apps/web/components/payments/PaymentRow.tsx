@@ -3,9 +3,9 @@
 import { useState } from 'react'
 import type { Payment } from '@oompa/types'
 import { formatCurrency, formatDate } from '@oompa/utils'
-import { api, paymentInvoiceHref } from '../../lib/api'
+import { api, paymentInvoiceHref } from '@/lib/api'
 import { PaymentStatusBadge } from './PaymentStatusBadge'
-import { Button } from '../ui/Button'
+import { Button } from '@/components/ui/Button'
 
 interface PaymentRowProps {
   dealId: string

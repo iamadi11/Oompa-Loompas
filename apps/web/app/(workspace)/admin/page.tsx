@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { serverApiFetch } from '../../../lib/server-api-fetch'
+import { serverApiFetch } from '@/lib/server-api-fetch'
 
 export const metadata: Metadata = {
   title: 'Admin',

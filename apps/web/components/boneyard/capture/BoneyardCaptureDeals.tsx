@@ -1,7 +1,7 @@
 'use client'
 
 import { Skeleton } from 'boneyard-js/react'
-import { DealsFixture } from '../fixtures/DealsFixture'
+import { DealsFixture } from '@/components/boneyard/fixtures/DealsFixture'
 
 export function BoneyardCaptureDeals() {
   return (

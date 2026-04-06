@@ -3,10 +3,10 @@
 import { useState } from 'react'
 import { CreateDeliverableSchema } from '@oompa/types'
 import { validate } from '@oompa/utils'
-import { api } from '../../lib/api'
-import { Input } from '../ui/Input'
-import { Select } from '../ui/Select'
-import { Button } from '../ui/Button'
+import { api } from '@/lib/api'
+import { Input } from '@/components/ui/Input'
+import { Select } from '@/components/ui/Select'
+import { Button } from '@/components/ui/Button'
 
 interface AddDeliverableFormProps {
   dealId: string

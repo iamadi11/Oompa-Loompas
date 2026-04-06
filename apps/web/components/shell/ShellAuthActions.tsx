@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Roles, type AuthUser } from '@oompa/types'
-import { api } from '../../lib/api'
+import { api } from '@/lib/api'
 
 const actionLink =
   'text-sm font-semibold text-stone-600 hover:text-stone-900 rounded-md px-3 py-2 transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas'

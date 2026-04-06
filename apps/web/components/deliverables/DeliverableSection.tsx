@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import type { Deliverable } from '@oompa/types'
 import { DeliverableRow } from './DeliverableRow'
 import { AddDeliverableForm } from './AddDeliverableForm'
-import { Button } from '../ui/Button'
+import { Button } from '@/components/ui/Button'
 
 interface DeliverableSectionProps {
   dealId: string

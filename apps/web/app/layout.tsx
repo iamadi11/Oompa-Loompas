@@ -6,8 +6,10 @@ import {
   APP_DISPLAY_NAME,
   APP_SHORT_NAME,
   APP_THEME_COLOR_HEX,
-} from '../lib/product-meta'
-import { BonesRegistryMount } from '../components/boneyard/BonesRegistryMount'
+} from '@/lib/product-meta'
+import { BonesRegistryMount } from '@/components/boneyard/BonesRegistryMount'
+import { SerwistRegister } from '@/components/pwa/SerwistRegister'
+import { AppToaster } from '@/components/ui/AppToaster'
 
 const display = Cormorant_Garamond({
   subsets: ['latin'],
@@ -54,14 +56,17 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${display.variable} ${sans.variable}`}>
       <body className="min-h-screen antialiased font-sans bg-mesh-page bg-canvas text-stone-900">
-        <BonesRegistryMount />
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-brand-900 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:outline-none focus:ring-2 focus:ring-gold-soft focus:ring-offset-2 focus:ring-offset-canvas"
-        >
-          Skip to main content
-        </a>
-        {children}
+        <SerwistRegister>
+          <BonesRegistryMount />
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-brand-900 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:outline-none focus:ring-2 focus:ring-gold-soft focus:ring-offset-2 focus:ring-offset-canvas"
+          >
+            Skip to main content
+          </a>
+          <AppToaster />
+          {children}
+        </SerwistRegister>
       </body>
     </html>
   )

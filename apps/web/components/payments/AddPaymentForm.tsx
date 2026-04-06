@@ -4,9 +4,9 @@ import { useState } from 'react'
 import type { Currency } from '@oompa/types'
 import { CreatePaymentSchema } from '@oompa/types'
 import { validate } from '@oompa/utils'
-import { api } from '../../lib/api'
-import { Input } from '../ui/Input'
-import { Button } from '../ui/Button'
+import { api } from '@/lib/api'
+import { Input } from '@/components/ui/Input'
+import { Button } from '@/components/ui/Button'
 
 interface AddPaymentFormProps {
   dealId: string

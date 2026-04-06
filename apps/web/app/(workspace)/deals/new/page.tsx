@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { DealForm } from '../../../../components/deals/DealForm'
+import { DealForm } from '@/components/deals/DealForm'
 
 export const metadata: Metadata = {
   title: 'New deal',

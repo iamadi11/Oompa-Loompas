@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { getServerApiBaseUrl } from '../get-server-api-base-url'
+import { getServerApiBaseUrl } from '@/lib/get-server-api-base-url'
 
 describe('getServerApiBaseUrl', () => {
   afterEach(() => {

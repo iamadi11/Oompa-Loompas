@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import type { AttentionQueue } from '@oompa/types'
-import { PriorityActionList } from '../../../components/dashboard/PriorityActionList'
-import { serverApiFetch } from '../../../lib/server-api-fetch'
+import { PriorityActionList } from '@/components/dashboard/PriorityActionList'
+import { serverApiFetch } from '@/lib/server-api-fetch'
 
 export const metadata: Metadata = {
   title: 'Attention',

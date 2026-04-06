@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isDealsNeedsAttentionFilter } from '../deals-page'
+import { isDealsNeedsAttentionFilter } from '@/lib/deals-page'
 
 describe('isDealsNeedsAttentionFilter', () => {
   it('is true when needsAttention is the string true or 1', () => {

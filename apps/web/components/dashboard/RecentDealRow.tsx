@@ -5,8 +5,8 @@ import Link from 'next/link'
 import type { DashboardDeal } from '@oompa/types'
 import { formatCurrency } from '@oompa/utils'
 import { motion } from 'motion/react'
-import { useAllowEntranceMotion, usePrefersReducedMotion } from '../../lib/motion/use-prefers-motion'
-import { StatusBadge } from '../ui/Badge'
+import { useAllowEntranceMotion, usePrefersReducedMotion } from '@/lib/motion/use-prefers-motion'
+import { StatusBadge } from '@/components/ui/Badge'
 
 const MotionLink = motion.create(Link)
 

@@ -2,8 +2,8 @@
 
 import Link from 'next/link'
 import { motion } from 'motion/react'
-import { useAllowEntranceMotion, usePrefersReducedMotion } from '../../lib/motion/use-prefers-motion'
-import { APP_DISPLAY_NAME, APP_TAGLINE } from '../../lib/product-meta'
+import { useAllowEntranceMotion, usePrefersReducedMotion } from '@/lib/motion/use-prefers-motion'
+import { APP_DISPLAY_NAME, APP_TAGLINE } from '@/lib/product-meta'
 
 const ctaClass =
   'inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas'

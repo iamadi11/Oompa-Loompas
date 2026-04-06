@@ -7,6 +7,9 @@ import { LoginForm } from './LoginForm'
 const push = vi.fn()
 const refresh = vi.fn()
 
+const toastError = vi.hoisted(() => vi.fn())
+const toastSuccess = vi.hoisted(() => vi.fn())
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push,
@@ -14,9 +17,16 @@ vi.mock('next/navigation', () => ({
   }),
 }))
 
+vi.mock('sonner', () => ({
+  toast: {
+    error: toastError,
+    success: toastSuccess,
+  },
+}))
+
 const loginMock = vi.fn()
 
-vi.mock('../../lib/api', () => ({
+vi.mock('@/lib/api', () => ({
   api: {
     login: (...args: unknown[]) => loginMock(...args),
   },
@@ -26,20 +36,22 @@ describe('LoginForm', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     loginMock.mockReset()
+    toastError.mockReset()
+    toastSuccess.mockReset()
   })
 
-  it('returns validation state when email and password are missing (action)', async () => {
+  it('shows validation toast when email and password are missing (action)', async () => {
     render(<LoginForm />)
     const form = screen.getByRole('textbox', { name: /^email$/i }).closest('form')
     expect(form).toBeTruthy()
     fireEvent.submit(form!)
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveTextContent('Enter your email and password.')
+      expect(toastError).toHaveBeenCalledWith('Enter your email and password.')
     })
     expect(loginMock).not.toHaveBeenCalled()
   })
 
-  it('shows API error message when login fails', async () => {
+  it('shows API error toast when login fails', async () => {
     const user = userEvent.setup()
     loginMock.mockRejectedValueOnce(new Error('Invalid email or password'))
     render(<LoginForm />)
@@ -47,7 +59,7 @@ describe('LoginForm', () => {
     await user.type(screen.getByLabelText(/^password$/i), 'wrong')
     await user.click(screen.getByRole('button', { name: /^sign in$/i }))
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveTextContent('Invalid email or password')
+      expect(toastError).toHaveBeenCalledWith('Invalid email or password')
     })
     expect(loginMock).toHaveBeenCalledWith({ email: 'a@test.dev', password: 'wrong' })
   })
@@ -62,6 +74,7 @@ describe('LoginForm', () => {
     await user.type(screen.getByLabelText(/^password$/i), 'secret')
     await user.click(screen.getByRole('button', { name: /^sign in$/i }))
     await waitFor(() => {
+      expect(toastSuccess).toHaveBeenCalledWith('Signed in')
       expect(push).toHaveBeenCalledWith('/dashboard')
       expect(refresh).toHaveBeenCalled()
     })

@@ -9,6 +9,8 @@ import { fileURLToPath } from 'node:url'
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const required = [
   'app/manifest.ts',
+  'app/sw.ts',
+  'app/serwist/[path]/route.ts',
   'public/icons/icon-192.png',
   'public/icons/icon-512.png',
 ]

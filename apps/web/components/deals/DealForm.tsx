@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation'
 import type { Deal, CreateDeal, DealStatus, UpdateDeal } from '@oompa/types'
 import { CreateDealSchema, DEAL_STATUS_TRANSITIONS, UpdateDealSchema } from '@oompa/types'
 import { validate } from '@oompa/utils'
-import { api } from '../../lib/api'
-import { Input } from '../ui/Input'
-import { Select } from '../ui/Select'
-import { Button } from '../ui/Button'
+import { api } from '@/lib/api'
+import { Input } from '@/components/ui/Input'
+import { Select } from '@/components/ui/Select'
+import { Button } from '@/components/ui/Button'
 
 interface DealFormProps {
   deal?: Deal

@@ -7,7 +7,7 @@ import { computePaymentSummary } from '@oompa/types'
 import { formatCurrency } from '@oompa/utils'
 import { PaymentRow } from './PaymentRow'
 import { AddPaymentForm } from './AddPaymentForm'
-import { Button } from '../ui/Button'
+import { Button } from '@/components/ui/Button'
 
 interface PaymentSectionProps {
   dealId: string

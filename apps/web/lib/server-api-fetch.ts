@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers'
-import { getServerApiBaseUrl } from './get-server-api-base-url'
+import { getServerApiBaseUrl } from '@/lib/get-server-api-base-url'
 
 /**
  * Server-side fetch to the Fastify API with the incoming request cookies (session).

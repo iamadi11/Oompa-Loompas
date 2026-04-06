@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'motion/react'
-import { useAllowEntranceMotion } from '../../lib/motion/use-prefers-motion'
+import { useAllowEntranceMotion } from '@/lib/motion/use-prefers-motion'
 
 export function WorkspacePageMotion({ children }: { children: React.ReactNode }) {
   const allowEntrance = useAllowEntranceMotion()

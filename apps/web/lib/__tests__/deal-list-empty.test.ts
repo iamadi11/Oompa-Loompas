@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getDealListEmptyContent } from '../deal-list-empty'
+import { getDealListEmptyContent } from '@/lib/deal-list-empty'
 
 describe('getDealListEmptyContent', () => {
   it('returns onboarding copy for all deals with empty list', () => {

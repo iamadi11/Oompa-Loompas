@@ -2,12 +2,12 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import type { DashboardSummary } from '@oompa/types'
 import { formatCurrency } from '@oompa/utils'
-import { OverviewFetchError } from '../../../components/dashboard/OverviewFetchError'
-import { PriorityActionsSection } from '../../../components/dashboard/PriorityActionsSection'
-import { RecentDealRow } from '../../../components/dashboard/RecentDealRow'
-import { SummaryCard } from '../../../components/dashboard/SummaryCard'
-import { resolveHomeOverviewState } from '../../../lib/home-page'
-import { serverApiFetch } from '../../../lib/server-api-fetch'
+import { OverviewFetchError } from '@/components/dashboard/OverviewFetchError'
+import { PriorityActionsSection } from '@/components/dashboard/PriorityActionsSection'
+import { RecentDealRow } from '@/components/dashboard/RecentDealRow'
+import { SummaryCard } from '@/components/dashboard/SummaryCard'
+import { resolveHomeOverviewState } from '@/lib/home-page'
+import { serverApiFetch } from '@/lib/server-api-fetch'
 
 async function getDashboardData(): Promise<DashboardSummary | null> {
   try {
