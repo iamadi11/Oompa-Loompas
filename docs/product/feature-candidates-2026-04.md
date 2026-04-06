@@ -33,4 +33,6 @@ Deals, payments, deliverables, dashboard summaries, **attention** queue for over
 
 **Shipped slice (2026-04-06):** HTML invoice per payment milestone — [docs/decisions/2026-04-06-payment-invoice-html-v1.md](../decisions/2026-04-06-payment-invoice-html-v1.md).
 
+**Shipped patch (2026-04-06):** Dev CORS for **`dev:clean` (port 3005)** + invoice a11y polish — [docs/releases/RELEASE-0.1.8.md](../releases/RELEASE-0.1.8.md).
+
 Document each slice with a decision record before implementation ([docs/decisions/](../decisions/)).

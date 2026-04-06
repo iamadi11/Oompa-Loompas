@@ -1,7 +1,7 @@
 # Browser MCP UX checklist — dashboard priority actions + attention queue
 
 **Date:** 2026-04-06 (re-run)  
-**Latest MCP run:** 2026-04-06 (Cursor browser MCP, **repeat**) — same routes on **3005** after **stale `.next`** fix (**`./958.js`** **500** → **`rm -rf .next`** + **`next dev -p 3005`**, or **`pnpm dev:clean`** from **`apps/web`** + API env); **Pass** below; **Nav `browser_click`** still **Fail (tooling)**. MCP console may show **`data-cursor-ref` hydration** warnings (**tooling**), not app regressions.  
+**Latest MCP run:** 2026-04-06 (agent) — **`/attention`** on **3005** after **`.next` clean** + dev restart: H1 **Needs your attention**, region **Overdue items**, footer **`Browse deals with overdue work`** **`href`** `/deals?needsAttention=true` — **Pass**. **Nav `browser_click`** on **`next/link`** still **Fail (tooling)**.  
 **Base URL:** `http://localhost:3005` (Next dev; API `http://localhost:3001`)  
 **Sources:** [docs/ux/dashboard-priority-actions.md](../ux/dashboard-priority-actions.md), [docs/ux/attention-queue.md](../ux/attention-queue.md)
 

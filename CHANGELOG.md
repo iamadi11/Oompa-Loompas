@@ -4,13 +4,23 @@ All notable changes to this repository are documented in this file.
 
 ## Unreleased
 
-### `@oompa/api`
+### `@oompa/db`
 
-- **Dev CORS:** allow **`http://localhost:3005`** and **`http://127.0.0.1:3005`** alongside existing localhost origins so client-side **`fetch`** from **`pnpm dev:clean`** (`apps/web`) receives **`Access-Control-Allow-Origin`**. Regression test in [`cors.test.ts`](./apps/api/src/__tests__/cors.test.ts).
+- **`db:seed`:** implement [`packages/db/src/seed.ts`](./packages/db/src/seed.ts) (idempotent: skips when any deal exists). Fixes broken **`pnpm db:seed`** script that pointed at a missing file.
 
-### `@oompa/web` / `@oompa/utils`
+## [0.1.8] - 2026-04-06
 
-- **Payment invoice UX (a11y):** **View invoice** link **focus-visible** ring; invoice HTML **`main`** landmark, table **`aria-label`**, human-readable **payment status** labels. Browser checklist: [docs/testing/browser-ux-checklist-payment-invoice-html-v1-2026-04-06.md](./docs/testing/browser-ux-checklist-payment-invoice-html-v1-2026-04-06.md).
+### `@oompa/api` **0.1.3**
+
+- **Dev CORS:** allow **`http://localhost:3005`** and **`http://127.0.0.1:3005`** alongside existing localhost origins so client-side **`fetch`** from **`pnpm dev:clean`** (`apps/web`) receives **`Access-Control-Allow-Origin`**. Regression test in [`cors.test.ts`](./apps/api/src/__tests__/cors.test.ts). **Docs:** [decision](./docs/decisions/2026-04-06-api-cors-dev-web-3005.md), [architecture](./docs/architecture/api-cors-dev-web-3005.md), [testing](./docs/testing/api-cors-dev-web-3005.md), [instrumentation](./docs/instrumentation/api-cors-dev-web-3005.md), [retro](./docs/retros/2026-04-06-release-0.1.8.md), [release notes](./docs/releases/RELEASE-0.1.8.md).
+
+### `@oompa/web` **0.1.8**
+
+- **Payment invoice UX (a11y):** **View invoice** link **focus-visible** ring. Browser checklist: [docs/testing/browser-ux-checklist-payment-invoice-html-v1-2026-04-06.md](./docs/testing/browser-ux-checklist-payment-invoice-html-v1-2026-04-06.md).
+
+### `@oompa/utils` **0.1.1**
+
+- **Payment invoice HTML (a11y):** **`main`** landmark, table **`aria-label`**, human-readable **payment status** labels (see [UX: payment invoice HTML v1](./docs/ux/payment-invoice-html-v1.md)).
 
 ## [0.1.7] - 2026-04-06
 

@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-06  
 **Environment:** Next.js dev `http://127.0.0.1:3005`, API `http://127.0.0.1:3001` (`API_URL` / `NEXT_PUBLIC_API_URL` aligned).  
-**Latest MCP re-check:** 2026-04-06 — same routes after **dev CORS :3005** fix; invoice **`Cache-Control: no-store`** confirmed via **`curl -I`**.  
+**Latest MCP re-check:** 2026-04-06 (agent) — after **`rm -rf apps/web/.next`** + **`next dev -p 3005`** restart (recovered **`/deals/[id]`** from **`Cannot find module './808.js'`**). Invoice HTML: **`curl`** confirms **`<main id="invoice-content">`**, **`table aria-label="Payment milestone details"`**, **`cache-control: no-store`**.  
 **Source:** [docs/ux/payment-invoice-html-v1.md](../ux/payment-invoice-html-v1.md)
 
 ## Results
@@ -22,6 +22,7 @@
 | Invoice **semantic structure** (main + table name) | **Fail → Fixed** | Added `<main id="invoice-content">`, `table aria-label="Payment milestone details"` |
 | Status human-readable (not raw enum) | **Fail → Fixed** | **RECEIVED** → **Received** in HTML for assistive tech + print |
 | **MCP regression sweep** (2026-04-06) | **Pass** | Deal with payments: **Payments** region, **View printable invoice…** links, **`rel`/`target`**; empty deal **bf97…**: no invoice links; invoice URL: title **Invoice — tst**, **H1** + reference; HTML contains **`<main id="invoice-content">`**, **`table aria-label="Payment milestone details"`** (`curl`); **`Cache-Control: no-store`**. |
+| **Stale `.next` → deal detail 500** (`./808.js`) | **Fail → Fixed (ops)** | Next dev overlay until **`.next` deleted** and dev server restarted from **`apps/web`** with API env. |
 
 ## Follow-ups
 

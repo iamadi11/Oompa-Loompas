@@ -1,7 +1,7 @@
 # Browser MCP UX checklist — deals “needs attention” filter
 
 **Date:** 2026-04-06 (post-filter ship)  
-**Latest MCP run:** 2026-04-06 (Cursor browser MCP, **repeat**) — after **`.next` clean** (recovered from **`./958.js`** **500**) + dev on **3005**: **`/deals`**, **`/deals?needsAttention=true`**, **`/attention`** — **200**; main nav **Deals** `states: [current]`; filter **`aria-current`** **Pass**; footer link **`href`** **`/deals?needsAttention=true`** **Pass**. **Document names:** **`Deals · Revenue`** / **`Needs attention · Revenue`** **Pass**.  
+**Latest MCP run:** 2026-04-06 (agent) — **`/deals`**, **`/deals?needsAttention=true`** on **3005** post-**`.next` clean**: main nav **Deals** `states: [current]`; **All deals** / **Needs attention** filter `aria-current` **Pass**; subtitles **4 deals** / **1 deal with overdue work** **Pass**; document titles **Deals · Revenue** / **Needs attention · Revenue** **Pass**.  
 **Base URL:** `http://localhost:3005` (Next dev; API `http://localhost:3001`)  
 **Source:** [docs/ux/deals-needs-attention-filter.md](../ux/deals-needs-attention-filter.md)
 

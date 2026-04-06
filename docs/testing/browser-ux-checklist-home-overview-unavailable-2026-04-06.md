@@ -2,6 +2,7 @@
 
 **Date:** 2026-04-06  
 **Latest MCP run:** 2026-04-06 (Cursor browser MCP) — **`http://127.0.0.1:3040`** / **`http://127.0.0.1:3041`**; **`@oompa/api`** on **:3001** (dashboard **200**).  
+**Agent session (same day):** Dual-port error/success profiles **not re-run**; healthy dashboard on **`http://127.0.0.1:3005/`** confirmed **Overview** + **What to do next** (see [browser-ux-checklist-run-2026-04-06.md](./browser-ux-checklist-run-2026-04-06.md)).  
 **Source:** [docs/ux/home-overview-unavailable-state.md](../ux/home-overview-unavailable-state.md)  
 **Reference:** [docs/ux/web-shell-pwa.md](../ux/web-shell-pwa.md) (global nav)
 
