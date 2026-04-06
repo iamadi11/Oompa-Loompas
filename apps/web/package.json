@@ -4,8 +4,8 @@
   "private": true,
   "description": "Oompa Loompas — Web App",
   "scripts": {
-    "dev": "next dev -p 3000",
-    "dev:clean": "node -e \"require('node:fs').rmSync('.next',{recursive:true,force:true})\" && next dev -p 3005",
+    "dev": "next dev --webpack -p 3000",
+    "dev:clean": "node -e \"require('node:fs').rmSync('.next',{recursive:true,force:true})\" && next dev --webpack -p 3005",
     "build": "next build --webpack",
     "start": "next start",
     "typecheck": "tsc --noEmit",

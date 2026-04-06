@@ -4,12 +4,12 @@ Monorepo for **Oompa Loompas**, the creator **financial outcome engine** (deals,
 
 ## Packages
 
-| Path | Role |
-|------|------|
-| `apps/web` | Next.js web client ([PWA](./docs/decisions/2026-04-06-pwa-web-client.md)) |
-| `apps/api` | Fastify API |
-| `packages/db` | Prisma / PostgreSQL |
-| `packages/types` | Shared types |
+| Path             | Role                                                                      |
+| ---------------- | ------------------------------------------------------------------------- |
+| `apps/web`       | Next.js web client ([PWA](./docs/decisions/2026-04-06-pwa-web-client.md)) |
+| `apps/api`       | Fastify API                                                               |
+| `packages/db`    | Prisma / PostgreSQL                                                       |
+| `packages/types` | Shared types                                                              |
 
 ## Web client (PWA)
 
@@ -29,6 +29,15 @@ pnpm install
 pnpm dev
 ```
 
-Use the root and package `package.json` scripts for typecheck, lint, and tests.
+The web app uses **Next.js 16** with **webpack** for dev and build (required for `@ducanh2912/next-pwa`). `apps/web` scripts already pass `--webpack`.
+
+Point the browser at the API from `apps/web` (rewrites `/api/v1/*`): set `API_URL` and, for any client-side `fetch` to the API origin, `NEXT_PUBLIC_API_URL` (see `apps/web/.env.example`). Example:
+
+```bash
+pnpm --filter @oompa/api dev
+cd apps/web && API_URL=http://127.0.0.1:3001 NEXT_PUBLIC_API_URL=http://127.0.0.1:3001 pnpm dev
+```
+
+Use the root and package `package.json` scripts for typecheck, lint, and tests. UX / PWA checklist runs are logged in [docs/testing/ux-checklist-results.md](./docs/testing/ux-checklist-results.md).
 
 For a **fresh database**, apply migrations (`pnpm --filter @oompa/db exec prisma migrate deploy`) and seed or create a user (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` when there are no deals). See `apps/api/.env.example` and `docs/architecture/auth-and-rbac.md`.

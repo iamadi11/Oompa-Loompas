@@ -2,20 +2,33 @@
 
 import type { Route } from 'next'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { api } from '../../lib/api'
+import { readNamedInput } from '../../lib/forms/read-named-input'
 
 export function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const formRef = useRef<HTMLFormElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault()
+  const runLogin = useCallback(async () => {
+    const form = formRef.current
+    if (!form) return
     setError(null)
+    const emailInput = readNamedInput(form, 'email')
+    const passwordInput = readNamedInput(form, 'password')
+    if (!emailInput || !passwordInput) {
+      setError('Sign-in form is not ready. Refresh and try again.')
+      return
+    }
+    const email = emailInput.value.trim()
+    const password = passwordInput.value
+    if (!email || !password) {
+      setError('Enter your email and password.')
+      return
+    }
     setPending(true)
     try {
       await api.login({ email, password })
@@ -29,10 +42,21 @@ export function LoginForm() {
     } finally {
       setPending(false)
     }
+  }, [router, searchParams])
+
+  function onFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    void runLogin()
+  }
+
+  /** Separate path for button click: some automation tools fire click without a reliable `submit` event. */
+  function onSignInClick(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault()
+    void runLogin()
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-5">
+    <form ref={formRef} onSubmit={onFormSubmit} className="space-y-5">
       <div className="space-y-2">
         <label htmlFor="login-email" className="block text-sm font-medium text-stone-800">
           Email
@@ -43,9 +67,7 @@ export function LoginForm() {
           type="email"
           autoComplete="email"
           required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-xl border border-line/90 bg-white px-3 py-2.5 text-stone-900 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-brand-500"
+          className="w-full rounded-xl border border-line/90 bg-white px-3 py-2.5 text-stone-900 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-700 focus:border-brand-600"
         />
       </div>
       <div className="space-y-2">
@@ -58,20 +80,22 @@ export function LoginForm() {
           type="password"
           autoComplete="current-password"
           required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-xl border border-line/90 bg-white px-3 py-2.5 text-stone-900 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-brand-500"
+          className="w-full rounded-xl border border-line/90 bg-white px-3 py-2.5 text-stone-900 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-700 focus:border-brand-600"
         />
       </div>
       {error ? (
-        <p className="text-sm text-red-800 bg-red-50 border border-red-200/80 rounded-lg px-3 py-2" role="alert">
+        <p
+          className="text-sm text-red-800 bg-red-50 border border-red-200/80 rounded-lg px-3 py-2"
+          role="alert"
+        >
           {error}
         </p>
       ) : null}
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-xl bg-brand-700 text-white text-sm font-semibold py-3 shadow-sm border border-brand-800/20 hover:bg-brand-800 disabled:opacity-60 transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-raised"
+        onClick={onSignInClick}
+        className="w-full rounded-xl bg-brand-700 text-white text-sm font-semibold py-3 shadow-sm border border-brand-800/20 hover:bg-brand-800 disabled:opacity-60 transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-raised"
       >
         {pending ? 'Signing in…' : 'Sign in'}
       </button>
