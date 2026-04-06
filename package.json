@@ -2,7 +2,7 @@
   "name": "oompa-loompas",
   "version": "0.2.0",
   "private": true,
-  "description": "Creator Revenue Intelligence System",
+  "description": "Oompa Loompas — creator financial outcome engine (monorepo)",
   "scripts": {
     "build": "pnpm -r build",
     "dev": "pnpm --parallel -r dev",
@@ -14,8 +14,8 @@
     "db:use-local-pg": "node scripts/use-local-postgres-url.cjs"
   },
   "devDependencies": {
-    "prettier": "^3.3.3",
-    "typescript": "^5.5.4"
+    "prettier": "^3.5.3",
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": ">=20.0.0",

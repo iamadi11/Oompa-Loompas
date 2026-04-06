@@ -1,16 +1,22 @@
 import type { MetadataRoute } from 'next'
+import {
+  APP_BACKGROUND_COLOR_HEX,
+  APP_DESCRIPTION,
+  APP_DISPLAY_NAME,
+  APP_SHORT_NAME,
+  APP_THEME_COLOR_HEX,
+} from './product-meta'
 
 export function buildWebManifest(): MetadataRoute.Manifest {
   return {
-    name: 'Creator Revenue Intelligence',
-    short_name: 'Revenue',
-    description:
-      'Deal tracking, payments, and revenue intelligence for creators — your personal business operator.',
+    name: APP_DISPLAY_NAME,
+    short_name: APP_SHORT_NAME,
+    description: APP_DESCRIPTION,
     start_url: '/',
     display: 'standalone',
     orientation: 'portrait-primary',
-    background_color: '#e9e4d9',
-    theme_color: '#1f3832',
+    background_color: APP_BACKGROUND_COLOR_HEX,
+    theme_color: APP_THEME_COLOR_HEX,
     icons: [
       {
         src: '/icons/icon-192.png',

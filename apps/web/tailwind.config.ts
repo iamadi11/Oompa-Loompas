@@ -12,50 +12,67 @@ const config: Config = {
         display: ['var(--font-display)', 'Georgia', 'serif'],
       },
       colors: {
-        /** Warm page field — avoids cold gray-50 “template” feel */
+        /** Parchment field — warm factory floor */
         canvas: {
-          DEFAULT: '#e9e4d9',
-          muted: '#e2dcd0',
+          DEFAULT: '#f4ead8',
+          muted: '#ebe3cf',
         },
-        /** Cards / panels */
         surface: {
-          DEFAULT: '#f7f5f0',
-          raised: '#fdfcfa',
+          DEFAULT: '#faf6ec',
+          raised: '#fffefb',
         },
-        /** Hairlines and dividers */
         line: {
-          DEFAULT: '#d4cdc0',
-          strong: '#b8afa0',
+          DEFAULT: '#d4c4a8',
+          strong: '#b8a684',
         },
         /**
-         * Primary accent: deep pine (trust, money-adjacent).
-         * Chosen to avoid overused sky/violet SaaS defaults.
+         * Chocolate + antique gold — premium “atelier” accent (not toy primary colors).
          */
         brand: {
-          50: '#f0f6f4',
-          100: '#dcebe6',
-          200: '#b9d4ca',
-          300: '#8eb5a7',
-          400: '#5c8f7f',
-          500: '#467a6b',
-          600: '#386456',
-          700: '#2e5247',
-          800: '#27433b',
-          900: '#1f3832',
+          50: '#fdf8ed',
+          100: '#f8ecd4',
+          200: '#efd9b0',
+          300: '#e3bf82',
+          400: '#d4a054',
+          500: '#c4853a',
+          600: '#a86b2e',
+          700: '#8a5528',
+          800: '#5c3a1c',
+          900: '#3d2914',
+        },
+        gold: {
+          soft: '#c9a227',
+          rich: '#b8860b',
+          glow: 'rgba(201, 162, 39, 0.35)',
         },
       },
       ringOffsetColor: {
-        canvas: '#e9e4d9',
+        canvas: '#f4ead8',
       },
       boxShadow: {
-        card: '0 1px 0 rgba(28, 25, 23, 0.05), 0 12px 32px -8px rgba(28, 25, 23, 0.08)',
+        card: '0 1px 0 rgba(61, 41, 20, 0.06), 0 14px 36px -10px rgba(61, 41, 20, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.45)',
         'card-hover':
-          '0 1px 0 rgba(28, 25, 23, 0.06), 0 20px 40px -12px rgba(31, 56, 50, 0.14)',
-        header: '0 1px 0 rgba(28, 25, 23, 0.06)',
+          '0 1px 0 rgba(61, 41, 20, 0.08), 0 22px 48px -12px rgba(201, 162, 39, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.55)',
+        header: '0 1px 0 rgba(61, 41, 20, 0.07), 0 8px 24px -8px rgba(61, 41, 20, 0.08)',
+        glow: '0 0 40px -8px rgba(201, 162, 39, 0.45)',
       },
       backgroundImage: {
         'mesh-page':
-          'radial-gradient(ellipse 120% 80% at 100% -20%, rgba(70, 122, 107, 0.09) 0%, transparent 55%), radial-gradient(ellipse 90% 70% at -10% 110%, rgba(180, 140, 90, 0.06) 0%, transparent 50%)',
+          'radial-gradient(ellipse 130% 90% at 100% -25%, rgba(201, 162, 39, 0.14) 0%, transparent 55%), radial-gradient(ellipse 100% 80% at -5% 105%, rgba(139, 90, 43, 0.08) 0%, transparent 52%), radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255, 255, 255, 0.5) 0%, transparent 70%)',
+      },
+      keyframes: {
+        'shimmer-gold': {
+          '0%': { backgroundPosition: '200% 0' },
+          '100%': { backgroundPosition: '-200% 0' },
+        },
+        'float-soft': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-4px)' },
+        },
+      },
+      animation: {
+        'shimmer-gold': 'shimmer-gold 4.5s ease-in-out infinite',
+        'float-soft': 'float-soft 5s ease-in-out infinite',
       },
     },
   },

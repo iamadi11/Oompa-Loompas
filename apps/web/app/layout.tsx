@@ -1,34 +1,37 @@
 import type { Metadata, Viewport } from 'next'
-import { Fraunces, Source_Sans_3 } from 'next/font/google'
+import { Cormorant_Garamond, DM_Sans } from 'next/font/google'
 import './globals.css'
+import {
+  APP_DESCRIPTION,
+  APP_DISPLAY_NAME,
+  APP_SHORT_NAME,
+  APP_THEME_COLOR_HEX,
+} from '../lib/product-meta'
 
-const APP_NAME = 'Revenue'
-
-const display = Fraunces({
+const display = Cormorant_Garamond({
   subsets: ['latin'],
   variable: '--font-display',
   display: 'swap',
 })
 
-const sans = Source_Sans_3({
+const sans = DM_Sans({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
 })
 
 export const metadata: Metadata = {
-  applicationName: APP_NAME,
+  applicationName: APP_SHORT_NAME,
   title: {
-    default: 'Creator Revenue Intelligence',
-    template: `%s · ${APP_NAME}`,
+    default: APP_DISPLAY_NAME,
+    template: `%s · ${APP_SHORT_NAME}`,
   },
-  description:
-    'Deal tracking, payments, and revenue intelligence for creators — your personal business operator.',
+  description: APP_DESCRIPTION,
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Creator Revenue Intelligence',
+    title: APP_DISPLAY_NAME,
   },
   formatDetection: {
     telephone: false,
@@ -36,7 +39,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#1f3832',
+  themeColor: APP_THEME_COLOR_HEX,
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -52,7 +55,7 @@ export default function RootLayout({
       <body className="min-h-screen antialiased font-sans bg-mesh-page bg-canvas text-stone-900">
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-brand-900 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 focus:ring-offset-canvas"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-brand-900 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:outline-none focus:ring-2 focus:ring-gold-soft focus:ring-offset-2 focus:ring-offset-canvas"
         >
           Skip to main content
         </a>

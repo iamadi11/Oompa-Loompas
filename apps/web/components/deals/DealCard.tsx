@@ -1,17 +1,40 @@
+'use client'
+
+import type { Route } from 'next'
 import Link from 'next/link'
 import type { Deal } from '@oompa/types'
 import { formatCurrency } from '@oompa/utils'
+import { motion, useReducedMotion } from 'motion/react'
 import { StatusBadge } from '../ui/Badge'
+
+const MotionLink = motion.create(Link)
 
 interface DealCardProps {
   deal: Deal
+  /** Stagger index for list entrance (dashboard / deals list). */
+  motionIndex?: number
 }
 
-export function DealCard({ deal }: DealCardProps) {
+export function DealCard({ deal, motionIndex = 0 }: DealCardProps) {
+  const reduce = useReducedMotion()
+
   return (
-    <Link
-      href={`/deals/${deal.id}`}
-      className="block rounded-2xl border border-line/90 bg-surface-raised p-4 sm:p-5 shadow-card transition-all duration-200 motion-reduce:transition-none hover:border-brand-300/80 hover:shadow-card-hover group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+    <MotionLink
+      href={`/deals/${deal.id}` as Route}
+      className="block rounded-2xl border border-line/90 bg-surface-raised p-4 sm:p-5 shadow-card transition-all duration-200 motion-reduce:transition-none hover:border-brand-400/70 hover:shadow-card-hover group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+      initial={reduce ? false : { opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.4,
+        delay: reduce ? 0 : motionIndex * 0.06,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+      {...(!reduce
+        ? {
+            whileHover: { y: -4, transition: { type: 'spring' as const, stiffness: 380, damping: 24 } },
+            whileTap: { scale: 0.99 },
+          }
+        : {})}
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
@@ -34,6 +57,6 @@ export function DealCard({ deal }: DealCardProps) {
           </span>
         )}
       </div>
-    </Link>
+    </MotionLink>
   )
 }

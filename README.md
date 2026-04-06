@@ -1,12 +1,12 @@
 # Oompa-Loompas
 
-Monorepo for the **Creator Revenue Intelligence System** — a financial outcome engine for creators (deals, payments, deliverables, dashboard). See [SOURCE_OF_TRUTH.md](./SOURCE_OF_TRUTH.md) for product authority.
+Monorepo for **Oompa Loompas**, the creator **financial outcome engine** (deals, payments, deliverables, dashboard). Product behavior and authority are defined in [SOURCE_OF_TRUTH.md](./SOURCE_OF_TRUTH.md).
 
 ## Packages
 
 | Path | Role |
 |------|------|
-| `apps/web` | Next.js 14 web client ([PWA](./docs/decisions/2026-04-06-pwa-web-client.md)) |
+| `apps/web` | Next.js web client ([PWA](./docs/decisions/2026-04-06-pwa-web-client.md)) |
 | `apps/api` | Fastify API |
 | `packages/db` | Prisma / PostgreSQL |
 | `packages/types` | Shared types |

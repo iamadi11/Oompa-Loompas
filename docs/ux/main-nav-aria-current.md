@@ -5,7 +5,7 @@
 ## User journey
 
 1. Creator lands on overview (`/dashboard`), **Attention**, or **Deals** (including new deal and deal detail).
-2. Header shows which **section** they are in: **Revenue** (brand → overview), **Overview**, **Attention**, or **Deals** — visually and via `aria-current="page"`.
+2. Header shows which **section** they are in: **Oompa Loompas** (brand → overview), **Overview**, **Attention**, or **Deals** — visually and via `aria-current="page"`.
 
 ## States
 

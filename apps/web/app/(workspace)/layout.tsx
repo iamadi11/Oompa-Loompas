@@ -1,3 +1,4 @@
+import { WorkspacePageMotion } from '../../components/motion/WorkspacePageMotion'
 import { AppShellHeader } from '../../components/shell/MainNav'
 
 export default function WorkspaceLayout({
@@ -17,7 +18,7 @@ export default function WorkspaceLayout({
         className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-10"
         tabIndex={-1}
       >
-        {children}
+        <WorkspacePageMotion>{children}</WorkspacePageMotion>
       </main>
     </div>
   )

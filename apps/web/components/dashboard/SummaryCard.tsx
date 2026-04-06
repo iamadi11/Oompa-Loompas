@@ -1,8 +1,13 @@
+'use client'
+
+import { motion, useReducedMotion } from 'motion/react'
+
 interface SummaryCardProps {
   label: string
   value: string
   accent?: 'default' | 'green' | 'red' | 'yellow' | undefined
   subtext?: string | undefined
+  motionIndex?: number
 }
 
 const ACCENT_STYLES = {
@@ -19,9 +24,27 @@ const VALUE_STYLES = {
   yellow: 'text-amber-900',
 }
 
-export function SummaryCard({ label, value, accent = 'default', subtext }: SummaryCardProps) {
+export function SummaryCard({
+  label,
+  value,
+  accent = 'default',
+  subtext,
+  motionIndex = 0,
+}: SummaryCardProps) {
+  const reduce = useReducedMotion()
+
   return (
-    <div className={`rounded-2xl border p-4 sm:p-5 ${ACCENT_STYLES[accent]}`}>
+    <motion.div
+      className={`rounded-2xl border p-4 sm:p-5 ${ACCENT_STYLES[accent]}`}
+      initial={reduce ? false : { opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.42,
+        delay: reduce ? 0 : motionIndex * 0.08,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+      {...(!reduce ? { whileHover: { y: -2, transition: { duration: 0.2 } } } : {})}
+    >
       <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-stone-500">{label}</p>
       <p className={`mt-2 text-xl sm:text-2xl font-bold tabular-nums tracking-tight ${VALUE_STYLES[accent]}`}>
         {value}
@@ -29,6 +52,6 @@ export function SummaryCard({ label, value, accent = 'default', subtext }: Summa
       {subtext && (
         <p className="mt-1.5 text-xs text-stone-500 leading-snug">{subtext}</p>
       )}
-    </div>
+    </motion.div>
   )
 }

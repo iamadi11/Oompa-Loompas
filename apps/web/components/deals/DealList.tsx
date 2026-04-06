@@ -52,8 +52,8 @@ export function DealList({ deals, emptyVariant = 'all' }: DealListProps) {
 
   return (
     <div className="grid gap-3 sm:gap-4">
-      {deals.map((deal) => (
-        <DealCard key={deal.id} deal={deal} />
+      {deals.map((deal, index) => (
+        <DealCard key={deal.id} deal={deal} motionIndex={index} />
       ))}
     </div>
   )

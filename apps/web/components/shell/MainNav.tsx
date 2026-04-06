@@ -1,13 +1,15 @@
 'use client'
 
 import Link from 'next/link'
+import { motion, useReducedMotion } from 'motion/react'
 import { useEffect, useId, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { isMainNavCurrent } from '../../lib/main-nav'
+import { APP_DISPLAY_NAME } from '../../lib/product-meta'
 import { ShellAuthActions } from './ShellAuthActions'
 
 const linkBase =
-  'rounded-md transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas'
+  'rounded-md transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas'
 
 function linkClassName(current: boolean): string {
   return `${linkBase} ${
@@ -52,18 +54,23 @@ function NavLinks(props: { onNavigate?: () => void; className?: string }) {
 }
 
 export function BrandHomeLink() {
+  const reduce = useReducedMotion()
   return (
     <Link
       href="/dashboard"
-      className="font-display text-lg sm:text-xl font-semibold tracking-tight text-stone-900 transition-opacity duration-200 motion-reduce:transition-none hover:opacity-85 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+      className="font-display text-lg sm:text-xl font-semibold tracking-tight text-stone-900 transition-opacity duration-200 motion-reduce:transition-none hover:opacity-90 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
     >
-      <span className="relative">
-        Revenue
+      <motion.span
+        className="relative inline-block"
+        transition={{ type: 'spring', stiffness: 420, damping: 22 }}
+        {...(!reduce ? { whileHover: { scale: 1.02 }, whileTap: { scale: 0.98 } } : {})}
+      >
+        {APP_DISPLAY_NAME}
         <span
-          className="absolute -bottom-0.5 left-0 right-0 h-px bg-gradient-to-r from-brand-600/0 via-brand-600/50 to-brand-600/0 opacity-70"
+          className="absolute -bottom-0.5 left-0 right-0 h-px bg-gradient-to-r from-gold-soft/0 via-gold-rich/65 to-gold-soft/0"
           aria-hidden="true"
         />
-      </span>
+      </motion.span>
     </Link>
   )
 }
@@ -77,7 +84,13 @@ export function AppShellHeader() {
   const menuId = useId()
 
   useEffect(() => {
-    setMenuOpen(false)
+    let active = true
+    queueMicrotask(() => {
+      if (active) setMenuOpen(false)
+    })
+    return () => {
+      active = false
+    }
   }, [pathname])
 
   useEffect(() => {
@@ -99,7 +112,7 @@ export function AppShellHeader() {
         </nav>
         <button
           type="button"
-          className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg border border-line/90 bg-surface-raised/80 text-stone-800 shadow-sm transition-colors hover:bg-surface-raised focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+          className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg border border-line/90 bg-surface-raised/80 text-stone-800 shadow-sm transition-colors hover:bg-surface-raised focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
           aria-expanded={menuOpen}
           aria-controls={menuId}
           aria-label={menuOpen ? 'Close menu' : 'Open menu'}

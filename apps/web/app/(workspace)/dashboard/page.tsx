@@ -33,7 +33,7 @@ export default async function HomePage() {
         <div className="space-y-4">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-800/90">Start here</p>
           <h1 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-stone-900 leading-[1.15]">
-            Your revenue, composed — not just counted.
+            Your outcomes, composed — not just counted.
           </h1>
           <p className="text-base sm:text-lg text-stone-600 leading-relaxed">
             Track deals and payments in one calm surface. Built for creators who treat their work like a studio, not a
@@ -64,7 +64,7 @@ export default async function HomePage() {
         </div>
         <Link
           href="/deals/new"
-          className="inline-flex w-fit items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-700 text-white text-sm font-semibold shadow-sm border border-brand-800/20 hover:bg-brand-800 transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+          className="inline-flex w-fit items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-700 text-white text-sm font-semibold shadow-sm border border-brand-800/20 hover:bg-brand-800 transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
         >
           <span className="text-lg leading-none" aria-hidden="true">
             +
@@ -84,21 +84,25 @@ export default async function HomePage() {
         </h2>
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           <SummaryCard
+            motionIndex={0}
             label="Contracted"
             value={formatCurrency(dashboard.totalContractedValue, currency)}
             subtext={`${dashboard.totalDealsCount} deal${dashboard.totalDealsCount !== 1 ? 's' : ''}`}
           />
           <SummaryCard
+            motionIndex={1}
             label="Received"
             value={formatCurrency(dashboard.totalReceivedValue, currency)}
             accent="green"
           />
           <SummaryCard
+            motionIndex={2}
             label="Outstanding"
             value={formatCurrency(dashboard.totalOutstandingValue, currency)}
             accent={dashboard.overduePaymentsCount > 0 ? 'red' : 'default'}
           />
           <SummaryCard
+            motionIndex={3}
             label={dashboard.overduePaymentsCount > 0 ? 'Overdue' : 'Active deals'}
             value={
               dashboard.overduePaymentsCount > 0
@@ -122,14 +126,14 @@ export default async function HomePage() {
           </h2>
           <Link
             href="/deals"
-            className="text-sm font-semibold text-brand-800 hover:text-brand-900 w-fit rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+            className="text-sm font-semibold text-brand-800 hover:text-brand-900 w-fit rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
           >
             View all
           </Link>
         </div>
         <div className="flex flex-col gap-2">
-          {dashboard.recentDeals.map((deal) => (
-            <RecentDealRow key={deal.id} deal={deal} />
+          {dashboard.recentDeals.map((deal, index) => (
+            <RecentDealRow key={deal.id} deal={deal} motionIndex={index} />
           ))}
         </div>
       </section>

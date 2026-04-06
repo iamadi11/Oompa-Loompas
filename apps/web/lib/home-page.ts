@@ -7,7 +7,7 @@ export type HomeOverviewState =
 
 /**
  * Separates “dashboard unavailable” (network/API) from “no deals yet”.
- * Conflating the two misleads creators into thinking their revenue data is empty.
+ * Conflating the two misleads creators into thinking their deal data is empty.
  */
 export function resolveHomeOverviewState(
   data: DashboardSummary | null | undefined

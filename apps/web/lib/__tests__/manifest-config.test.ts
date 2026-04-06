@@ -4,13 +4,13 @@ import { buildWebManifest } from '../manifest-config'
 describe('buildWebManifest', () => {
   it('returns installable PWA manifest fields', () => {
     const m = buildWebManifest()
-    expect(m.name).toBe('Creator Revenue Intelligence')
-    expect(m.short_name).toBe('Revenue')
+    expect(m.name).toBe('Oompa Loompas')
+    expect(m.short_name).toBe('Oompa')
     expect(m.start_url).toBe('/')
     expect(m.display).toBe('standalone')
     expect(m.orientation).toBe('portrait-primary')
-    expect(m.background_color).toBe('#e9e4d9')
-    expect(m.theme_color).toBe('#1f3832')
+    expect(m.background_color).toBe('#f4ead8')
+    expect(m.theme_color).toBe('#3d2914')
     expect(m.description).toContain('creators')
   })
 

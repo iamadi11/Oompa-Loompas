@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Suspense } from 'react'
 import { LoginForm } from '../../components/auth/LoginForm'
+import { APP_DISPLAY_NAME } from '../../lib/product-meta'
 
 export const metadata: Metadata = {
   title: 'Log in',
@@ -14,9 +15,9 @@ export default function LoginPage() {
         <div className="text-center space-y-2">
           <Link
             href="/"
-            className="inline-block font-display text-2xl font-semibold tracking-tight text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 rounded-md"
+            className="inline-block font-display text-2xl font-semibold tracking-tight text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 rounded-md"
           >
-            Revenue
+            {APP_DISPLAY_NAME}
           </Link>
           <p className="text-sm text-stone-600">Sign in to your workspace</p>
         </div>

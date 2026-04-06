@@ -29,11 +29,12 @@ async function getDeals(needsAttention: boolean): Promise<{ deals: Deal[]; loadE
 }
 
 type Props = {
-  searchParams: Record<string, string | string[] | undefined>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
-  const needsAttention = isDealsNeedsAttentionFilter(searchParams)
+  const sp = await searchParams
+  const needsAttention = isDealsNeedsAttentionFilter(sp)
   return {
     title: needsAttention ? 'Needs attention' : 'Deals',
   }
@@ -43,7 +44,8 @@ const filterPillBase =
   'rounded-xl px-3.5 py-2 text-sm font-semibold transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas'
 
 export default async function DealsPage({ searchParams }: Props) {
-  const needsAttention = isDealsNeedsAttentionFilter(searchParams)
+  const sp = await searchParams
+  const needsAttention = isDealsNeedsAttentionFilter(sp)
   const { deals, loadError } = await getDeals(needsAttention)
 
   return (

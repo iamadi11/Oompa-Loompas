@@ -9,7 +9,7 @@ import { DeliverableSection } from '../../../../components/deliverables/Delivera
 import { serverApiFetch } from '../../../../lib/server-api-fetch'
 
 interface Props {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 const panelClass =
@@ -50,18 +50,20 @@ async function getDeliverables(dealId: string): Promise<Deliverable[]> {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const deal = await getDeal(params.id)
-  // Root layout template is "%s · Revenue"; do not embed "Revenue" again in the segment title.
+  const { id } = await params
+  const deal = await getDeal(id)
+  // Root layout title template appends short app name; keep segment title to the deal only.
   return {
     title: deal ? deal.title : 'Deal not found',
   }
 }
 
 export default async function DealDetailPage({ params }: Props) {
+  const { id } = await params
   const [deal, payments, deliverables] = await Promise.all([
-    getDeal(params.id),
-    getPayments(params.id),
-    getDeliverables(params.id),
+    getDeal(id),
+    getPayments(id),
+    getDeliverables(id),
   ])
   if (!deal) {
     return <DealNotFoundContent />
