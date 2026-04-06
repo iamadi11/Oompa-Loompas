@@ -1,6 +1,6 @@
 {
   "name": "@oompa/api",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "description": "Fastify REST API",
   "type": "module",

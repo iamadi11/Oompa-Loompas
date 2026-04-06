@@ -1,5 +1,11 @@
 import type { FastifyInstance } from 'fastify'
-import { listPayments, createPayment, updatePayment, deletePayment } from './handlers.js'
+import {
+  listPayments,
+  createPayment,
+  updatePayment,
+  deletePayment,
+  getPaymentInvoice,
+} from './handlers.js'
 
 /**
  * Payment routes nested under deals (for deal-scoped listing/creation)
@@ -7,6 +13,7 @@ import { listPayments, createPayment, updatePayment, deletePayment } from './han
  */
 export async function paymentRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get('/deals/:dealId/payments', listPayments)
+  fastify.get('/deals/:dealId/payments/:paymentId/invoice', getPaymentInvoice)
   fastify.post('/deals/:dealId/payments', createPayment)
   fastify.patch('/payments/:id', updatePayment)
   fastify.delete('/payments/:id', deletePayment)

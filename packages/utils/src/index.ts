@@ -1,3 +1,5 @@
 export * from './currency.js'
 export * from './date.js'
+export * from './html.js'
+export * from './payment-invoice-html.js'
 export * from './validation.js'

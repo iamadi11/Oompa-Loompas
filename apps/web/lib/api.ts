@@ -14,7 +14,11 @@ import type {
   ApiResponse,
 } from '@oompa/types'
 
-const API_BASE = process.env['NEXT_PUBLIC_API_URL'] ?? 'http://localhost:3001'
+/** Base URL for browser-visible API links (invoice HTML, downloads). Mirrors the JSON client. */
+export const PUBLIC_API_BASE_URL =
+  process.env['NEXT_PUBLIC_API_URL'] ?? 'http://localhost:3001'
+
+const API_BASE = PUBLIC_API_BASE_URL
 
 class ApiClient {
   private async request<T>(

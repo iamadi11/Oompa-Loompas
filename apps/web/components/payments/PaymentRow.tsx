@@ -3,16 +3,17 @@
 import { useState } from 'react'
 import type { Payment } from '@oompa/types'
 import { formatCurrency, formatDate } from '@oompa/utils'
-import { api } from '../../lib/api'
+import { api, PUBLIC_API_BASE_URL } from '../../lib/api'
 import { PaymentStatusBadge } from './PaymentStatusBadge'
 import { Button } from '../ui/Button'
 
 interface PaymentRowProps {
+  dealId: string
   payment: Payment
   onUpdate: () => void
 }
 
-export function PaymentRow({ payment, onUpdate }: PaymentRowProps) {
+export function PaymentRow({ dealId, payment, onUpdate }: PaymentRowProps) {
   const [marking, setMarking] = useState(false)
 
   async function markReceived() {
@@ -60,17 +61,28 @@ export function PaymentRow({ payment, onUpdate }: PaymentRowProps) {
         </div>
       </div>
 
-      {canMarkReceived && (
-        <Button
-          variant="secondary"
-          size="sm"
-          loading={marking}
-          onClick={() => void markReceived()}
-          aria-label={`Mark payment of ${formatCurrency(payment.amount, payment.currency as 'INR' | 'USD' | 'EUR' | 'GBP')} as received`}
+      <div className="flex items-center gap-2 shrink-0">
+        <a
+          href={`${PUBLIC_API_BASE_URL}/api/v1/deals/${dealId}/payments/${payment.id}/invoice`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded text-sm font-medium text-brand-600 underline underline-offset-2 hover:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+          aria-label={`View printable invoice for ${formatCurrency(payment.amount, payment.currency as 'INR' | 'USD' | 'EUR' | 'GBP')} payment`}
         >
-          Mark received
-        </Button>
-      )}
+          View invoice
+        </a>
+        {canMarkReceived && (
+          <Button
+            variant="secondary"
+            size="sm"
+            loading={marking}
+            onClick={() => void markReceived()}
+            aria-label={`Mark payment of ${formatCurrency(payment.amount, payment.currency as 'INR' | 'USD' | 'EUR' | 'GBP')} as received`}
+          >
+            Mark received
+          </Button>
+        )}
+      </div>
     </div>
   )
 }

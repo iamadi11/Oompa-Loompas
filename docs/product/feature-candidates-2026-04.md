@@ -31,4 +31,6 @@ Deals, payments, deliverables, dashboard summaries, **attention** queue for over
 
 **Epic A — “Get paid”:** invoice generation (v1: deterministic fields from deal + payment milestones) → optional send/export → reminder jobs (v2).
 
+**Shipped slice (2026-04-06):** HTML invoice per payment milestone — [docs/decisions/2026-04-06-payment-invoice-html-v1.md](../decisions/2026-04-06-payment-invoice-html-v1.md).
+
 Document each slice with a decision record before implementation ([docs/decisions/](../decisions/)).

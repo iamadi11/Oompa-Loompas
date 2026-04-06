@@ -8,7 +8,7 @@ import {
   UpdatePaymentSchema,
   computeIsOverdue,
 } from '@oompa/types'
-import { validate } from '@oompa/utils'
+import { buildPaymentInvoiceHtml, validate } from '@oompa/utils'
 import { NotFoundError, ValidationError, sendError } from '../../lib/errors.js'
 
 type DbPayment = {
@@ -153,4 +153,59 @@ export async function deletePayment(
 
   await prisma.payment.delete({ where: { id } })
   void reply.status(204).send()
+}
+
+/**
+ * Printable HTML invoice for a single payment milestone (deal-scoped).
+ * Returns 404 when the payment is missing or does not belong to the deal.
+ */
+export async function getPaymentInvoice(
+  request: FastifyRequest<{ Params: { dealId: string; paymentId: string } }>,
+  reply: FastifyReply,
+): Promise<void> {
+  const { dealId, paymentId } = request.params
+
+  const payment = await prisma.payment.findUnique({
+    where: { id: paymentId },
+    include: {
+      deal: {
+        select: {
+          id: true,
+          title: true,
+          brandName: true,
+          currency: true,
+          notes: true,
+        },
+      },
+    },
+  })
+
+  if (!payment || payment.dealId !== dealId) {
+    return sendError(reply, new NotFoundError('Payment', paymentId))
+  }
+
+  const html = buildPaymentInvoiceHtml({
+    generatedAtIso: new Date().toISOString(),
+    deal: {
+      title: payment.deal.title,
+      brandName: payment.deal.brandName,
+      currency: payment.deal.currency,
+      notes: payment.deal.notes,
+    },
+    payment: {
+      id: payment.id,
+      amount: Number(payment.amount),
+      currency: payment.currency,
+      status: payment.status,
+      dueDateIso: payment.dueDate?.toISOString() ?? null,
+      receivedAtIso: payment.receivedAt?.toISOString() ?? null,
+      notes: payment.notes,
+    },
+  })
+
+  void reply
+    .header('Content-Type', 'text/html; charset=utf-8')
+    .header('Cache-Control', 'no-store')
+    .status(200)
+    .send(html)
 }

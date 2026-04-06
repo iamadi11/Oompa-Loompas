@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { buildServer } from '../server.js'
-import { prisma } from '@oompa/db'
+import { prisma, Prisma } from '@oompa/db'
 
 const mockPrisma = prisma as typeof prisma & {
   deal: { findUnique: ReturnType<typeof vi.fn> }
@@ -21,7 +21,7 @@ const mockDealStub = { id: DEAL_ID }
 const mockPayment = {
   id: PAYMENT_ID,
   dealId: DEAL_ID,
-  amount: { toNumber: () => 40000, toString: () => '40000' },
+  amount: new Prisma.Decimal(40000),
   currency: 'INR',
   status: 'PENDING',
   dueDate: null,
@@ -29,6 +29,19 @@ const mockPayment = {
   notes: null,
   createdAt: new Date('2026-04-04T00:00:00.000Z'),
   updatedAt: new Date('2026-04-04T00:00:00.000Z'),
+}
+
+const mockDealForInvoice = {
+  id: DEAL_ID,
+  title: 'Creator partnership',
+  brandName: 'Acme Brand',
+  currency: 'INR' as const,
+  notes: null as string | null,
+}
+
+const mockPaymentWithDeal = {
+  ...mockPayment,
+  deal: mockDealForInvoice,
 }
 
 describe('GET /api/v1/deals/:dealId/payments', () => {
@@ -302,6 +315,58 @@ describe('PATCH /api/v1/payments/:id', () => {
     })
 
     expect(response.statusCode).toBe(200)
+    await fastify.close()
+  })
+})
+
+describe('GET /api/v1/deals/:dealId/payments/:paymentId/invoice', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockPrisma.payment.findUnique.mockResolvedValue(mockPaymentWithDeal)
+  })
+
+  it('returns 200 HTML with invoice content and no-store cache header', async () => {
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'GET',
+      url: `/api/v1/deals/${DEAL_ID}/payments/${PAYMENT_ID}/invoice`,
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(response.headers['content-type']).toContain('text/html')
+    expect(response.headers['cache-control']).toBe('no-store')
+    expect(response.payload).toContain('Invoice')
+    expect(response.payload).toContain('Acme Brand')
+    expect(response.payload).toContain(PAYMENT_ID)
+    await fastify.close()
+  })
+
+  it('returns 404 when payment does not exist', async () => {
+    mockPrisma.payment.findUnique.mockResolvedValue(null)
+
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'GET',
+      url: `/api/v1/deals/${DEAL_ID}/payments/660e8400-e29b-41d4-a716-000000000000/invoice`,
+    })
+
+    expect(response.statusCode).toBe(404)
+    await fastify.close()
+  })
+
+  it('returns 404 when payment belongs to a different deal', async () => {
+    mockPrisma.payment.findUnique.mockResolvedValue({
+      ...mockPaymentWithDeal,
+      dealId: '550e8400-e29b-41d4-a716-000000000099',
+    })
+
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'GET',
+      url: `/api/v1/deals/${DEAL_ID}/payments/${PAYMENT_ID}/invoice`,
+    })
+
+    expect(response.statusCode).toBe(404)
     await fastify.close()
   })
 })

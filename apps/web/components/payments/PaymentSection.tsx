@@ -111,6 +111,7 @@ export function PaymentSection({
           {payments.map((payment) => (
             <PaymentRow
               key={payment.id}
+              dealId={dealId}
               payment={payment}
               onUpdate={handlePaymentChange}
             />

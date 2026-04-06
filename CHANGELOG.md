@@ -4,14 +4,25 @@ All notable changes to this repository are documented in this file.
 
 ## Unreleased
 
-_Nothing yet._
+### `@oompa/web` / `@oompa/utils`
+
+- **Payment invoice UX (a11y):** **View invoice** link **focus-visible** ring; invoice HTML **`main`** landmark, table **`aria-label`**, human-readable **payment status** labels. Browser checklist: [docs/testing/browser-ux-checklist-payment-invoice-html-v1-2026-04-06.md](./docs/testing/browser-ux-checklist-payment-invoice-html-v1-2026-04-06.md).
 
 ## [0.1.7] - 2026-04-06
 
-### `@oompa/api` **0.1.1**
+### `@oompa/api` **0.1.2**
 
 - **`GET /api/v1/health`** — versioned liveness probe with **`{ data: { status, service }, meta: { timestamp } }`**; **`GET /health`** unchanged. Tests in [`apps/api/src/__tests__/health.test.ts`](./apps/api/src/__tests__/health.test.ts); CORS coverage in [`cors.test.ts`](./apps/api/src/__tests__/cors.test.ts).
-- **Docs:** [decision](./docs/decisions/2026-04-06-api-v1-health.md), [architecture](./docs/architecture/api-v1-health.md), [UX](./docs/ux/api-v1-health.md), [testing](./docs/testing/api-v1-health.md), [instrumentation](./docs/instrumentation/api-v1-health.md), [retro](./docs/retros/2026-04-06-api-v1-health.md), [browser checklist](./docs/testing/browser-ux-checklist-api-v1-health-2026-04-06.md).
+- **`GET /api/v1/deals/:dealId/payments/:paymentId/invoice`** — printable **HTML** invoice for one payment milestone (`text/html`, **`Cache-Control: no-store`**). **Docs:** [decision](./docs/decisions/2026-04-06-payment-invoice-html-v1.md), [architecture](./docs/architecture/payment-invoice-html-v1.md), [UX](./docs/ux/payment-invoice-html-v1.md), [testing](./docs/testing/payment-invoice-html-v1.md), [instrumentation](./docs/instrumentation/payment-invoice-html-v1.md), [retro](./docs/retros/2026-04-06-payment-invoice-html-v1.md).
+- **Health docs:** [decision](./docs/decisions/2026-04-06-api-v1-health.md), [architecture](./docs/architecture/api-v1-health.md), [UX](./docs/ux/api-v1-health.md), [testing](./docs/testing/api-v1-health.md), [instrumentation](./docs/instrumentation/api-v1-health.md), [retro](./docs/retros/2026-04-06-api-v1-health.md), [browser checklist](./docs/testing/browser-ux-checklist-api-v1-health-2026-04-06.md).
+
+### `@oompa/web` **0.1.7**
+
+- **Deal payments:** **View invoice** link (new tab) using **`PUBLIC_API_BASE_URL`**; **`aria-label`** on the link. Release notes: [docs/releases/RELEASE-0.1.7.md](./docs/releases/RELEASE-0.1.7.md).
+
+### `@oompa/utils`
+
+- **`escapeHtml`**, **`buildPaymentInvoiceHtml`** — shared deterministic invoice body for the API.
 
 ### CI / process
 

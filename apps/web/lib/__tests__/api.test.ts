@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { api } from '../api'
+import { api, PUBLIC_API_BASE_URL } from '../api'
 
 function jsonResponse(
   body: unknown,
@@ -234,5 +234,11 @@ describe('ApiClient', () => {
   it('throws Unknown error when error body is not JSON', async () => {
     fetchMock.mockResolvedValueOnce(rejectJsonResponse({ ok: false, status: 502 }))
     await expect(api.getDeal('x')).rejects.toThrow('Unknown error')
+  })
+})
+
+describe('PUBLIC_API_BASE_URL', () => {
+  it('matches the default JSON client origin so invoice links stay consistent', () => {
+    expect(PUBLIC_API_BASE_URL).toBe('http://localhost:3001')
   })
 })
