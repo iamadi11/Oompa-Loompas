@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import type { AttentionQueue } from '@oompa/types'
-import { PriorityActionList } from '../../components/dashboard/PriorityActionList'
-import { getServerApiBaseUrl } from '../../lib/get-server-api-base-url'
+import { PriorityActionList } from '../../../components/dashboard/PriorityActionList'
+import { serverApiFetch } from '../../../lib/server-api-fetch'
 
 export const metadata: Metadata = {
   title: 'Attention',
@@ -13,7 +13,7 @@ const linkClass =
 
 async function getAttentionQueue(): Promise<AttentionQueue | null> {
   try {
-    const res = await fetch(`${getServerApiBaseUrl()}/api/v1/attention`, { cache: 'no-store' })
+    const res = await serverApiFetch('/api/v1/attention')
     if (!res.ok) return null
     const body = (await res.json()) as { data: AttentionQueue }
     return body.data
@@ -37,7 +37,7 @@ export default async function AttentionPage() {
         <p id="attention-error-desc" className="text-stone-600 leading-relaxed">
           We could not load your queue. Check your connection and try again.
         </p>
-        <Link href="/" className={`inline-flex ${linkClass}`}>
+        <Link href="/dashboard" className={`inline-flex ${linkClass}`}>
           Back to overview
         </Link>
       </div>
@@ -57,7 +57,7 @@ export default async function AttentionPage() {
           No overdue payments or deliverables right now. When something slips, it will show up here and on your
           overview.
         </p>
-        <Link href="/" className={`inline-flex ${linkClass}`}>
+        <Link href="/dashboard" className={`inline-flex ${linkClass}`}>
           Back to overview
         </Link>
       </div>
@@ -79,7 +79,7 @@ export default async function AttentionPage() {
             {data.actions.length} overdue {data.actions.length === 1 ? 'item' : 'items'} — most overdue first.
           </p>
         </div>
-        <Link href="/" className={`${linkClass} sm:shrink-0 w-fit`}>
+        <Link href="/dashboard" className={`${linkClass} sm:shrink-0 w-fit`}>
           ← Overview
         </Link>
       </div>

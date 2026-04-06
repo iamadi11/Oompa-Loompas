@@ -9,7 +9,13 @@ import {
   computeIsOverdue,
 } from '@oompa/types'
 import { buildPaymentInvoiceHtml, validate } from '@oompa/utils'
-import { NotFoundError, ValidationError, sendError } from '../../lib/errors.js'
+import { findDealIdForUser } from '../../lib/deal-scope.js'
+import {
+  NotFoundError,
+  UnauthorizedError,
+  ValidationError,
+  sendError,
+} from '../../lib/errors.js'
 import {
   readPaymentInvoiceDocumentLabel,
   readPaymentInvoiceIssuerEnv,
@@ -57,10 +63,15 @@ export async function listPayments(
   request: FastifyRequest<{ Params: { dealId: string } }>,
   reply: FastifyReply,
 ): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
   const { dealId } = request.params
 
-  const deal = await prisma.deal.findUnique({ where: { id: dealId }, select: { id: true } })
-  if (!deal) {
+  const owned = await findDealIdForUser(dealId, userId)
+  if (!owned) {
     return sendError(reply, new NotFoundError('Deal', dealId))
   }
 
@@ -76,10 +87,15 @@ export async function createPayment(
   request: FastifyRequest<{ Params: { dealId: string }; Body: CreatePayment }>,
   reply: FastifyReply,
 ): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
   const { dealId } = request.params
 
-  const deal = await prisma.deal.findUnique({ where: { id: dealId }, select: { id: true } })
-  if (!deal) {
+  const owned = await findDealIdForUser(dealId, userId)
+  if (!owned) {
     return sendError(reply, new NotFoundError('Deal', dealId))
   }
 
@@ -108,9 +124,16 @@ export async function updatePayment(
   request: FastifyRequest<{ Params: { id: string }; Body: UpdatePayment }>,
   reply: FastifyReply,
 ): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
   const { id } = request.params
 
-  const existing = await prisma.payment.findUnique({ where: { id } })
+  const existing = await prisma.payment.findFirst({
+    where: { id, deal: { userId } },
+  })
   if (!existing) {
     return sendError(reply, new NotFoundError('Payment', id))
   }
@@ -149,9 +172,16 @@ export async function deletePayment(
   request: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
 ): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
   const { id } = request.params
 
-  const existing = await prisma.payment.findUnique({ where: { id } })
+  const existing = await prisma.payment.findFirst({
+    where: { id, deal: { userId } },
+  })
   if (!existing) {
     return sendError(reply, new NotFoundError('Payment', id))
   }
@@ -168,12 +198,27 @@ export async function getPaymentInvoice(
   request: FastifyRequest<{ Params: { dealId: string; paymentId: string } }>,
   reply: FastifyReply,
 ): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
   const { dealId, paymentId } = request.params
 
   const nowIso = new Date().toISOString()
 
   const assigned = await prisma.$transaction(async (tx) => {
-    await tx.$executeRaw(Prisma.sql`SELECT 1 FROM payments WHERE id = ${paymentId} FOR UPDATE`)
+    const locked = await tx.$queryRaw<Array<{ ok: number }>>(
+      Prisma.sql`
+        SELECT 1 AS ok FROM payments p
+        INNER JOIN deals d ON d.id = p.deal_id AND d.user_id = ${userId}
+        WHERE p.id = ${paymentId} AND p.deal_id = ${dealId}
+        FOR UPDATE
+      `,
+    )
+    if (locked.length === 0) {
+      return null
+    }
 
     const row = await tx.payment.findUnique({
       where: { id: paymentId },

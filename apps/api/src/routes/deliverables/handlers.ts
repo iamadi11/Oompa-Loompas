@@ -7,7 +7,13 @@ import {
 } from '@oompa/types'
 import { validate } from '@oompa/utils'
 import { CreateDeliverableSchema, UpdateDeliverableSchema } from './schema.js'
-import { NotFoundError, ValidationError, sendError } from '../../lib/errors.js'
+import { findDealIdForUser } from '../../lib/deal-scope.js'
+import {
+  NotFoundError,
+  UnauthorizedError,
+  ValidationError,
+  sendError,
+} from '../../lib/errors.js'
 
 type DbDeliverable = {
   id: string
@@ -47,10 +53,15 @@ export async function listDeliverables(
   request: FastifyRequest<{ Params: { dealId: string } }>,
   reply: FastifyReply,
 ): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
   const { dealId } = request.params
 
-  const deal = await prisma.deal.findUnique({ where: { id: dealId }, select: { id: true } })
-  if (!deal) {
+  const owned = await findDealIdForUser(dealId, userId)
+  if (!owned) {
     return sendError(reply, new NotFoundError('Deal', dealId))
   }
 
@@ -66,10 +77,15 @@ export async function createDeliverable(
   request: FastifyRequest<{ Params: { dealId: string }; Body: CreateDeliverable }>,
   reply: FastifyReply,
 ): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
   const { dealId } = request.params
 
-  const deal = await prisma.deal.findUnique({ where: { id: dealId }, select: { id: true } })
-  if (!deal) {
+  const owned = await findDealIdForUser(dealId, userId)
+  if (!owned) {
     return sendError(reply, new NotFoundError('Deal', dealId))
   }
 
@@ -98,9 +114,16 @@ export async function updateDeliverable(
   request: FastifyRequest<{ Params: { id: string }; Body: UpdateDeliverable }>,
   reply: FastifyReply,
 ): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
   const { id } = request.params
 
-  const existing = await prisma.deliverable.findUnique({ where: { id } })
+  const existing = await prisma.deliverable.findFirst({
+    where: { id, deal: { userId } },
+  })
   if (!existing) {
     return sendError(reply, new NotFoundError('Deliverable', id))
   }
@@ -148,9 +171,16 @@ export async function deleteDeliverable(
   request: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
 ): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
   const { id } = request.params
 
-  const existing = await prisma.deliverable.findUnique({ where: { id } })
+  const existing = await prisma.deliverable.findFirst({
+    where: { id, deal: { userId } },
+  })
   if (!existing) {
     return sendError(reply, new NotFoundError('Deliverable', id))
   }

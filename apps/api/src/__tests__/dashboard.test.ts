@@ -2,8 +2,16 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import type { DashboardPriorityAction } from '@oompa/types'
 import { buildServer } from '../server.js'
 import { prisma } from '@oompa/db'
+import {
+  mockSessionFindUnique,
+  testAuthCookieHeader,
+  TEST_USER_ID,
+} from './auth-test-helpers.js'
+
+const auth = testAuthCookieHeader()
 
 const mockPrisma = prisma as typeof prisma & {
+  session: { findUnique: ReturnType<typeof vi.fn> }
   deal: {
     findMany: ReturnType<typeof vi.fn>
   }
@@ -81,13 +89,14 @@ describe('GET /api/v1/dashboard', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
+    mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
     app = await buildServer()
   })
 
   it('returns 200 with zero summary when no deals exist', async () => {
     mockPrisma.deal.findMany.mockResolvedValue([])
 
-    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard', headers: auth })
 
     expect(res.statusCode).toBe(200)
     const body = res.json()
@@ -106,7 +115,7 @@ describe('GET /api/v1/dashboard', () => {
   it('returns correct totalContractedValue (sum of all deal values)', async () => {
     mockPrisma.deal.findMany.mockResolvedValue([mockDeal1, mockDeal2])
 
-    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard', headers: auth })
 
     expect(res.statusCode).toBe(200)
     const body = res.json()
@@ -116,7 +125,7 @@ describe('GET /api/v1/dashboard', () => {
   it('returns correct totalReceivedValue (RECEIVED payments only)', async () => {
     mockPrisma.deal.findMany.mockResolvedValue([mockDeal1, mockDeal2])
 
-    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard', headers: auth })
 
     expect(res.statusCode).toBe(200)
     const body = res.json()
@@ -126,7 +135,7 @@ describe('GET /api/v1/dashboard', () => {
   it('returns correct totalOutstandingValue', async () => {
     mockPrisma.deal.findMany.mockResolvedValue([mockDeal1, mockDeal2])
 
-    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard', headers: auth })
 
     expect(res.statusCode).toBe(200)
     const body = res.json()
@@ -136,7 +145,7 @@ describe('GET /api/v1/dashboard', () => {
   it('returns correct overduePaymentsCount', async () => {
     mockPrisma.deal.findMany.mockResolvedValue([mockDeal1, mockDeal2])
 
-    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard', headers: auth })
 
     expect(res.statusCode).toBe(200)
     const body = res.json()
@@ -146,7 +155,7 @@ describe('GET /api/v1/dashboard', () => {
   it('returns correct overduePaymentsValue', async () => {
     mockPrisma.deal.findMany.mockResolvedValue([mockDeal1, mockDeal2])
 
-    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard', headers: auth })
 
     expect(res.statusCode).toBe(200)
     const body = res.json()
@@ -156,7 +165,7 @@ describe('GET /api/v1/dashboard', () => {
   it('returns correct activeDealsCount', async () => {
     mockPrisma.deal.findMany.mockResolvedValue([mockDeal1, mockDeal2])
 
-    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard', headers: auth })
 
     expect(res.statusCode).toBe(200)
     const body = res.json()
@@ -166,7 +175,7 @@ describe('GET /api/v1/dashboard', () => {
   it('returns correct totalDealsCount', async () => {
     mockPrisma.deal.findMany.mockResolvedValue([mockDeal1, mockDeal2])
 
-    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard', headers: auth })
 
     expect(res.statusCode).toBe(200)
     const body = res.json()
@@ -182,7 +191,7 @@ describe('GET /api/v1/dashboard', () => {
     }))
     mockPrisma.deal.findMany.mockResolvedValue(manyDeals)
 
-    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard', headers: auth })
 
     expect(res.statusCode).toBe(200)
     const body = res.json()
@@ -192,7 +201,7 @@ describe('GET /api/v1/dashboard', () => {
   it('includes paymentSummary on each recentDeal', async () => {
     mockPrisma.deal.findMany.mockResolvedValue([mockDeal1])
 
-    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard', headers: auth })
 
     expect(res.statusCode).toBe(200)
     const body = res.json()
@@ -223,7 +232,7 @@ describe('GET /api/v1/dashboard', () => {
     }
     mockPrisma.deal.findMany.mockResolvedValue([receivedPastDue])
 
-    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard', headers: auth })
 
     expect(res.statusCode).toBe(200)
     const body = res.json()
@@ -233,7 +242,7 @@ describe('GET /api/v1/dashboard', () => {
   it('returns dominantCurrency as the most common deal currency', async () => {
     mockPrisma.deal.findMany.mockResolvedValue([mockDeal1, mockDeal2])
 
-    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard', headers: auth })
 
     expect(res.statusCode).toBe(200)
     const body = res.json()
@@ -258,7 +267,7 @@ describe('GET /api/v1/dashboard', () => {
     }
     mockPrisma.deal.findMany.mockResolvedValue([futurePending])
 
-    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard', headers: auth })
 
     expect(res.statusCode).toBe(200)
     const body = res.json()
@@ -302,7 +311,7 @@ describe('GET /api/v1/dashboard', () => {
     }
     mockPrisma.deal.findMany.mockResolvedValue([twoOverduePayments])
 
-    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard', headers: auth })
 
     expect(res.statusCode).toBe(200)
     const body = res.json()
@@ -337,7 +346,7 @@ describe('GET /api/v1/dashboard', () => {
     }
     mockPrisma.deal.findMany.mockResolvedValue([deliverablePastDue])
 
-    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard', headers: auth })
 
     expect(res.statusCode).toBe(200)
     const body = res.json()
@@ -354,7 +363,7 @@ describe('GET /api/v1/dashboard', () => {
   it('includes mockDeal1 overdue payment in priorityActions', async () => {
     mockPrisma.deal.findMany.mockResolvedValue([mockDeal1, mockDeal2])
 
-    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard', headers: auth })
 
     expect(res.statusCode).toBe(200)
     const body = res.json()
@@ -407,7 +416,7 @@ describe('GET /api/v1/dashboard', () => {
     }
     mockPrisma.deal.findMany.mockResolvedValue([mixedDeal])
 
-    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard', headers: auth })
 
     expect(res.statusCode).toBe(200)
     const body = res.json()
@@ -437,7 +446,7 @@ describe('GET /api/v1/dashboard', () => {
     }
     mockPrisma.deal.findMany.mockResolvedValue([bulkDeal])
 
-    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard' })
+    const res = await app.inject({ method: 'GET', url: '/api/v1/dashboard', headers: auth })
 
     expect(res.statusCode).toBe(200)
     const body = res.json()

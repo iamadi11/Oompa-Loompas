@@ -1,11 +1,20 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { buildServer } from '../server.js'
 import { prisma, Prisma } from '@oompa/db'
+import {
+  mockSessionFindUnique,
+  testAuthCookieHeader,
+  TEST_USER_ID,
+} from './auth-test-helpers.js'
+
+const auth = testAuthCookieHeader()
 
 const mockPrisma = prisma as typeof prisma & {
-  deal: { findUnique: ReturnType<typeof vi.fn> }
+  session: { findUnique: ReturnType<typeof vi.fn> }
+  deal: { findFirst: ReturnType<typeof vi.fn> }
   payment: {
     findMany: ReturnType<typeof vi.fn>
+    findFirst: ReturnType<typeof vi.fn>
     findUnique: ReturnType<typeof vi.fn>
     create: ReturnType<typeof vi.fn>
     update: ReturnType<typeof vi.fn>
@@ -14,6 +23,7 @@ const mockPrisma = prisma as typeof prisma & {
   invoiceCounter: { upsert: ReturnType<typeof vi.fn> }
   $transaction: ReturnType<typeof vi.fn>
   $executeRaw: ReturnType<typeof vi.fn>
+  $queryRaw: ReturnType<typeof vi.fn>
 }
 
 const DEAL_ID = '550e8400-e29b-41d4-a716-446655440000'
@@ -51,7 +61,8 @@ const mockPaymentWithDeal = {
 describe('GET /api/v1/deals/:dealId/payments', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockPrisma.deal.findUnique.mockResolvedValue(mockDealStub)
+    mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
+    mockPrisma.deal.findFirst.mockResolvedValue(mockDealStub)
     mockPrisma.payment.findMany.mockResolvedValue([mockPayment])
   })
 
@@ -60,6 +71,7 @@ describe('GET /api/v1/deals/:dealId/payments', () => {
     const response = await fastify.inject({
       method: 'GET',
       url: `/api/v1/deals/${DEAL_ID}/payments`,
+      headers: auth,
     })
 
     expect(response.statusCode).toBe(200)
@@ -69,12 +81,13 @@ describe('GET /api/v1/deals/:dealId/payments', () => {
   })
 
   it('returns 404 when deal does not exist', async () => {
-    mockPrisma.deal.findUnique.mockResolvedValue(null)
+    mockPrisma.deal.findFirst.mockResolvedValue(null)
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'GET',
       url: `/api/v1/deals/550e8400-e29b-41d4-a716-000000000000/payments`,
+      headers: auth,
     })
 
     expect(response.statusCode).toBe(404)
@@ -90,6 +103,7 @@ describe('GET /api/v1/deals/:dealId/payments', () => {
     const response = await fastify.inject({
       method: 'GET',
       url: `/api/v1/deals/${DEAL_ID}/payments`,
+      headers: auth,
     })
 
     const body = response.json()
@@ -106,6 +120,7 @@ describe('GET /api/v1/deals/:dealId/payments', () => {
     const response = await fastify.inject({
       method: 'GET',
       url: `/api/v1/deals/${DEAL_ID}/payments`,
+      headers: auth,
     })
 
     const body = response.json()
@@ -122,6 +137,7 @@ describe('GET /api/v1/deals/:dealId/payments', () => {
     const response = await fastify.inject({
       method: 'GET',
       url: `/api/v1/deals/${DEAL_ID}/payments`,
+      headers: auth,
     })
 
     const body = response.json()
@@ -133,7 +149,8 @@ describe('GET /api/v1/deals/:dealId/payments', () => {
 describe('POST /api/v1/deals/:dealId/payments', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockPrisma.deal.findUnique.mockResolvedValue(mockDealStub)
+    mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
+    mockPrisma.deal.findFirst.mockResolvedValue(mockDealStub)
     mockPrisma.payment.create.mockResolvedValue(mockPayment)
   })
 
@@ -142,6 +159,7 @@ describe('POST /api/v1/deals/:dealId/payments', () => {
     const response = await fastify.inject({
       method: 'POST',
       url: `/api/v1/deals/${DEAL_ID}/payments`,
+      headers: auth,
       payload: { amount: 40000 },
     })
 
@@ -162,6 +180,7 @@ describe('POST /api/v1/deals/:dealId/payments', () => {
     const response = await fastify.inject({
       method: 'POST',
       url: `/api/v1/deals/${DEAL_ID}/payments`,
+      headers: auth,
       payload: {
         amount: 40000,
         dueDate: '2026-05-01T00:00:00.000Z',
@@ -174,12 +193,13 @@ describe('POST /api/v1/deals/:dealId/payments', () => {
   })
 
   it('returns 404 when deal does not exist', async () => {
-    mockPrisma.deal.findUnique.mockResolvedValue(null)
+    mockPrisma.deal.findFirst.mockResolvedValue(null)
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'POST',
       url: `/api/v1/deals/550e8400-e29b-41d4-a716-000000000000/payments`,
+      headers: auth,
       payload: { amount: 40000 },
     })
 
@@ -192,6 +212,7 @@ describe('POST /api/v1/deals/:dealId/payments', () => {
     const response = await fastify.inject({
       method: 'POST',
       url: `/api/v1/deals/${DEAL_ID}/payments`,
+      headers: auth,
       payload: {},
     })
 
@@ -204,6 +225,7 @@ describe('POST /api/v1/deals/:dealId/payments', () => {
     const response = await fastify.inject({
       method: 'POST',
       url: `/api/v1/deals/${DEAL_ID}/payments`,
+      headers: auth,
       payload: { amount: -1000 },
     })
 
@@ -216,6 +238,7 @@ describe('POST /api/v1/deals/:dealId/payments', () => {
     const response = await fastify.inject({
       method: 'POST',
       url: `/api/v1/deals/${DEAL_ID}/payments`,
+      headers: auth,
       payload: { amount: 0 },
     })
 
@@ -227,10 +250,11 @@ describe('POST /api/v1/deals/:dealId/payments', () => {
 describe('PATCH /api/v1/payments/:id', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
   })
 
   it('updates payment and returns 200', async () => {
-    mockPrisma.payment.findUnique.mockResolvedValue(mockPayment)
+    mockPrisma.payment.findFirst.mockResolvedValue(mockPayment)
     mockPrisma.payment.update.mockResolvedValue({
       ...mockPayment,
       status: 'RECEIVED',
@@ -241,6 +265,7 @@ describe('PATCH /api/v1/payments/:id', () => {
     const response = await fastify.inject({
       method: 'PATCH',
       url: `/api/v1/payments/${PAYMENT_ID}`,
+      headers: auth,
       payload: {
         status: 'RECEIVED',
         receivedAt: '2026-04-10T00:00:00.000Z',
@@ -254,12 +279,13 @@ describe('PATCH /api/v1/payments/:id', () => {
   })
 
   it('returns 404 when payment does not exist', async () => {
-    mockPrisma.payment.findUnique.mockResolvedValue(null)
+    mockPrisma.payment.findFirst.mockResolvedValue(null)
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'PATCH',
       url: `/api/v1/payments/660e8400-e29b-41d4-a716-000000000000`,
+      headers: auth,
       payload: { status: 'RECEIVED' },
     })
 
@@ -268,12 +294,13 @@ describe('PATCH /api/v1/payments/:id', () => {
   })
 
   it('returns 400 for invalid amount (negative)', async () => {
-    mockPrisma.payment.findUnique.mockResolvedValue(mockPayment)
+    mockPrisma.payment.findFirst.mockResolvedValue(mockPayment)
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'PATCH',
       url: `/api/v1/payments/${PAYMENT_ID}`,
+      headers: auth,
       payload: { amount: -500 },
     })
 
@@ -282,7 +309,7 @@ describe('PATCH /api/v1/payments/:id', () => {
   })
 
   it('clears dueDate and receivedAt when set to null', async () => {
-    mockPrisma.payment.findUnique.mockResolvedValue(mockPayment)
+    mockPrisma.payment.findFirst.mockResolvedValue(mockPayment)
     mockPrisma.payment.update.mockResolvedValue({
       ...mockPayment,
       dueDate: null,
@@ -293,6 +320,7 @@ describe('PATCH /api/v1/payments/:id', () => {
     const response = await fastify.inject({
       method: 'PATCH',
       url: `/api/v1/payments/${PAYMENT_ID}`,
+      headers: auth,
       payload: { dueDate: null, receivedAt: null },
     })
 
@@ -301,7 +329,7 @@ describe('PATCH /api/v1/payments/:id', () => {
   })
 
   it('sets dueDate and receivedAt when provided as ISO strings', async () => {
-    mockPrisma.payment.findUnique.mockResolvedValue(mockPayment)
+    mockPrisma.payment.findFirst.mockResolvedValue(mockPayment)
     mockPrisma.payment.update.mockResolvedValue({
       ...mockPayment,
       dueDate: new Date('2026-05-01T00:00:00.000Z'),
@@ -312,6 +340,7 @@ describe('PATCH /api/v1/payments/:id', () => {
     const response = await fastify.inject({
       method: 'PATCH',
       url: `/api/v1/payments/${PAYMENT_ID}`,
+      headers: auth,
       payload: {
         dueDate: '2026-05-01T00:00:00.000Z',
         receivedAt: '2026-05-05T00:00:00.000Z',
@@ -326,6 +355,8 @@ describe('PATCH /api/v1/payments/:id', () => {
 describe('GET /api/v1/deals/:dealId/payments/:paymentId/invoice', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
+    mockPrisma.$queryRaw.mockResolvedValue([{ ok: 1 }])
     mockPrisma.payment.findUnique.mockResolvedValue(mockPaymentWithDeal)
   })
 
@@ -334,6 +365,7 @@ describe('GET /api/v1/deals/:dealId/payments/:paymentId/invoice', () => {
     const response = await fastify.inject({
       method: 'GET',
       url: `/api/v1/deals/${DEAL_ID}/payments/${PAYMENT_ID}/invoice`,
+      headers: auth,
     })
 
     expect(response.statusCode).toBe(200)
@@ -358,6 +390,7 @@ describe('GET /api/v1/deals/:dealId/payments/:paymentId/invoice', () => {
     const response = await fastify.inject({
       method: 'GET',
       url: `/api/v1/deals/${DEAL_ID}/payments/${PAYMENT_ID}/invoice`,
+      headers: auth,
     })
 
     expect(response.statusCode).toBe(200)
@@ -367,12 +400,13 @@ describe('GET /api/v1/deals/:dealId/payments/:paymentId/invoice', () => {
   })
 
   it('returns 404 when payment does not exist', async () => {
-    mockPrisma.payment.findUnique.mockResolvedValue(null)
+    mockPrisma.$queryRaw.mockResolvedValue([])
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'GET',
       url: `/api/v1/deals/${DEAL_ID}/payments/660e8400-e29b-41d4-a716-000000000000/invoice`,
+      headers: auth,
     })
 
     expect(response.statusCode).toBe(404)
@@ -380,15 +414,13 @@ describe('GET /api/v1/deals/:dealId/payments/:paymentId/invoice', () => {
   })
 
   it('returns 404 when payment belongs to a different deal', async () => {
-    mockPrisma.payment.findUnique.mockResolvedValue({
-      ...mockPaymentWithDeal,
-      dealId: '550e8400-e29b-41d4-a716-000000000099',
-    })
+    mockPrisma.$queryRaw.mockResolvedValue([])
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'GET',
       url: `/api/v1/deals/${DEAL_ID}/payments/${PAYMENT_ID}/invoice`,
+      headers: auth,
     })
 
     expect(response.statusCode).toBe(404)
@@ -399,16 +431,18 @@ describe('GET /api/v1/deals/:dealId/payments/:paymentId/invoice', () => {
 describe('DELETE /api/v1/payments/:id', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
   })
 
   it('deletes payment and returns 204', async () => {
-    mockPrisma.payment.findUnique.mockResolvedValue(mockPayment)
+    mockPrisma.payment.findFirst.mockResolvedValue(mockPayment)
     mockPrisma.payment.delete.mockResolvedValue(mockPayment)
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'DELETE',
       url: `/api/v1/payments/${PAYMENT_ID}`,
+      headers: auth,
     })
 
     expect(response.statusCode).toBe(204)
@@ -416,12 +450,13 @@ describe('DELETE /api/v1/payments/:id', () => {
   })
 
   it('returns 404 when payment does not exist', async () => {
-    mockPrisma.payment.findUnique.mockResolvedValue(null)
+    mockPrisma.payment.findFirst.mockResolvedValue(null)
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'DELETE',
       url: `/api/v1/payments/660e8400-e29b-41d4-a716-000000000000`,
+      headers: auth,
     })
 
     expect(response.statusCode).toBe(404)

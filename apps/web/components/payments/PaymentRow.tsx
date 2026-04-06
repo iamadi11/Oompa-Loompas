@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import type { Payment } from '@oompa/types'
 import { formatCurrency, formatDate } from '@oompa/utils'
-import { api, PUBLIC_API_BASE_URL } from '../../lib/api'
+import { api, paymentInvoiceHref } from '../../lib/api'
 import { PaymentStatusBadge } from './PaymentStatusBadge'
 import { Button } from '../ui/Button'
 
@@ -84,7 +84,7 @@ export function PaymentRow({ dealId, payment, onUpdate }: PaymentRowProps) {
 
       <div className="flex flex-wrap items-center gap-2 shrink-0 border-t border-line/50 sm:border-0 pt-2 sm:pt-0">
         <a
-          href={`${PUBLIC_API_BASE_URL}/api/v1/deals/${dealId}/payments/${payment.id}/invoice`}
+          href={paymentInvoiceHref(dealId, payment.id)}
           target="_blank"
           rel="noopener noreferrer"
           className="rounded-md text-sm font-semibold text-brand-800 underline underline-offset-2 hover:text-brand-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"

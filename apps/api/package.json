@@ -15,12 +15,15 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "dotenv": "^16.4.5",
+    "@fastify/cookie": "^8.3.0",
     "@fastify/cors": "^9.0.1",
     "@fastify/sensible": "^5.6.0",
     "@oompa/db": "workspace:*",
     "@oompa/types": "workspace:*",
     "@oompa/utils": "workspace:*",
+    "@types/bcryptjs": "^3.0.0",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^16.4.5",
     "fastify": "^4.28.1",
     "fastify-plugin": "^4.5.1",
     "zod": "^3.23.8"

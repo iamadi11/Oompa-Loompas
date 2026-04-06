@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import type { Deal, CreateDeal, UpdateDeal } from '@oompa/types'
-import { CreateDealSchema, UpdateDealSchema } from '@oompa/types'
+import type { Deal, CreateDeal, DealStatus, UpdateDeal } from '@oompa/types'
+import { CreateDealSchema, DEAL_STATUS_TRANSITIONS, UpdateDealSchema } from '@oompa/types'
 import { validate } from '@oompa/utils'
 import { api } from '../../lib/api'
 import { Input } from '../ui/Input'
@@ -31,6 +31,13 @@ const STATUS_OPTIONS = [
   { value: 'CANCELLED', label: 'Cancelled' },
 ]
 
+function statusSelectOptions(mode: 'create' | 'edit', currentStatus: string): typeof STATUS_OPTIONS {
+  if (mode === 'create') return STATUS_OPTIONS
+  const cur = currentStatus as DealStatus
+  const allowed = new Set<DealStatus>([cur, ...DEAL_STATUS_TRANSITIONS[cur]])
+  return STATUS_OPTIONS.filter((o) => allowed.has(o.value as DealStatus))
+}
+
 export function DealForm({ deal, mode }: DealFormProps) {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
@@ -46,6 +53,11 @@ export function DealForm({ deal, mode }: DealFormProps) {
     status: deal?.status ?? 'DRAFT',
     notes: deal?.notes ?? '',
   })
+
+  const editStatusOptions = useMemo(
+    () => statusSelectOptions(mode, form.status),
+    [mode, form.status],
+  )
 
   function setField(name: string, value: string) {
     setForm((prev) => ({ ...prev, [name]: value }))
@@ -184,7 +196,7 @@ export function DealForm({ deal, mode }: DealFormProps) {
             name="status"
             value={form.status}
             onChange={(e) => setField('status', e.target.value)}
-            options={STATUS_OPTIONS}
+            options={editStatusOptions}
           />
         )}
       </div>

@@ -1,12 +1,20 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { buildServer } from '../server.js'
 import { prisma } from '@oompa/db'
+import {
+  mockSessionFindUnique,
+  testAuthCookieHeader,
+  TEST_USER_ID,
+} from './auth-test-helpers.js'
+
+const auth = testAuthCookieHeader()
 
 const mockPrisma = prisma as typeof prisma & {
-  deal: { findUnique: ReturnType<typeof vi.fn> }
+  session: { findUnique: ReturnType<typeof vi.fn> }
+  deal: { findFirst: ReturnType<typeof vi.fn> }
   deliverable: {
     findMany: ReturnType<typeof vi.fn>
-    findUnique: ReturnType<typeof vi.fn>
+    findFirst: ReturnType<typeof vi.fn>
     create: ReturnType<typeof vi.fn>
     update: ReturnType<typeof vi.fn>
     delete: ReturnType<typeof vi.fn>
@@ -35,7 +43,8 @@ const mockDeliverable = {
 describe('GET /api/v1/deals/:dealId/deliverables', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockPrisma.deal.findUnique.mockResolvedValue(mockDealStub)
+    mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
+    mockPrisma.deal.findFirst.mockResolvedValue(mockDealStub)
     mockPrisma.deliverable.findMany.mockResolvedValue([mockDeliverable])
   })
 
@@ -43,6 +52,7 @@ describe('GET /api/v1/deals/:dealId/deliverables', () => {
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'GET',
+      headers: auth,
       url: `/api/v1/deals/${DEAL_ID}/deliverables`,
     })
 
@@ -53,11 +63,12 @@ describe('GET /api/v1/deals/:dealId/deliverables', () => {
   })
 
   it('returns 404 when deal does not exist', async () => {
-    mockPrisma.deal.findUnique.mockResolvedValue(null)
+    mockPrisma.deal.findFirst.mockResolvedValue(null)
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'GET',
+      headers: auth,
       url: `/api/v1/deals/550e8400-e29b-41d4-a716-000000000000/deliverables`,
     })
 
@@ -69,6 +80,7 @@ describe('GET /api/v1/deals/:dealId/deliverables', () => {
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'GET',
+      headers: auth,
       url: `/api/v1/deals/${DEAL_ID}/deliverables`,
     })
 
@@ -85,6 +97,7 @@ describe('GET /api/v1/deals/:dealId/deliverables', () => {
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'GET',
+      headers: auth,
       url: `/api/v1/deals/${DEAL_ID}/deliverables`,
     })
 
@@ -106,6 +119,7 @@ describe('GET /api/v1/deals/:dealId/deliverables', () => {
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'GET',
+      headers: auth,
       url: `/api/v1/deals/${DEAL_ID}/deliverables`,
     })
 
@@ -126,6 +140,7 @@ describe('GET /api/v1/deals/:dealId/deliverables', () => {
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'GET',
+      headers: auth,
       url: `/api/v1/deals/${DEAL_ID}/deliverables`,
     })
 
@@ -142,6 +157,7 @@ describe('GET /api/v1/deals/:dealId/deliverables', () => {
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'GET',
+      headers: auth,
       url: `/api/v1/deals/${DEAL_ID}/deliverables`,
     })
 
@@ -154,7 +170,8 @@ describe('GET /api/v1/deals/:dealId/deliverables', () => {
 describe('POST /api/v1/deals/:dealId/deliverables', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockPrisma.deal.findUnique.mockResolvedValue(mockDealStub)
+    mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
+    mockPrisma.deal.findFirst.mockResolvedValue(mockDealStub)
     mockPrisma.deliverable.create.mockResolvedValue(mockDeliverable)
   })
 
@@ -162,6 +179,7 @@ describe('POST /api/v1/deals/:dealId/deliverables', () => {
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'POST',
+      headers: auth,
       url: `/api/v1/deals/${DEAL_ID}/deliverables`,
       payload: {
         title: '3x Instagram Reels',
@@ -187,6 +205,7 @@ describe('POST /api/v1/deals/:dealId/deliverables', () => {
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'POST',
+      headers: auth,
       url: `/api/v1/deals/${DEAL_ID}/deliverables`,
       payload: {
         title: '3x Instagram Reels',
@@ -202,11 +221,12 @@ describe('POST /api/v1/deals/:dealId/deliverables', () => {
   })
 
   it('returns 404 when deal does not exist', async () => {
-    mockPrisma.deal.findUnique.mockResolvedValue(null)
+    mockPrisma.deal.findFirst.mockResolvedValue(null)
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'POST',
+      headers: auth,
       url: `/api/v1/deals/550e8400-e29b-41d4-a716-000000000000/deliverables`,
       payload: {
         title: '3x Instagram Reels',
@@ -223,6 +243,7 @@ describe('POST /api/v1/deals/:dealId/deliverables', () => {
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'POST',
+      headers: auth,
       url: `/api/v1/deals/${DEAL_ID}/deliverables`,
       payload: { platform: 'INSTAGRAM', type: 'REEL' },
     })
@@ -235,6 +256,7 @@ describe('POST /api/v1/deals/:dealId/deliverables', () => {
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'POST',
+      headers: auth,
       url: `/api/v1/deals/${DEAL_ID}/deliverables`,
       payload: { title: '', platform: 'INSTAGRAM', type: 'REEL' },
     })
@@ -247,6 +269,7 @@ describe('POST /api/v1/deals/:dealId/deliverables', () => {
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'POST',
+      headers: auth,
       url: `/api/v1/deals/${DEAL_ID}/deliverables`,
       payload: { title: '3x Reels', type: 'REEL' },
     })
@@ -259,6 +282,7 @@ describe('POST /api/v1/deals/:dealId/deliverables', () => {
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'POST',
+      headers: auth,
       url: `/api/v1/deals/${DEAL_ID}/deliverables`,
       payload: { title: '3x Reels', platform: 'INSTAGRAM' },
     })
@@ -271,6 +295,7 @@ describe('POST /api/v1/deals/:dealId/deliverables', () => {
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'POST',
+      headers: auth,
       url: `/api/v1/deals/${DEAL_ID}/deliverables`,
       payload: { title: '3x Reels', platform: 'TIKTOK', type: 'REEL' },
     })
@@ -283,6 +308,7 @@ describe('POST /api/v1/deals/:dealId/deliverables', () => {
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'POST',
+      headers: auth,
       url: `/api/v1/deals/${DEAL_ID}/deliverables`,
       payload: { title: '3x Reels', platform: 'INSTAGRAM', type: 'TWEET' },
     })
@@ -295,10 +321,11 @@ describe('POST /api/v1/deals/:dealId/deliverables', () => {
 describe('PATCH /api/v1/deliverables/:id', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
   })
 
   it('updates deliverable title and returns 200', async () => {
-    mockPrisma.deliverable.findUnique.mockResolvedValue(mockDeliverable)
+    mockPrisma.deliverable.findFirst.mockResolvedValue(mockDeliverable)
     mockPrisma.deliverable.update.mockResolvedValue({
       ...mockDeliverable,
       title: 'Updated title',
@@ -307,6 +334,7 @@ describe('PATCH /api/v1/deliverables/:id', () => {
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'PATCH',
+      headers: auth,
       url: `/api/v1/deliverables/${DELIVERABLE_ID}`,
       payload: { title: 'Updated title' },
     })
@@ -318,7 +346,7 @@ describe('PATCH /api/v1/deliverables/:id', () => {
   })
 
   it('marks deliverable COMPLETED and sets completedAt', async () => {
-    mockPrisma.deliverable.findUnique.mockResolvedValue(mockDeliverable)
+    mockPrisma.deliverable.findFirst.mockResolvedValue(mockDeliverable)
     mockPrisma.deliverable.update.mockResolvedValue({
       ...mockDeliverable,
       status: 'COMPLETED',
@@ -328,6 +356,7 @@ describe('PATCH /api/v1/deliverables/:id', () => {
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'PATCH',
+      headers: auth,
       url: `/api/v1/deliverables/${DELIVERABLE_ID}`,
       payload: { status: 'COMPLETED' },
     })
@@ -340,7 +369,7 @@ describe('PATCH /api/v1/deliverables/:id', () => {
   })
 
   it('reverts COMPLETED deliverable to PENDING and clears completedAt', async () => {
-    mockPrisma.deliverable.findUnique.mockResolvedValue({
+    mockPrisma.deliverable.findFirst.mockResolvedValue({
       ...mockDeliverable,
       status: 'COMPLETED',
       completedAt: new Date('2026-04-03T00:00:00.000Z'),
@@ -354,6 +383,7 @@ describe('PATCH /api/v1/deliverables/:id', () => {
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'PATCH',
+      headers: auth,
       url: `/api/v1/deliverables/${DELIVERABLE_ID}`,
       payload: { status: 'PENDING' },
     })
@@ -366,11 +396,12 @@ describe('PATCH /api/v1/deliverables/:id', () => {
   })
 
   it('returns 404 when deliverable does not exist', async () => {
-    mockPrisma.deliverable.findUnique.mockResolvedValue(null)
+    mockPrisma.deliverable.findFirst.mockResolvedValue(null)
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'PATCH',
+      headers: auth,
       url: `/api/v1/deliverables/770e8400-e29b-41d4-a716-000000000000`,
       payload: { status: 'COMPLETED' },
     })
@@ -380,11 +411,12 @@ describe('PATCH /api/v1/deliverables/:id', () => {
   })
 
   it('returns 400 for invalid status enum', async () => {
-    mockPrisma.deliverable.findUnique.mockResolvedValue(mockDeliverable)
+    mockPrisma.deliverable.findFirst.mockResolvedValue(mockDeliverable)
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'PATCH',
+      headers: auth,
       url: `/api/v1/deliverables/${DELIVERABLE_ID}`,
       payload: { status: 'DONE' },
     })
@@ -394,7 +426,7 @@ describe('PATCH /api/v1/deliverables/:id', () => {
   })
 
   it('clears dueDate when set to null', async () => {
-    mockPrisma.deliverable.findUnique.mockResolvedValue({
+    mockPrisma.deliverable.findFirst.mockResolvedValue({
       ...mockDeliverable,
       dueDate: new Date('2026-05-01T00:00:00.000Z'),
     })
@@ -406,6 +438,7 @@ describe('PATCH /api/v1/deliverables/:id', () => {
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'PATCH',
+      headers: auth,
       url: `/api/v1/deliverables/${DELIVERABLE_ID}`,
       payload: { dueDate: null },
     })
@@ -420,15 +453,17 @@ describe('PATCH /api/v1/deliverables/:id', () => {
 describe('DELETE /api/v1/deliverables/:id', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
   })
 
   it('deletes deliverable and returns 204', async () => {
-    mockPrisma.deliverable.findUnique.mockResolvedValue(mockDeliverable)
+    mockPrisma.deliverable.findFirst.mockResolvedValue(mockDeliverable)
     mockPrisma.deliverable.delete.mockResolvedValue(mockDeliverable)
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'DELETE',
+      headers: auth,
       url: `/api/v1/deliverables/${DELIVERABLE_ID}`,
     })
 
@@ -437,11 +472,12 @@ describe('DELETE /api/v1/deliverables/:id', () => {
   })
 
   it('returns 404 when deliverable does not exist', async () => {
-    mockPrisma.deliverable.findUnique.mockResolvedValue(null)
+    mockPrisma.deliverable.findFirst.mockResolvedValue(null)
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'DELETE',
+      headers: auth,
       url: `/api/v1/deliverables/770e8400-e29b-41d4-a716-000000000000`,
     })
 

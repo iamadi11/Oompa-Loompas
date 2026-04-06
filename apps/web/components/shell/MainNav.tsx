@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useId, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { isMainNavCurrent } from '../../lib/main-nav'
+import { ShellAuthActions } from './ShellAuthActions'
 
 const linkBase =
   'rounded-md transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas'
@@ -22,6 +23,14 @@ function NavLinks(props: { onNavigate?: () => void; className?: string }) {
 
   return (
     <>
+      <Link
+        href="/dashboard"
+        className={`${linkClassName(isMainNavCurrent(pathname, 'overview'))} ${className}`}
+        aria-current={isMainNavCurrent(pathname, 'overview') ? 'page' : undefined}
+        {...(onNavigate ? { onClick: onNavigate } : {})}
+      >
+        Overview
+      </Link>
       <Link
         href="/attention"
         className={`${linkClassName(isMainNavCurrent(pathname, 'attention'))} ${className}`}
@@ -44,10 +53,10 @@ function NavLinks(props: { onNavigate?: () => void; className?: string }) {
 
 export function BrandHomeLink() {
   const pathname = usePathname() ?? ''
-  const current = isMainNavCurrent(pathname, 'home')
+  const current = isMainNavCurrent(pathname, 'overview')
   return (
     <Link
-      href="/"
+      href="/dashboard"
       className="font-display text-lg sm:text-xl font-semibold tracking-tight text-stone-900 transition-opacity duration-200 motion-reduce:transition-none hover:opacity-85 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
       aria-current={current ? 'page' : undefined}
     >
@@ -89,6 +98,7 @@ export function AppShellHeader() {
         <BrandHomeLink />
         <nav className="hidden md:flex items-center gap-1" aria-label="Main">
           <NavLinks />
+          <ShellAuthActions className="ml-2 pl-2 border-l border-line/70" />
         </nav>
         <button
           type="button"
@@ -123,6 +133,11 @@ export function AppShellHeader() {
             <NavLinks
               onNavigate={() => setMenuOpen(false)}
               className="!flex !w-full !justify-start"
+            />
+            <ShellAuthActions
+              variant="stacked"
+              onNavigate={() => setMenuOpen(false)}
+              className="!flex !w-full !justify-start mt-2 pt-2 border-t border-line/70"
             />
           </nav>
         ) : null}

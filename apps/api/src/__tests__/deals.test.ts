@@ -1,11 +1,20 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { buildServer } from '../server.js'
 import { prisma } from '@oompa/db'
+import {
+  mockSessionFindUnique,
+  testAuthCookieHeader,
+  TEST_USER_ID,
+} from './auth-test-helpers.js'
+
+const auth = testAuthCookieHeader()
 
 const mockPrisma = prisma as typeof prisma & {
+  session: { findUnique: ReturnType<typeof vi.fn> }
   deal: {
     findMany: ReturnType<typeof vi.fn>
     findUnique: ReturnType<typeof vi.fn>
+    findFirst: ReturnType<typeof vi.fn>
     create: ReturnType<typeof vi.fn>
     update: ReturnType<typeof vi.fn>
     delete: ReturnType<typeof vi.fn>
@@ -30,6 +39,7 @@ const mockDeal = {
 describe('GET /api/v1/deals', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
     mockPrisma.deal.findMany.mockResolvedValue([mockDeal])
     mockPrisma.deal.count.mockResolvedValue(1)
   })
@@ -39,6 +49,7 @@ describe('GET /api/v1/deals', () => {
     const response = await fastify.inject({
       method: 'GET',
       url: '/api/v1/deals',
+      headers: auth,
     })
 
     expect(response.statusCode).toBe(200)
@@ -56,6 +67,7 @@ describe('GET /api/v1/deals', () => {
     const response = await fastify.inject({
       method: 'GET',
       url: '/api/v1/deals?status=DRAFT',
+      headers: auth,
     })
 
     expect(response.statusCode).toBe(200)
@@ -67,6 +79,7 @@ describe('GET /api/v1/deals', () => {
     const response = await fastify.inject({
       method: 'GET',
       url: '/api/v1/deals?status=INVALID_STATUS',
+      headers: auth,
     })
 
     expect(response.statusCode).toBe(400)
@@ -78,6 +91,7 @@ describe('GET /api/v1/deals', () => {
     const response = await fastify.inject({
       method: 'GET',
       url: '/api/v1/deals?needsAttention=yes',
+      headers: auth,
     })
 
     expect(response.statusCode).toBe(400)
@@ -92,13 +106,15 @@ describe('GET /api/v1/deals', () => {
     const response = await fastify.inject({
       method: 'GET',
       url: '/api/v1/deals?needsAttention=true',
+      headers: auth,
     })
 
     expect(response.statusCode).toBe(200)
     expect(mockPrisma.deal.findMany).toHaveBeenCalled()
     const callArg = mockPrisma.deal.findMany.mock.calls[0]?.[0] as {
-      where: { AND?: unknown[]; OR?: unknown }
+      where: { userId?: string; AND?: unknown[] }
     }
+    expect(callArg.where.userId).toBe(TEST_USER_ID)
     expect(callArg.where.AND).toHaveLength(1)
     expect(callArg.where.AND?.[0]).toMatchObject({
       OR: expect.arrayContaining([
@@ -113,15 +129,17 @@ describe('GET /api/v1/deals', () => {
 describe('GET /api/v1/deals/:id', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
   })
 
   it('returns 200 with deal data for valid id', async () => {
-    mockPrisma.deal.findUnique.mockResolvedValue(mockDeal)
+    mockPrisma.deal.findFirst.mockResolvedValue(mockDeal)
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'GET',
       url: `/api/v1/deals/${mockDeal.id}`,
+      headers: auth,
     })
 
     expect(response.statusCode).toBe(200)
@@ -132,12 +150,13 @@ describe('GET /api/v1/deals/:id', () => {
   })
 
   it('returns 404 for unknown id', async () => {
-    mockPrisma.deal.findUnique.mockResolvedValue(null)
+    mockPrisma.deal.findFirst.mockResolvedValue(null)
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'GET',
       url: '/api/v1/deals/550e8400-e29b-41d4-a716-000000000000',
+      headers: auth,
     })
 
     expect(response.statusCode).toBe(404)
@@ -150,6 +169,7 @@ describe('GET /api/v1/deals/:id', () => {
 describe('POST /api/v1/deals', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
     mockPrisma.deal.create.mockResolvedValue(mockDeal)
   })
 
@@ -158,6 +178,7 @@ describe('POST /api/v1/deals', () => {
     const response = await fastify.inject({
       method: 'POST',
       url: '/api/v1/deals',
+      headers: auth,
       payload: {
         title: 'Nike Reel Campaign',
         brandName: 'Nike',
@@ -169,6 +190,11 @@ describe('POST /api/v1/deals', () => {
     expect(response.statusCode).toBe(201)
     const body = response.json()
     expect(body.data.id).toBe(mockDeal.id)
+    expect(mockPrisma.deal.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ userId: TEST_USER_ID }),
+      }),
+    )
     await fastify.close()
   })
 
@@ -177,6 +203,7 @@ describe('POST /api/v1/deals', () => {
     const response = await fastify.inject({
       method: 'POST',
       url: '/api/v1/deals',
+      headers: auth,
       payload: { brandName: 'Nike', value: 80000 },
     })
 
@@ -189,6 +216,7 @@ describe('POST /api/v1/deals', () => {
     const response = await fastify.inject({
       method: 'POST',
       url: '/api/v1/deals',
+      headers: auth,
       payload: { title: 'Test', brandName: 'Nike', value: -100 },
     })
 
@@ -201,6 +229,7 @@ describe('POST /api/v1/deals', () => {
     const response = await fastify.inject({
       method: 'POST',
       url: '/api/v1/deals',
+      headers: auth,
       payload: { title: 'Test', brandName: 'Nike' },
     })
 
@@ -213,6 +242,7 @@ describe('POST /api/v1/deals', () => {
     const response = await fastify.inject({
       method: 'POST',
       url: '/api/v1/deals',
+      headers: auth,
       payload: { title: 'Test', value: 80000 },
     })
 
@@ -224,16 +254,18 @@ describe('POST /api/v1/deals', () => {
 describe('PATCH /api/v1/deals/:id', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
   })
 
   it('updates a deal and returns 200', async () => {
-    mockPrisma.deal.findUnique.mockResolvedValue(mockDeal)
+    mockPrisma.deal.findFirst.mockResolvedValue(mockDeal)
     mockPrisma.deal.update.mockResolvedValue({ ...mockDeal, title: 'Updated Title' })
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'PATCH',
       url: `/api/v1/deals/${mockDeal.id}`,
+      headers: auth,
       payload: { title: 'Updated Title' },
     })
 
@@ -242,12 +274,13 @@ describe('PATCH /api/v1/deals/:id', () => {
   })
 
   it('returns 404 when deal does not exist', async () => {
-    mockPrisma.deal.findUnique.mockResolvedValue(null)
+    mockPrisma.deal.findFirst.mockResolvedValue(null)
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'PATCH',
       url: '/api/v1/deals/550e8400-e29b-41d4-a716-000000000000',
+      headers: auth,
       payload: { title: 'Updated' },
     })
 
@@ -256,12 +289,13 @@ describe('PATCH /api/v1/deals/:id', () => {
   })
 
   it('returns 409 for invalid status transition', async () => {
-    mockPrisma.deal.findUnique.mockResolvedValue({ ...mockDeal, status: 'PAID' })
+    mockPrisma.deal.findFirst.mockResolvedValue({ ...mockDeal, status: 'PAID' })
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'PATCH',
       url: `/api/v1/deals/${mockDeal.id}`,
+      headers: auth,
       payload: { status: 'DRAFT' },
     })
 
@@ -270,13 +304,14 @@ describe('PATCH /api/v1/deals/:id', () => {
   })
 
   it('allows valid status transition DRAFT → NEGOTIATING', async () => {
-    mockPrisma.deal.findUnique.mockResolvedValue({ ...mockDeal, status: 'DRAFT' })
+    mockPrisma.deal.findFirst.mockResolvedValue({ ...mockDeal, status: 'DRAFT' })
     mockPrisma.deal.update.mockResolvedValue({ ...mockDeal, status: 'NEGOTIATING' })
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'PATCH',
       url: `/api/v1/deals/${mockDeal.id}`,
+      headers: auth,
       payload: { status: 'NEGOTIATING' },
     })
 
@@ -285,7 +320,7 @@ describe('PATCH /api/v1/deals/:id', () => {
   })
 
   it('clears startDate and endDate when set to null', async () => {
-    mockPrisma.deal.findUnique.mockResolvedValue({
+    mockPrisma.deal.findFirst.mockResolvedValue({
       ...mockDeal,
       startDate: new Date('2026-05-01T00:00:00.000Z'),
       endDate: new Date('2026-06-01T00:00:00.000Z'),
@@ -296,6 +331,7 @@ describe('PATCH /api/v1/deals/:id', () => {
     const response = await fastify.inject({
       method: 'PATCH',
       url: `/api/v1/deals/${mockDeal.id}`,
+      headers: auth,
       payload: { startDate: null, endDate: null },
     })
 
@@ -304,7 +340,7 @@ describe('PATCH /api/v1/deals/:id', () => {
   })
 
   it('sets startDate and endDate when provided as ISO strings', async () => {
-    mockPrisma.deal.findUnique.mockResolvedValue(mockDeal)
+    mockPrisma.deal.findFirst.mockResolvedValue(mockDeal)
     mockPrisma.deal.update.mockResolvedValue({
       ...mockDeal,
       startDate: new Date('2026-05-01T00:00:00.000Z'),
@@ -315,6 +351,7 @@ describe('PATCH /api/v1/deals/:id', () => {
     const response = await fastify.inject({
       method: 'PATCH',
       url: `/api/v1/deals/${mockDeal.id}`,
+      headers: auth,
       payload: {
         startDate: '2026-05-01T00:00:00.000Z',
         endDate: '2026-06-01T00:00:00.000Z',
@@ -329,16 +366,18 @@ describe('PATCH /api/v1/deals/:id', () => {
 describe('DELETE /api/v1/deals/:id', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
   })
 
   it('deletes a deal and returns 204', async () => {
-    mockPrisma.deal.findUnique.mockResolvedValue(mockDeal)
+    mockPrisma.deal.findFirst.mockResolvedValue(mockDeal)
     mockPrisma.deal.delete.mockResolvedValue(mockDeal)
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'DELETE',
       url: `/api/v1/deals/${mockDeal.id}`,
+      headers: auth,
     })
 
     expect(response.statusCode).toBe(204)
@@ -346,16 +385,16 @@ describe('DELETE /api/v1/deals/:id', () => {
   })
 
   it('returns 404 when deal does not exist', async () => {
-    mockPrisma.deal.findUnique.mockResolvedValue(null)
+    mockPrisma.deal.findFirst.mockResolvedValue(null)
 
     const fastify = await buildServer()
     const response = await fastify.inject({
       method: 'DELETE',
       url: '/api/v1/deals/550e8400-e29b-41d4-a716-000000000000',
+      headers: auth,
     })
 
     expect(response.statusCode).toBe(404)
     await fastify.close()
   })
 })
-

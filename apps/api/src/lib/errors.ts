@@ -30,6 +30,18 @@ export class ConflictError extends AppError {
   }
 }
 
+export class UnauthorizedError extends AppError {
+  constructor(message = 'Authentication required') {
+    super(401, 'Unauthorized', message)
+  }
+}
+
+export class ForbiddenError extends AppError {
+  constructor(message = 'Insufficient permissions') {
+    super(403, 'Forbidden', message)
+  }
+}
+
 export function sendError(reply: FastifyReply, error: AppError): void {
   const body: ApiError = {
     error: error.error,

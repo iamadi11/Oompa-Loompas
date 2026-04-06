@@ -17,6 +17,7 @@ import {
   NotFoundError,
   ValidationError,
   ConflictError,
+  UnauthorizedError,
   sendError,
 } from '../../lib/errors.js'
 
@@ -52,6 +53,11 @@ export async function listDeals(
   request: FastifyRequest<{ Querystring: DealListFilters }>,
   reply: FastifyReply,
 ): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
   const parsed = validate(DealListFiltersSchema, request.query)
   if (!parsed.success) {
     return sendError(reply, new ValidationError(parsed.errors.map((e) => e.message).join(', ')))
@@ -92,7 +98,7 @@ export async function listDeals(
   }
 
   const where: Prisma.DealWhereInput =
-    andFilters.length === 0 ? {} : { AND: andFilters }
+    andFilters.length === 0 ? { userId } : { userId, AND: andFilters }
 
   const [deals, total] = await Promise.all([
     prisma.deal.findMany({
@@ -119,8 +125,13 @@ export async function getDeal(
   request: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
 ): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
   const { id } = request.params
-  const deal = await prisma.deal.findUnique({ where: { id } })
+  const deal = await prisma.deal.findFirst({ where: { id, userId } })
   if (!deal) {
     return sendError(reply, new NotFoundError('Deal', id))
   }
@@ -131,6 +142,11 @@ export async function createDeal(
   request: FastifyRequest<{ Body: CreateDeal }>,
   reply: FastifyReply,
 ): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
   const parsed = validate(CreateDealSchema, request.body)
   if (!parsed.success) {
     return sendError(reply, new ValidationError(parsed.errors.map((e) => e.message).join(', ')))
@@ -140,6 +156,7 @@ export async function createDeal(
 
   const deal = await prisma.deal.create({
     data: {
+      userId,
       title,
       brandName,
       value: new Prisma.Decimal(value),
@@ -164,6 +181,11 @@ export async function updateDeal(
   request: FastifyRequest<{ Params: { id: string }; Body: UpdateDeal }>,
   reply: FastifyReply,
 ): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
   const { id } = request.params
 
   const parsed = validate(UpdateDealSchema, request.body)
@@ -171,7 +193,7 @@ export async function updateDeal(
     return sendError(reply, new ValidationError(parsed.errors.map((e) => e.message).join(', ')))
   }
 
-  const existing = await prisma.deal.findUnique({ where: { id } })
+  const existing = await prisma.deal.findFirst({ where: { id, userId } })
   if (!existing) {
     return sendError(reply, new NotFoundError('Deal', id))
   }
@@ -223,9 +245,14 @@ export async function deleteDeal(
   request: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
 ): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
   const { id } = request.params
 
-  const existing = await prisma.deal.findUnique({ where: { id } })
+  const existing = await prisma.deal.findFirst({ where: { id, userId } })
   if (!existing) {
     return sendError(reply, new NotFoundError('Deal', id))
   }

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { api, PUBLIC_API_BASE_URL } from '../api'
+import { api, getBrowserApiBase, paymentInvoiceHref } from '../api'
 
 function jsonResponse(
   body: unknown,
@@ -26,16 +26,23 @@ function rejectJsonResponse(
   } as Response
 }
 
+const defaultFetchInit = {
+  credentials: 'include' as const,
+  headers: { 'Content-Type': 'application/json' },
+}
+
 describe('ApiClient', () => {
   const fetchMock = vi.fn()
 
   beforeEach(() => {
+    vi.stubEnv('NEXT_PUBLIC_API_URL', 'http://localhost:3001')
     vi.stubGlobal('fetch', fetchMock)
     fetchMock.mockReset()
   })
 
   afterEach(() => {
     vi.unstubAllGlobals()
+    vi.unstubAllEnvs()
   })
 
   it('listDeals calls deals endpoint without query when filters empty', async () => {
@@ -44,6 +51,7 @@ describe('ApiClient', () => {
     expect(fetchMock).toHaveBeenCalledWith(
       'http://localhost:3001/api/v1/deals',
       expect.objectContaining({
+        credentials: 'include',
         headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
       }),
     )
@@ -73,7 +81,7 @@ describe('ApiClient', () => {
     await api.getDeal('abc')
     expect(fetchMock).toHaveBeenCalledWith(
       'http://localhost:3001/api/v1/deals/abc',
-      expect.any(Object),
+      expect.objectContaining(defaultFetchInit),
     )
   })
 
@@ -89,6 +97,7 @@ describe('ApiClient', () => {
     await api.createDeal(payload)
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/deals', {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     })
@@ -99,6 +108,7 @@ describe('ApiClient', () => {
     await api.updateDeal('x', { title: 'N' })
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/deals/x', {
       method: 'PATCH',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title: 'N' }),
     })
@@ -111,6 +121,7 @@ describe('ApiClient', () => {
     await api.deleteDeal('d1')
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/deals/d1', {
       method: 'DELETE',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
     })
   })
@@ -120,7 +131,7 @@ describe('ApiClient', () => {
     await api.listPayments('deal-9')
     expect(fetchMock).toHaveBeenCalledWith(
       'http://localhost:3001/api/v1/deals/deal-9/payments',
-      expect.any(Object),
+      expect.objectContaining(defaultFetchInit),
     )
   })
 
@@ -136,6 +147,7 @@ describe('ApiClient', () => {
       'http://localhost:3001/api/v1/deals/d/payments',
       {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       },
@@ -147,6 +159,7 @@ describe('ApiClient', () => {
     await api.updatePayment('pid', { status: 'RECEIVED' })
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/payments/pid', {
       method: 'PATCH',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: 'RECEIVED' }),
     })
@@ -157,6 +170,7 @@ describe('ApiClient', () => {
     await api.deletePayment('pid')
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/payments/pid', {
       method: 'DELETE',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
     })
   })
@@ -166,7 +180,7 @@ describe('ApiClient', () => {
     await api.getDashboard()
     expect(fetchMock).toHaveBeenCalledWith(
       'http://localhost:3001/api/v1/dashboard',
-      expect.any(Object),
+      expect.objectContaining(defaultFetchInit),
     )
   })
 
@@ -175,7 +189,7 @@ describe('ApiClient', () => {
     await api.getAttention()
     expect(fetchMock).toHaveBeenCalledWith(
       'http://localhost:3001/api/v1/attention',
-      expect.any(Object),
+      expect.objectContaining(defaultFetchInit),
     )
   })
 
@@ -184,7 +198,7 @@ describe('ApiClient', () => {
     await api.listDeliverables('d2')
     expect(fetchMock).toHaveBeenCalledWith(
       'http://localhost:3001/api/v1/deals/d2/deliverables',
-      expect.any(Object),
+      expect.objectContaining(defaultFetchInit),
     )
   })
 
@@ -201,6 +215,7 @@ describe('ApiClient', () => {
       'http://localhost:3001/api/v1/deals/d2/deliverables',
       {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       },
@@ -212,6 +227,7 @@ describe('ApiClient', () => {
     await api.updateDeliverable('del1', { title: 'T2' })
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/deliverables/del1', {
       method: 'PATCH',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title: 'T2' }),
     })
@@ -222,8 +238,41 @@ describe('ApiClient', () => {
     await api.deleteDeliverable('del1')
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/deliverables/del1', {
       method: 'DELETE',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
     })
+  })
+
+  it('login POSTs credentials', async () => {
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse({ data: { id: 'u1', email: 'a@b.co', roles: ['ADMIN'] } }),
+    )
+    await api.login({ email: 'a@b.co', password: 'x' })
+    expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/auth/login', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'a@b.co', password: 'x' }),
+    })
+  })
+
+  it('logout POSTs', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(undefined, { ok: true, status: 204 }) as Response)
+    await api.logout()
+    expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/auth/logout', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+    })
+  })
+
+  it('getMe GETs session user', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ data: { id: 'u1', email: 'a@b.co', roles: ['MEMBER'] } }))
+    await api.getMe()
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3001/api/v1/auth/me',
+      expect.objectContaining(defaultFetchInit),
+    )
   })
 
   it('throws with server message when response is not ok', async () => {
@@ -235,10 +284,36 @@ describe('ApiClient', () => {
     fetchMock.mockResolvedValueOnce(rejectJsonResponse({ ok: false, status: 502 }))
     await expect(api.getDeal('x')).rejects.toThrow('Unknown error')
   })
+
+  it('uses same-origin paths when NEXT_PUBLIC_API_URL is unset', async () => {
+    vi.unstubAllEnvs()
+    fetchMock.mockResolvedValueOnce(jsonResponse({ data: [] }))
+    await api.listDeals()
+    expect(fetchMock).toHaveBeenCalledWith('/api/v1/deals', expect.objectContaining(defaultFetchInit))
+  })
 })
 
-describe('PUBLIC_API_BASE_URL', () => {
-  it('matches the default JSON client origin so invoice links stay consistent', () => {
-    expect(PUBLIC_API_BASE_URL).toBe('http://localhost:3001')
+describe('getBrowserApiBase and paymentInvoiceHref', () => {
+  beforeEach(() => {
+    vi.stubEnv('NEXT_PUBLIC_API_URL', 'http://localhost:3001')
+  })
+  afterEach(() => {
+    vi.unstubAllEnvs()
+  })
+
+  it('getBrowserApiBase trims trailing slash from env', () => {
+    vi.stubEnv('NEXT_PUBLIC_API_URL', 'http://localhost:3001/')
+    expect(getBrowserApiBase()).toBe('http://localhost:3001')
+  })
+
+  it('paymentInvoiceHref prefixes path when base is set', () => {
+    expect(paymentInvoiceHref('d1', 'p1')).toBe(
+      'http://localhost:3001/api/v1/deals/d1/payments/p1/invoice',
+    )
+  })
+
+  it('paymentInvoiceHref is relative when base is empty', () => {
+    vi.unstubAllEnvs()
+    expect(paymentInvoiceHref('d1', 'p1')).toBe('/api/v1/deals/d1/payments/p1/invoice')
   })
 })

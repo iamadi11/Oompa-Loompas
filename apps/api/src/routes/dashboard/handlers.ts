@@ -12,6 +12,7 @@ import {
   MAX_DASHBOARD_PRIORITY_ACTIONS,
   type DbDealWithRelations,
 } from '../../lib/priority-actions.js'
+import { UnauthorizedError, sendError } from '../../lib/errors.js'
 
 /**
  * Computes the dominant (most frequent) currency across all deals.
@@ -28,13 +29,20 @@ function computeDominantCurrency(deals: DbDealWithRelations[]): Currency {
 }
 
 export async function getDashboard(
-  _request: FastifyRequest,
+  request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<void> {
-  const deals = await prisma.deal.findMany({
+  const userId = request.authUser?.id
+  if (!userId) {
+    sendError(reply, new UnauthorizedError())
+    return
+  }
+
+  const deals = (await prisma.deal.findMany({
+    where: { userId },
     include: { payments: true, deliverables: true },
     orderBy: { createdAt: 'desc' },
-  }) as DbDealWithRelations[]
+  })) as DbDealWithRelations[]
 
   let totalContractedValue = 0
   let totalReceivedValue = 0

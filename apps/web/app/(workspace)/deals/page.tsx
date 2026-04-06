@@ -1,18 +1,17 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import type { Deal } from '@oompa/types'
-import { DealList } from '../../components/deals/DealList'
-import { isDealsNeedsAttentionFilter } from '../../lib/deals-page'
-import { getServerApiBaseUrl } from '../../lib/get-server-api-base-url'
+import { DealList } from '../../../components/deals/DealList'
+import { isDealsNeedsAttentionFilter } from '../../../lib/deals-page'
+import { getServerApiBaseUrl } from '../../../lib/get-server-api-base-url'
+import { serverApiFetch } from '../../../lib/server-api-fetch'
 
 async function getDeals(needsAttention: boolean): Promise<{ deals: Deal[]; loadError: string | null }> {
   const apiBase = getServerApiBaseUrl()
   const qs = new URLSearchParams({ limit: '100', sortOrder: 'desc' })
   if (needsAttention) qs.set('needsAttention', 'true')
   try {
-    const res = await fetch(`${apiBase}/api/v1/deals?${qs.toString()}`, {
-      cache: 'no-store',
-    })
+    const res = await serverApiFetch(`/api/v1/deals?${qs.toString()}`)
     if (!res.ok) {
       return {
         deals: [],

@@ -4,7 +4,7 @@
  */
 export type DealListEmptyVariant = 'all' | 'needsAttention'
 
-type AppPath = '/' | '/deals' | '/deals/new'
+type AppPath = '/dashboard' | '/deals' | '/deals/new'
 
 export type DealListEmptyContent = {
   title: string
@@ -18,21 +18,21 @@ export type DealListEmptyContent = {
 export function getDealListEmptyContent(variant: DealListEmptyVariant): DealListEmptyContent {
   if (variant === 'needsAttention') {
     return {
-      title: "You're all caught up",
+      title: "Nothing needs you right now",
       description:
-        'No deals have overdue payments or deliverables right now. Check all deals or add a new one anytime.',
+        'No overdue payments or deliverables on your deals. Open the full list or capture a new commitment when you are ready.',
       primaryHref: '/deals',
       primaryLabel: 'View all deals',
-      secondaryHref: '/',
+      secondaryHref: '/dashboard',
       secondaryLabel: 'Back to overview',
     }
   }
   return {
     title: 'No deals yet',
-    description: 'Add your first brand deal to start tracking revenue.',
+    description: 'Record a brand commitment once — see value, milestones, and follow-ups in one place.',
     primaryHref: '/deals/new',
-    primaryLabel: 'Add deal',
-    secondaryHref: '/',
+    primaryLabel: 'Add your first deal',
+    secondaryHref: '/dashboard',
     secondaryLabel: 'Back to overview',
   }
 }

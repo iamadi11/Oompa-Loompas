@@ -23,7 +23,9 @@
     "db:seed": "dotenv -e ../../apps/api/.env -- tsx src/seed.ts"
   },
   "dependencies": {
-    "@prisma/client": "^5.18.0"
+    "@prisma/client": "^5.18.0",
+    "@types/bcryptjs": "^3.0.0",
+    "bcryptjs": "^3.0.3"
   },
   "devDependencies": {
     "@oompa/config": "workspace:*",

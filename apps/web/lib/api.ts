@@ -12,20 +12,36 @@ import type {
   DashboardSummary,
   AttentionQueue,
   ApiResponse,
+  LoginBody,
+  MeResponse,
 } from '@oompa/types'
 
-/** Base URL for browser-visible API links (invoice HTML, downloads). Mirrors the JSON client. */
-export const PUBLIC_API_BASE_URL =
-  process.env['NEXT_PUBLIC_API_URL'] ?? 'http://localhost:3001'
+/**
+ * Browser JSON + invoice link base. Empty string = same-origin `/api/v1` via Next rewrites (cookies on web host).
+ * Set `NEXT_PUBLIC_API_URL` when the API is on another origin.
+ */
+export function getBrowserApiBase(): string {
+  const raw = process.env['NEXT_PUBLIC_API_URL']
+  if (typeof raw === 'string' && raw.trim().length > 0) {
+    return raw.replace(/\/$/, '')
+  }
+  return ''
+}
 
-const API_BASE = PUBLIC_API_BASE_URL
+export function paymentInvoiceHref(dealId: string, paymentId: string): string {
+  const base = getBrowserApiBase()
+  const path = `/api/v1/deals/${dealId}/payments/${paymentId}/invoice`
+  return base ? `${base}${path}` : path
+}
 
 class ApiClient {
   private async request<T>(
     path: string,
     options: RequestInit = {},
   ): Promise<T> {
-    const res = await fetch(`${API_BASE}${path}`, {
+    const base = getBrowserApiBase()
+    const res = await fetch(`${base}${path}`, {
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
@@ -128,6 +144,21 @@ class ApiClient {
 
   async deleteDeliverable(id: string): Promise<void> {
     return this.request<void>(`/api/v1/deliverables/${id}`, { method: 'DELETE' })
+  }
+
+  async login(body: LoginBody): Promise<MeResponse> {
+    return this.request<MeResponse>('/api/v1/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    })
+  }
+
+  async logout(): Promise<void> {
+    return this.request<void>('/api/v1/auth/logout', { method: 'POST' })
+  }
+
+  async getMe(): Promise<MeResponse> {
+    return this.request<MeResponse>('/api/v1/auth/me')
   }
 }
 

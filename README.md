@@ -30,3 +30,5 @@ pnpm dev
 ```
 
 Use the root and package `package.json` scripts for typecheck, lint, and tests.
+
+For a **fresh database**, apply migrations (`pnpm --filter @oompa/db exec prisma migrate deploy`) and seed or create a user (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` when there are no deals). See `apps/api/.env.example` and `docs/architecture/auth-and-rbac.md`.

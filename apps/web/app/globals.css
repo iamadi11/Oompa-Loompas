@@ -6,6 +6,8 @@
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Sticky app header (~py-3 + nav); keeps scroll-into-view and in-page targets from sitting under the shell */
+    scroll-padding-top: 5.5rem;
   }
 
   body {

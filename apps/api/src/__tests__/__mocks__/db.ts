@@ -1,9 +1,18 @@
 import { vi } from 'vitest'
 
 export const prisma = {
+  user: {
+    findUnique: vi.fn(),
+  },
+  session: {
+    findUnique: vi.fn(),
+    create: vi.fn(),
+    deleteMany: vi.fn(),
+  },
   deal: {
     findMany: vi.fn(),
     findUnique: vi.fn(),
+    findFirst: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
     delete: vi.fn(),
@@ -11,6 +20,7 @@ export const prisma = {
   },
   payment: {
     findMany: vi.fn(),
+    findFirst: vi.fn(),
     findUnique: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
@@ -18,6 +28,7 @@ export const prisma = {
   },
   deliverable: {
     findMany: vi.fn(),
+    findFirst: vi.fn(),
     findUnique: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
@@ -27,10 +38,13 @@ export const prisma = {
     upsert: vi.fn().mockResolvedValue({ id: 'singleton', lastSeq: 1 }),
   },
   $executeRaw: vi.fn().mockResolvedValue(undefined),
+  $queryRaw: vi.fn().mockResolvedValue([{ ok: 1 }]),
   $transaction: vi.fn(),
 }
 
-prisma.$transaction.mockImplementation((fn: (tx: typeof prisma) => unknown) => Promise.resolve(fn(prisma)))
+prisma.$transaction.mockImplementation((fn: (tx: typeof prisma) => unknown) =>
+  Promise.resolve(fn(prisma)),
+)
 
 export const Prisma = {
   Decimal: class Decimal {

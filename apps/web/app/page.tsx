@@ -1,138 +1,95 @@
 import Link from 'next/link'
-import type { DashboardSummary } from '@oompa/types'
-import { formatCurrency } from '@oompa/utils'
-import { OverviewFetchError } from '../components/dashboard/OverviewFetchError'
-import { PriorityActionsSection } from '../components/dashboard/PriorityActionsSection'
-import { RecentDealRow } from '../components/dashboard/RecentDealRow'
-import { SummaryCard } from '../components/dashboard/SummaryCard'
-import { getServerApiBaseUrl } from '../lib/get-server-api-base-url'
-import { resolveHomeOverviewState } from '../lib/home-page'
+import type { Metadata } from 'next'
 
-async function getDashboardData(): Promise<DashboardSummary | null> {
-  try {
-    const res = await fetch(`${getServerApiBaseUrl()}/api/v1/dashboard`, { cache: 'no-store' })
-    if (!res.ok) return null
-    const body = (await res.json()) as { data: DashboardSummary }
-    return body.data
-  } catch {
-    return null
-  }
+export const metadata: Metadata = {
+  title: 'Turn creator revenue into clear next actions',
 }
 
-export default async function HomePage() {
-  const data = await getDashboardData()
-  const state = resolveHomeOverviewState(data)
+const ctaClass =
+  'inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas'
 
-  if (state.kind === 'unavailable') {
-    return <OverviewFetchError />
-  }
-
-  if (state.kind === 'empty') {
-    return (
-      <div className="flex flex-col gap-8 py-8 sm:py-14 max-w-xl">
-        <div className="space-y-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-800/90">Start here</p>
-          <h1 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-stone-900 leading-[1.15]">
-            Your revenue, composed — not just counted.
-          </h1>
-          <p className="text-base sm:text-lg text-stone-600 leading-relaxed">
-            Track deals and payments in one calm surface. Built for creators who treat their work like a studio, not a
-            spreadsheet.
-          </p>
-        </div>
-        <Link
-          href="/deals/new"
-          className="inline-flex w-fit items-center px-5 py-3 rounded-xl bg-brand-700 text-white text-sm font-semibold shadow-sm border border-brand-800/20 hover:bg-brand-800 transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
-        >
-          Add your first deal
-        </Link>
-      </div>
-    )
-  }
-
-  const { data: dashboard } = state
-  const currency = dashboard.dominantCurrency
-
+export default function MarketingHomePage() {
   return (
-    <div className="space-y-8 sm:space-y-10 py-2 sm:py-4">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">Today</p>
-          <h1 className="mt-1 font-display text-2xl sm:text-3xl font-semibold tracking-tight text-stone-900">
-            Overview
-          </h1>
-        </div>
-        <Link
-          href="/deals/new"
-          className="inline-flex w-fit items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-700 text-white text-sm font-semibold shadow-sm border border-brand-800/20 hover:bg-brand-800 transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
-        >
-          <span className="text-lg leading-none" aria-hidden="true">
-            +
-          </span>
-          New deal
-        </Link>
-      </div>
-
-      <PriorityActionsSection
-        actions={dashboard.priorityActions}
-        totalCount={dashboard.priorityActionsTotalCount}
-      />
-
-      <section aria-labelledby="summary-heading">
-        <h2 id="summary-heading" className="sr-only">
-          Financial summary
-        </h2>
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-          <SummaryCard
-            label="Contracted"
-            value={formatCurrency(dashboard.totalContractedValue, currency)}
-            subtext={`${dashboard.totalDealsCount} deal${dashboard.totalDealsCount !== 1 ? 's' : ''}`}
-          />
-          <SummaryCard
-            label="Received"
-            value={formatCurrency(dashboard.totalReceivedValue, currency)}
-            accent="green"
-          />
-          <SummaryCard
-            label="Outstanding"
-            value={formatCurrency(dashboard.totalOutstandingValue, currency)}
-            accent={dashboard.overduePaymentsCount > 0 ? 'red' : 'default'}
-          />
-          <SummaryCard
-            label={dashboard.overduePaymentsCount > 0 ? 'Overdue' : 'Active deals'}
-            value={
-              dashboard.overduePaymentsCount > 0
-                ? formatCurrency(dashboard.overduePaymentsValue, currency)
-                : String(dashboard.activeDealsCount)
-            }
-            accent={dashboard.overduePaymentsCount > 0 ? 'red' : 'default'}
-            subtext={
-              dashboard.overduePaymentsCount > 0
-                ? `${dashboard.overduePaymentsCount} payment${dashboard.overduePaymentsCount !== 1 ? 's' : ''} overdue`
-                : undefined
-            }
-          />
-        </div>
-      </section>
-
-      <section aria-labelledby="recent-deals-heading">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
-          <h2 id="recent-deals-heading" className="font-display text-lg font-semibold text-stone-900">
-            Recent deals
-          </h2>
+    <div className="min-h-screen flex flex-col">
+      <header className="border-b border-line/70 bg-surface-raised/90 backdrop-blur-md">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between py-4">
+          <span className="font-display text-xl font-semibold tracking-tight text-stone-900">Revenue</span>
           <Link
-            href="/deals"
-            className="text-sm font-semibold text-brand-800 hover:text-brand-900 w-fit rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+            href="/login"
+            className={`${ctaClass} border border-line/90 bg-surface-raised text-stone-800 hover:bg-canvas`}
           >
-            View all
+            Log in
           </Link>
         </div>
-        <div className="flex flex-col gap-2">
-          {dashboard.recentDeals.map((deal) => (
-            <RecentDealRow key={deal.id} deal={deal} />
-          ))}
-        </div>
-      </section>
+      </header>
+
+      <main id="main-content" className="flex-1">
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-28">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-brand-800/90 mb-5">
+            Creator Revenue Intelligence
+          </p>
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-[3.25rem] font-semibold tracking-tight text-stone-900 leading-[1.12] text-balance max-w-3xl">
+            Know what to collect, deliver, and follow up — before revenue leaks.
+          </h1>
+          <p className="mt-6 text-lg sm:text-xl text-stone-600 leading-relaxed max-w-2xl text-pretty">
+            One calm workspace for deals, payment milestones, and deliverables. Built for creators who run a studio,
+            not a spreadsheet.
+          </p>
+          <div className="mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <Link
+              href="/login"
+              className={`${ctaClass} bg-brand-700 text-white border border-brand-800/25 shadow-sm hover:bg-brand-800`}
+            >
+              Open your workspace
+            </Link>
+            <a
+              href="#how-it-works"
+              className={`${ctaClass} text-stone-700 hover:text-stone-900 border border-transparent`}
+            >
+              How it works
+            </a>
+          </div>
+        </section>
+
+        <section
+          id="how-it-works"
+          className="border-t border-line/60 bg-surface-raised/50 py-16 sm:py-20"
+          aria-labelledby="how-heading"
+        >
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2
+              id="how-heading"
+              className="font-display text-2xl sm:text-3xl font-semibold text-stone-900 text-balance"
+            >
+              Outcome-first, not activity-first
+            </h2>
+            <ul className="mt-10 grid gap-8 sm:grid-cols-3">
+              <li className="space-y-2">
+                <h3 className="text-sm font-semibold text-stone-900">Capture commitments</h3>
+                <p className="text-sm text-stone-600 leading-relaxed">
+                  Record deal value, brands, and timelines so nothing informal stays invisible.
+                </p>
+              </li>
+              <li className="space-y-2">
+                <h3 className="text-sm font-semibold text-stone-900">See what needs you</h3>
+                <p className="text-sm text-stone-600 leading-relaxed">
+                  Overdue payments and deliverables surface in one attention queue — oldest risk first.
+                </p>
+              </li>
+              <li className="space-y-2">
+                <h3 className="text-sm font-semibold text-stone-900">Prove what was agreed</h3>
+                <p className="text-sm text-stone-600 leading-relaxed">
+                  Printable invoices per payment milestone, with clear status and amounts.
+                </p>
+              </li>
+            </ul>
+          </div>
+        </section>
+      </main>
+
+      <footer className="border-t border-line/60 py-8 text-center text-xs text-stone-500">
+        <div className="max-w-5xl mx-auto px-4">Revenue — financial outcome tooling for creators.</div>
+      </footer>
     </div>
   )
 }

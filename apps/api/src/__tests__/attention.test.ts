@@ -1,8 +1,16 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { buildServer } from '../server.js'
 import { prisma } from '@oompa/db'
+import {
+  mockSessionFindUnique,
+  testAuthCookieHeader,
+  TEST_USER_ID,
+} from './auth-test-helpers.js'
+
+const auth = testAuthCookieHeader()
 
 const mockPrisma = prisma as typeof prisma & {
+  session: { findUnique: ReturnType<typeof vi.fn> }
   deal: {
     findMany: ReturnType<typeof vi.fn>
   }
@@ -19,13 +27,14 @@ describe('GET /api/v1/attention', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
+    mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
     app = await buildServer()
   })
 
   it('returns 200 with empty actions when no deals', async () => {
     mockPrisma.deal.findMany.mockResolvedValue([])
 
-    const res = await app.inject({ method: 'GET', url: '/api/v1/attention' })
+    const res = await app.inject({ method: 'GET', url: '/api/v1/attention', headers: auth })
 
     expect(res.statusCode).toBe(200)
     const body = res.json()
@@ -62,7 +71,7 @@ describe('GET /api/v1/attention', () => {
     }
     mockPrisma.deal.findMany.mockResolvedValue([bulkDeal])
 
-    const res = await app.inject({ method: 'GET', url: '/api/v1/attention' })
+    const res = await app.inject({ method: 'GET', url: '/api/v1/attention', headers: auth })
 
     expect(res.statusCode).toBe(200)
     const body = res.json()
