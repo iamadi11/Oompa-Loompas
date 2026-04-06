@@ -6,6 +6,7 @@ import { paymentRoutes } from './routes/payments/index.js'
 import { dashboardRoutes } from './routes/dashboard/index.js'
 import { deliverableRoutes } from './routes/deliverables/index.js'
 import { attentionRoutes } from './routes/attention/index.js'
+import { healthV1Routes } from './routes/health/index.js'
 
 export async function buildServer() {
   const fastify = Fastify({
@@ -17,8 +18,10 @@ export async function buildServer() {
   await fastify.register(sensible)
   await fastify.register(corsPlugin)
 
+  /** Legacy root probe (CORS tests, simple uptime). Prefer `GET /api/v1/health` for versioned monitoring. */
   fastify.get('/health', async () => ({ status: 'ok', timestamp: new Date().toISOString() }))
 
+  await fastify.register(healthV1Routes, { prefix: '/api/v1' })
   await fastify.register(dealRoutes, { prefix: '/api/v1/deals' })
   await fastify.register(paymentRoutes, { prefix: '/api/v1' })
   await fastify.register(dashboardRoutes, { prefix: '/api/v1' })

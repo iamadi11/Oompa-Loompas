@@ -4,15 +4,19 @@ All notable changes to this repository are documented in this file.
 
 ## Unreleased
 
-### CI
+_Nothing yet._
 
-- **Reusable workflow:** remove **`apps/web/.next`** before **`pnpm build`** so stale Next output cannot break production builds ([`.github/workflows/ci-reusable.yml`](./.github/workflows/ci-reusable.yml)).
+## [0.1.7] - 2026-04-06
 
-### Documentation
+### `@oompa/api` **0.1.1**
 
-- **Ship gate log:** [docs/testing/ship-gates-2026-04-06.md](./docs/testing/ship-gates-2026-04-06.md)
+- **`GET /api/v1/health`** — versioned liveness probe with **`{ data: { status, service }, meta: { timestamp } }`**; **`GET /health`** unchanged. Tests in [`apps/api/src/__tests__/health.test.ts`](./apps/api/src/__tests__/health.test.ts); CORS coverage in [`cors.test.ts`](./apps/api/src/__tests__/cors.test.ts).
+- **Docs:** [decision](./docs/decisions/2026-04-06-api-v1-health.md), [architecture](./docs/architecture/api-v1-health.md), [UX](./docs/ux/api-v1-health.md), [testing](./docs/testing/api-v1-health.md), [instrumentation](./docs/instrumentation/api-v1-health.md), [retro](./docs/retros/2026-04-06-api-v1-health.md), [browser checklist](./docs/testing/browser-ux-checklist-api-v1-health-2026-04-06.md).
 
-_See **[0.1.6]** and [docs/product/feature-candidates-2026-04.md](./docs/product/feature-candidates-2026-04.md) for the last versioned web release._
+### CI / process
+
+- **Reusable workflow:** **`rm -rf apps/web/.next`** before **`pnpm build`** ([`ci-reusable.yml`](./.github/workflows/ci-reusable.yml)).
+- **Ship gate log:** [docs/testing/ship-gates-2026-04-06.md](./docs/testing/ship-gates-2026-04-06.md).
 
 ## [0.1.6] - 2026-04-06
 

@@ -359,13 +359,3 @@ describe('DELETE /api/v1/deals/:id', () => {
   })
 })
 
-describe('GET /health', () => {
-  it('returns 200 with ok status', async () => {
-    const fastify = await buildServer()
-    const response = await fastify.inject({ method: 'GET', url: '/health' })
-    expect(response.statusCode).toBe(200)
-    const body = response.json()
-    expect(body.status).toBe('ok')
-    await fastify.close()
-  })
-})

@@ -20,4 +20,17 @@ describe('CORS (non-preflight responses)', () => {
     expect(res.headers['access-control-allow-credentials']).toBe('true')
     await fastify.close()
   })
+
+  it('adds Access-Control-Allow-Origin on GET /api/v1/health when Origin is allowed', async () => {
+    const fastify = await buildServer()
+    const res = await fastify.inject({
+      method: 'GET',
+      url: '/api/v1/health',
+      headers: { origin: 'http://localhost:3000' },
+    })
+
+    expect(res.statusCode).toBe(200)
+    expect(res.headers['access-control-allow-origin']).toBe('http://localhost:3000')
+    await fastify.close()
+  })
 })

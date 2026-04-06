@@ -14,6 +14,11 @@ Create Environments under **Settings → Environments**. Suggested **variables**
 
 The **`deploy-*`** jobs ship with a **no-op deploy** until you wire a real command; **`quality`** already runs typecheck, lint, test, and build.
 
+### API health probes
+
+- **Versioned (preferred for `/api/v1` ingress):** `GET /api/v1/health` → JSON `{ data: { status, service }, meta: { timestamp } }`.
+- **Legacy root:** `GET /health` → `{ status, timestamp }`.
+
 ## PostgreSQL (recommended for `P1010` / permission errors)
 
 On macOS with **Homebrew Postgres**, run once from the repo root:
