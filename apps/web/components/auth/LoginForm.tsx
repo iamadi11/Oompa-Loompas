@@ -1,76 +1,59 @@
 'use client'
 
-import type { Route } from 'next'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useActionState, useCallback } from 'react'
+import { useFormStatus } from 'react-dom'
 import { api } from '../../lib/api'
-import { readNamedInput } from '../../lib/forms/read-named-input'
+import { postLoginDestination } from '../../lib/post-login-destination'
 
 export interface LoginFormProps {
   /** Post-login path from `?from=` (passed from server page — avoids `useSearchParams` suspend/hydration gaps). */
   redirectFrom?: string | null
 }
 
+type LoginFormState = {
+  error: string | null
+}
+
+function LoginSubmitButton() {
+  const { pending } = useFormStatus()
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="w-full rounded-xl bg-brand-700 text-white text-sm font-semibold py-3 shadow-sm border border-brand-800/20 hover:bg-brand-800 disabled:opacity-60 transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-raised"
+    >
+      {pending ? 'Signing in…' : 'Sign in'}
+    </button>
+  )
+}
+
 export function LoginForm({ redirectFrom = null }: LoginFormProps) {
   const router = useRouter()
-  const formRef = useRef<HTMLFormElement>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [pending, setPending] = useState(false)
 
-  /** Block real document navigation (`POST /login`) if submit fires before/alongside React's handler (e.g. automation). */
-  useEffect(() => {
-    const form = formRef.current
-    if (!form) return
-    const blockDocumentSubmit = (e: Event) => {
-      e.preventDefault()
-    }
-    form.addEventListener('submit', blockDocumentSubmit, true)
-    return () => form.removeEventListener('submit', blockDocumentSubmit, true)
-  }, [])
+  const loginAction = useCallback(
+    async (_prevState: LoginFormState, formData: FormData): Promise<LoginFormState> => {
+      const email = String(formData.get('email') ?? '').trim()
+      const password = String(formData.get('password') ?? '')
+      if (!email || !password) {
+        return { error: 'Enter your email and password.' }
+      }
+      try {
+        await api.login({ email, password })
+        router.push(postLoginDestination(redirectFrom))
+        router.refresh()
+        return { error: null }
+      } catch (err) {
+        return { error: err instanceof Error ? err.message : 'Sign-in failed' }
+      }
+    },
+    [router, redirectFrom],
+  )
 
-  const runLogin = useCallback(async () => {
-    const form = formRef.current
-    if (!form) return
-    setError(null)
-    const emailInput = readNamedInput(form, 'email')
-    const passwordInput = readNamedInput(form, 'password')
-    if (!emailInput || !passwordInput) {
-      setError('Sign-in form is not ready. Refresh and try again.')
-      return
-    }
-    const email = emailInput.value.trim()
-    const password = passwordInput.value
-    if (!email || !password) {
-      setError('Enter your email and password.')
-      return
-    }
-    setPending(true)
-    try {
-      await api.login({ email, password })
-      const from = redirectFrom?.trim() || null
-      const dest: Route =
-        from && from.startsWith('/') && !from.startsWith('//') ? (from as Route) : '/dashboard'
-      router.push(dest)
-      router.refresh()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Sign-in failed')
-    } finally {
-      setPending(false)
-    }
-  }, [router, redirectFrom])
-
-  function onFormSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    void runLogin()
-  }
+  const [state, formAction] = useActionState(loginAction, { error: null })
 
   return (
-    <form
-      ref={formRef}
-      method="post"
-      onSubmit={onFormSubmit}
-      className="space-y-5"
-    >
+    <form action={formAction} className="space-y-5">
       <div className="space-y-2">
         <label htmlFor="login-email" className="block text-sm font-medium text-stone-800">
           Email
@@ -97,21 +80,15 @@ export function LoginForm({ redirectFrom = null }: LoginFormProps) {
           className="w-full rounded-xl border border-line/90 bg-white px-3 py-2.5 text-stone-900 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-700 focus:border-brand-600"
         />
       </div>
-      {error ? (
+      {state.error ? (
         <p
           className="text-sm text-red-800 bg-red-50 border border-red-200/80 rounded-lg px-3 py-2"
           role="alert"
         >
-          {error}
+          {state.error}
         </p>
       ) : null}
-      <button
-        type="submit"
-        disabled={pending}
-        className="w-full rounded-xl bg-brand-700 text-white text-sm font-semibold py-3 shadow-sm border border-brand-800/20 hover:bg-brand-800 disabled:opacity-60 transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-raised"
-      >
-        {pending ? 'Signing in…' : 'Sign in'}
-      </button>
+      <LoginSubmitButton />
     </form>
   )
 }

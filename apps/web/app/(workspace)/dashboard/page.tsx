@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import type { DashboardSummary } from '@oompa/types'
 import { formatCurrency } from '@oompa/utils'
 import { OverviewFetchError } from '../../../components/dashboard/OverviewFetchError'
@@ -11,6 +12,9 @@ import { serverApiFetch } from '../../../lib/server-api-fetch'
 async function getDashboardData(): Promise<DashboardSummary | null> {
   try {
     const res = await serverApiFetch('/api/v1/dashboard')
+    if (res.status === 401) {
+      redirect('/login?from=/dashboard')
+    }
     if (!res.ok) return null
     const body = (await res.json()) as { data: DashboardSummary }
     return body.data

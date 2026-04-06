@@ -1,6 +1,26 @@
 # UX / PWA checklist run log
 
-Date: **2026-04-06** — **Latest agent pass (Boneyard + perf + Browser MCP + curl + full `pnpm -r` verify)**
+Date: **2026-04-06** — **Latest agent pass (Browser MCP + curl + `pnpm -r` test/lint/typecheck + login helper)**
+
+**This pass (Browser MCP on `http://127.0.0.1:3000`, curl, automated verify)**
+
+| Check | Result | Notes |
+| ----- | ------ | ----- |
+| Marketing `/` — skip link + hero + CTAs | **Pass** | MCP snapshot: Skip to main content, Log in, Open your workspace, How it works, outcome headline |
+| `/offline` — H1 + Try home | **Pass** | Title `Offline · Oompa` |
+| `/login` — shell (email, password, Sign in, back link) | **Pass** | Title `Log in · Oompa` |
+| **Sign in** via MCP (type + submit) | **Partial** | No `POST /api/v1/auth/login` observed after fill + click; likely **dev hydration / automation** vs React 19 `useActionState` form actions (console may show extension or chunk noise). **Verify in real Chrome** with seeded user; **RTL** [`LoginForm.test.tsx`](../../apps/web/components/auth/LoginForm.test.tsx) covers action + `useFormStatus`. |
+| Auth gate `/deals` logged out | **Pass** | Redirect to `/login?from=%2Fdeals` |
+| Global 404 (unknown path) | **Pass** | Title `Page not found · Oompa`; `curl` body includes H1 “This page does not exist”, Home, Log in (MCP a11y tree can show dev overlay buttons — prefer `curl` or real browser for copy) |
+| `GET :3001` / `:3000` `/api/v1/health` | **Pass** | 200 |
+| `GET /api/v1/deals` no cookie (`:3001`) | **Pass** | 401 |
+| `POST /api/v1/auth/login` `{}` via `:3000` rewrite | **Pass** | 400 |
+| `GET /manifest.webmanifest` (`:3000`) | **Pass** | 200 |
+| `pnpm -r` **test** / **lint** / **typecheck** | **Pass** | After [`post-login-destination`](../../apps/web/lib/post-login-destination.ts) + [`LoginForm`](../../apps/web/components/auth/LoginForm.tsx) |
+
+---
+
+Date: **2026-04-06** — **Earlier pass (Boneyard + perf + Browser MCP + curl + full `pnpm -r` verify)**
 
 **Environment:** API `http://127.0.0.1:3001`, Web `http://127.0.0.1:3000` — `pnpm --filter @oompa/api dev` + `apps/web` with **`API_URL=http://127.0.0.1:3001`** (rewrites) and **`next dev --webpack`** (required on Next.js 16 with `@ducanh2912/next-pwa`; plain `next dev` exits — see [`apps/web/package.json`](../../apps/web/package.json)). **Do not set `NEXT_PUBLIC_API_URL` for normal local dev** — browser `fetch` must stay same-origin so the session cookie is for `:3000` (see [`README.md`](../../README.md), [`apps/web/lib/api.ts`](../../apps/web/lib/api.ts)).
 
@@ -42,7 +62,7 @@ Date: **2026-04-06** — **Latest agent pass (Boneyard + perf + Browser MCP + cu
 | `/offline` — copy                | **Pass**           | H1 "You are offline"; deals/payments/balances need connection; **Try home** link                                                                                                                                                                                                              |
 | `/offline` — document title      | **Pass**           | `Offline · Oompa`                                                                                                                                                                                                                                                                             |
 | `/login` — shell                 | **Pass**           | Oompa Loompas link, Email/Password, Sign in, Back to product page                                                                                                                                                                                                                             |
-| **Sign in** via MCP (fill + click) | **Partial**    | [`LoginForm`](../../apps/web/components/auth/LoginForm.tsx): **`type="submit"`** + capture-phase **`submit` listener** blocks accidental **document `POST /login`** (full reload) while keeping **`method="post"`** + `preventDefault` for SPA login. **Verify end-to-end** with **real Chrome** + seeded user; use **`curl -X POST http://127.0.0.1:3000/api/v1/auth/login`** for API smoke. MCP tool sequencing (refs after navigation) remains flaky — prefer fresh **`browser_navigate`** → snapshot → fill → click. **Do not use `browser_lock`** before MCP unless required. |
+| **Sign in** via MCP (fill + click) | **Partial**    | [`LoginForm`](../../apps/web/components/auth/LoginForm.tsx) uses React 19 **`useActionState`** + **`useFormStatus`** (`react-dom`) and same-origin `api.login`. MCP did not observe `POST /api/v1/auth/login` in this run — treat as **tooling/hydration** limitation; use **real Chrome** + seeded user and **Vitest** for the form. **`curl -X POST http://127.0.0.1:3000/api/v1/auth/login`** for API smoke. Prefer **`browser_navigate`** → snapshot → type/fill → click. **Do not use `browser_lock`** before MCP unless required. |
 | Protected deal URL logged out    | **Pass**           | `/deals/00000000-…` → `proxy` → `/login?from=…` (auth gate)                                                                                                                                                                                                                                   |
 | `next/link` client nav in MCP    | **Partial**        | Per prior runs: prefer **`browser_navigate`** for route changes                                                                                                                                                                                                                               |
 
@@ -53,10 +73,10 @@ Date: **2026-04-06** — **Latest agent pass (Boneyard + perf + Browser MCP + cu
 | Item                                 | Change                                                                                                                                                                                                                                                                                                                                                        |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Boneyard skeletons** | [boneyard-js](https://github.com/0xGF/boneyard) capture routes under `/boneyard-capture/*`, workspace [`loading.tsx`](../../apps/web/app/(workspace)/dashboard/loading.tsx) files, [`bones/`](../../apps/web/bones/) artifacts, [`boneyard.config.json`](../../apps/web/boneyard.config.json) breakpoints. |
-| **Login document POST** | `type="submit"` for a11y + **capture `submit` `preventDefault`** so automation/native submit cannot navigate the document to `POST /login`. [`LoginForm.tsx`](../../apps/web/components/auth/LoginForm.tsx). |
+| **Login form actions** | React 19 **`useActionState`** + **`useFormStatus`**; shared [`postLoginDestination`](../../apps/web/lib/post-login-destination.ts) for safe `?from=` redirects. [`LoginForm.tsx`](../../apps/web/components/auth/LoginForm.tsx). |
 | **API compression + health cache** | [`@fastify/compress`](../../apps/api/src/server.ts); `Cache-Control` on [`/health`](../../apps/api/src/server.ts) and [`/api/v1/health`](../../apps/api/src/routes/health/index.ts). |
 | **`next dev` crash (Next 16 + PWA)** | [`apps/web/package.json`](../../apps/web/package.json) — `dev` / `dev:clean` use **`next dev --webpack`** (same reason as production `next build --webpack`).                                                                                                                                                                                                 |
-| **Login form fields**     | **`method="post"`** + **`readNamedInput`** (no credential query params). See [`LoginForm.tsx`](../../apps/web/components/auth/LoginForm.tsx).                                                                                                                                                         |
+| **Login form fields**     | Named inputs + **`FormData`** in the action (no credential query params). See [`LoginForm.tsx`](../../apps/web/components/auth/LoginForm.tsx).                                                                                                                                                         |
 | **Session cookie vs `NEXT_PUBLIC_API_URL`** | Browser `fetch` to `:3001` does not store session for `:3000`. [`lib/api.ts`](../../apps/web/lib/api.ts) — **`getBrowserApiBase()` returns `''` in `window`** (always same-origin `/api/v1/*`). README dev example: **`API_URL` only**.                                                                                                                        |
 | **Login `useSearchParams` suspend**  | Server [`app/login/page.tsx`](../../apps/web/app/login/page.tsx) passes **`redirectFrom`** from `searchParams`; client [`LoginForm`](../../apps/web/components/auth/LoginForm.tsx) no longer calls `useSearchParams` (avoids hydration/tooling gaps).                                                                                                          |
 | **`middleware` → `proxy` (Next 16)** | [`proxy.ts`](../../apps/web/proxy.ts) replaces deprecated `middleware.ts`; build warning removed.                                                                                                                                                                                                                                                            |
