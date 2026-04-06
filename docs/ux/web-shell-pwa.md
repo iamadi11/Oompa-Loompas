@@ -51,8 +51,8 @@ Define how the **global shell** (navigation, chrome, typography, motion) and **P
 
 ## Global navigation (accessibility)
 
-- **Main** nav (`aria-label="Main"`): **Attention**, **Deals** use `aria-current="page"` when the route matches; active item uses stronger text weight and `text-gray-900` vs `text-gray-600` for inactive links.
-- **Revenue** (brand link to `/`): `aria-current="page"` on the home/overview route only.
+- **Main** nav (`aria-label="Main"`): **Overview**, **Attention**, and **Deals** use `aria-current="page"` when the route matches; active item uses stronger text weight and `text-stone-900` vs `text-stone-600` for inactive links.
+- **Revenue** (brand link to `/dashboard`): no `aria-current` — only **Overview** marks the workspace home so a single nav item carries `current` (WCAG-friendly).
 - **Deals** is considered current for `/deals`, `/deals/new`, and `/deals/[id]` so orientation persists inside the deal module.
 
 Decision record: [docs/decisions/2026-04-06-main-nav-aria-current.md](../decisions/2026-04-06-main-nav-aria-current.md).

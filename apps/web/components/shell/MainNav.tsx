@@ -52,13 +52,10 @@ function NavLinks(props: { onNavigate?: () => void; className?: string }) {
 }
 
 export function BrandHomeLink() {
-  const pathname = usePathname() ?? ''
-  const current = isMainNavCurrent(pathname, 'overview')
   return (
     <Link
       href="/dashboard"
       className="font-display text-lg sm:text-xl font-semibold tracking-tight text-stone-900 transition-opacity duration-200 motion-reduce:transition-none hover:opacity-85 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
-      aria-current={current ? 'page' : undefined}
     >
       <span className="relative">
         Revenue

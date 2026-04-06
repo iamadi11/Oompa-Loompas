@@ -85,6 +85,17 @@ describe('POST /api/v1/auth/login', () => {
     expect(response.statusCode).toBe(401)
     await fastify.close()
   })
+
+  it('returns 400 for invalid login body', async () => {
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/api/v1/auth/login',
+      payload: { email: 'not-an-email', password: 'x' },
+    })
+    expect(response.statusCode).toBe(400)
+    await fastify.close()
+  })
 })
 
 describe('GET /api/v1/auth/me', () => {
@@ -140,6 +151,30 @@ describe('POST /api/v1/auth/logout', () => {
 
     expect(response.statusCode).toBe(204)
     expect(mockPrisma.session.deleteMany).toHaveBeenCalled()
+    await fastify.close()
+  })
+
+  it('accepts application/json with empty object (browser client)', async () => {
+    mockPrisma.session.deleteMany.mockResolvedValue({ count: 1 })
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/api/v1/auth/logout',
+      headers: { ...auth, 'content-type': 'application/json' },
+      payload: {},
+    })
+    expect(response.statusCode).toBe(204)
+    await fastify.close()
+  })
+
+  it('returns 204 when no session cookie (still clears client cookie)', async () => {
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/api/v1/auth/logout',
+    })
+    expect(response.statusCode).toBe(204)
+    expect(mockPrisma.session.deleteMany).not.toHaveBeenCalled()
     await fastify.close()
   })
 })

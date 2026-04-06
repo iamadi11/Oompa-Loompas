@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Roles, type AuthUser } from '@oompa/types'
 import { api } from '../../lib/api'
@@ -16,7 +15,6 @@ type Props = {
 }
 
 export function ShellAuthActions({ className = '', variant = 'inline', onNavigate }: Props) {
-  const router = useRouter()
   const [me, setMe] = useState<AuthUser | null | undefined>(undefined)
   const [loggingOut, setLoggingOut] = useState(false)
 
@@ -44,8 +42,8 @@ export function ShellAuthActions({ className = '', variant = 'inline', onNavigat
     } finally {
       setLoggingOut(false)
       onNavigate?.()
-      router.push('/login')
-      router.refresh()
+      // Full navigation so middleware re-reads cookies (client transition can leave stale session in some embeds).
+      window.location.assign('/login')
     }
   }
 

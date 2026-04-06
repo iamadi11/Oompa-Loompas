@@ -154,7 +154,11 @@ class ApiClient {
   }
 
   async logout(): Promise<void> {
-    return this.request<void>('/api/v1/auth/logout', { method: 'POST' })
+    // Fastify rejects application/json with an empty body; send a minimal object.
+    return this.request<void>('/api/v1/auth/logout', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    })
   }
 
   async getMe(): Promise<MeResponse> {
