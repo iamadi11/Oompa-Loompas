@@ -96,6 +96,8 @@ Date: **2026-04-06** — **Latest agent pass (Boneyard + perf + Browser MCP + cu
 | ------------------------------------------------------------ | -------- | ----------------------------------------------------------- |
 | `GET /api/v1/deals` (no cookie)                              | 401      | **Pass**                                                    |
 | `GET /api/v1/health`                                         | 200      | **Pass**                                                    |
+| `GET /api/v1/health` response header                         | `Cache-Control: public, max-age=5` | **Pass** (curl `-D -`)                    |
+| `GET /health` response header                                | `Cache-Control: public, max-age=5` | **Pass**                                    |
 | `GET /api/v1/admin/ping` (no cookie)                         | 401      | **Pass**                                                    |
 | `POST /api/v1/auth/login` `{}`                               | 400      | **Pass**                                                    |
 | `POST /api/v1/auth/login` bad password (valid shape)         | 401      | **Pass**                                                    |
@@ -119,7 +121,8 @@ Date: **2026-04-06** — **Latest agent pass (Boneyard + perf + Browser MCP + cu
 
 1. **Production:** `pnpm --filter @oompa/web build && pnpm --filter @oompa/web start` — SW registration, Lighthouse, offline fetch behavior per [pwa-web-client.md](./pwa-web-client.md).
 2. **Real Chrome:** Logged-in shell, **Deals · Oompa** / **Needs attention · Oompa** titles, deal CRUD, `confirm()` deletes, invoice `target=_blank`.
-3. **MCP:** Re-try login **without** `browser_lock`; if still no `fetch`, treat as Cursor browser limitation, not product regression.
+3. **Boneyard:** After changing workspace layout or [`fixtures/`](../../apps/web/components/boneyard/fixtures/), re-run **`bones:build`** against a **production** `next start` server (see [README](../../README.md)).
+4. **MCP:** Use **`browser_navigate`** between flows; login **Partial** above — confirm with real browser + curl.
 
 ---
 
