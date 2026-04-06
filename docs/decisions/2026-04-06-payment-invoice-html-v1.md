@@ -40,4 +40,8 @@ A shared document service is premature. This slice is **Payment-owned**, read-on
 ## Assumptions (to be validated)
 
 - Creators accept **browser print-to-PDF** until a native PDF export is justified by volume or compliance feedback.
-- A single **payment id** is an acceptable document reference until sequential invoice numbering and audit tables are specified.
+- **Update:** Sequential **`INV-*`** numbering and **`payments.invoice_number`** are **shipped**; full **audit/event tables** for invoicing remain future scope.
+
+## Amendment (2026-04-06) — sequential number + issuer env
+
+**Shipped in code:** The invoice route now assigns a stable **`INV-########`** on **first GET**, persisted on **`payments.invoice_number`** with a global **`invoice_counters`** row (transaction + **`FOR UPDATE`** on the payment). Optional **`INVOICE_DOCUMENT_LABEL`**, **`INVOICE_ISSUER_*`**, **`INVOICE_PLACE_OF_SUPPLY`** populate the printable HTML; see **`apps/api/.env.example`**. The human-facing document also includes a **toolbar** (print, copy link, share, download HTML) and expanded compliance copy in **`@oompa/utils`**.

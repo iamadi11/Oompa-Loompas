@@ -8,6 +8,22 @@ All notable changes to this repository are documented in this file.
 
 - **`db:seed`:** implement [`packages/db/src/seed.ts`](./packages/db/src/seed.ts) (idempotent: skips when any deal exists). Fixes broken **`pnpm db:seed`** script that pointed at a missing file.
 
+## [0.1.9] - 2026-04-06
+
+### `@oompa/api` **0.1.4**
+
+- **Payment invoice:** sequential **`INV-########`** assigned on **first GET**, persisted on **`payments.invoice_number`** with **`invoice_counters`** and a transactional **`FOR UPDATE`** on the payment row. Optional **`INVOICE_DOCUMENT_LABEL`**, **`INVOICE_ISSUER_*`**, **`INVOICE_PLACE_OF_SUPPLY`** (see [`apps/api/.env.example`](./apps/api/.env.example)). **Docs:** [architecture](./docs/architecture/payment-invoice-html-v1.md) (updated), [decision amendment](./docs/decisions/2026-04-06-payment-invoice-html-v1.md), [instrumentation](./docs/instrumentation/payment-invoice-html-v1.md).
+
+### `@oompa/db` **0.1.1**
+
+- **Migration** [`20260406120000_invoice_counter_and_number`](./packages/db/prisma/migrations/20260406120000_invoice_counter_and_number/migration.sql): **`invoice_counters`**, unique **`payments.invoice_number`**.
+
+### `@oompa/utils` **0.1.2**
+
+- **`buildPaymentInvoiceHtml`:** structured printable layout (issuer / customer, line items, totals, compliance), **toolbar** script (print, copy link, Web Share, download HTML), exported **`PaymentInvoiceIssuerInput`**.
+
+**Release notes:** [docs/releases/RELEASE-0.1.9.md](./docs/releases/RELEASE-0.1.9.md) · **Retro:** [docs/retros/2026-04-06-payment-invoice-sequencing-and-issuer.md](./docs/retros/2026-04-06-payment-invoice-sequencing-and-issuer.md) · **Ship gates:** [docs/testing/ship-gates-release-0.1.9-2026-04-06.md](./docs/testing/ship-gates-release-0.1.9-2026-04-06.md)
+
 ## [0.1.8] - 2026-04-06
 
 ### `@oompa/api` **0.1.3**

@@ -17,7 +17,9 @@ Pre-ship: no invoice URL; manual copy/paste only (not measurable in product).
 
 ## Rollout plan
 
-Immediate — read-only route, no schema migration. Roll back by removing the route registration if critical defects appear.
+**Schema-dependent:** deploy **`@oompa/db` migration** (`invoice_counters`, `payments.invoice_number`) **before or with** the API version that assigns numbers. Roll back API first on defects; already-issued numbers remain in DB for traceability.
+
+**Read-only to payees:** the route does not mutate deal/payment business fields except **lazy** `invoice_number` assignment on first open.
 
 ## Learning milestone (30 days)
 

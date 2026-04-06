@@ -15,6 +15,9 @@ Graph `tests_for` on payment handlers previously covered CRUD only; invoice path
 | GET invoice payment missing | Integration | `404` | Medium |
 | GET invoice wrong `dealId` | Integration | `404` (no leak) | High |
 | `PUBLIC_API_BASE_URL` default | Unit | Matches JSON client default origin | Medium |
+| First GET assigns `INV-*` | Integration | Response body contains **`INV-`**; DB **`invoice_number`** set | High |
+| Second GET same payment | Integration | Same **`INV-*`** as first GET (idempotent) | High |
+| `payment-invoice-env` / `INVOICE_*` | Unit | Document label, issuer, place-of-supply parsing | Medium |
 
 ## Edge cases
 

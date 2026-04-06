@@ -11,14 +11,14 @@
 
 - **Zero state:** No payments — section copy unchanged; invoice link only appears on rows.  
 - **Loading:** N/A (full navigation to API).  
-- **Success:** HTML document with deal title, brand, amount, status, optional due/received dates, notes.  
+- **Success:** HTML document with **invoice no. `INV-*`**, issue date (UTC), optional **issuer** block (from **`INVOICE_*`** env), **Bill to** brand, line item / totals / payment status tables, optional notes, **toolbar** (print, copy link, share, download HTML).  
 - **Error:** API down or wrong URL — user sees browser error page; configure `NEXT_PUBLIC_API_URL` in production to match the deployed API.
 
 ## Critic Feedback
 
 - **Friction:** Requires API reachable from the user’s browser; misconfigured env breaks the link (documented in error state).  
 - **Trust:** Footer states the document is informational; legal/tax wording remains the creator’s responsibility until compliance requirements are scoped.  
-- **Next:** Sequential invoice numbers and “issued at” immutability will matter for some users; not in v1.
+- **Numbers:** Sequential **`INV-*`** is assigned the **first time** the invoice URL is opened and then **stuck** to that payment row; creators who need a different numbering scheme will still use external tools until configurable prefixes exist.
 
 ## Accessibility
 
