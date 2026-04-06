@@ -52,6 +52,65 @@ describe('POST /api/v1/auth/login', () => {
     await fastify.close()
   })
 
+  it('omits Secure on session cookie when WEB_URL is http (even if NODE_ENV is production)', async () => {
+    vi.stubEnv('NODE_ENV', 'production')
+    vi.stubEnv('WEB_URL', 'http://localhost:3000')
+    const hash = await bcrypt.hash('correct-password', 4)
+    mockPrisma.user.findUnique.mockResolvedValue({
+      id: TEST_USER_ID,
+      email: 'admin@test.dev',
+      passwordHash: hash,
+      roles: ['ADMIN', 'MEMBER'],
+    })
+    mockPrisma.session.create.mockResolvedValue({})
+
+    const fastify = await buildServer()
+    try {
+      const response = await fastify.inject({
+        method: 'POST',
+        url: '/api/v1/auth/login',
+        payload: { email: 'admin@test.dev', password: 'correct-password' },
+      })
+      expect(response.statusCode).toBe(200)
+      const setCookie = response.headers['set-cookie']
+      const cookieHeader = Array.isArray(setCookie) ? setCookie.join(';') : String(setCookie ?? '')
+      expect(cookieHeader).toMatch(/oompa_session=/)
+      expect(cookieHeader).not.toMatch(/;\s*Secure\b/i)
+    } finally {
+      await fastify.close()
+      vi.unstubAllEnvs()
+    }
+  })
+
+  it('sets Secure on session cookie when WEB_URL is https', async () => {
+    vi.stubEnv('NODE_ENV', 'production')
+    vi.stubEnv('WEB_URL', 'https://app.example.com')
+    const hash = await bcrypt.hash('correct-password', 4)
+    mockPrisma.user.findUnique.mockResolvedValue({
+      id: TEST_USER_ID,
+      email: 'admin@test.dev',
+      passwordHash: hash,
+      roles: ['ADMIN', 'MEMBER'],
+    })
+    mockPrisma.session.create.mockResolvedValue({})
+
+    const fastify = await buildServer()
+    try {
+      const response = await fastify.inject({
+        method: 'POST',
+        url: '/api/v1/auth/login',
+        payload: { email: 'admin@test.dev', password: 'correct-password' },
+      })
+      expect(response.statusCode).toBe(200)
+      const setCookie = response.headers['set-cookie']
+      const cookieHeader = Array.isArray(setCookie) ? setCookie.join(';') : String(setCookie ?? '')
+      expect(cookieHeader).toMatch(/;\s*Secure\b/i)
+    } finally {
+      await fastify.close()
+      vi.unstubAllEnvs()
+    }
+  })
+
   it('returns 401 for unknown email', async () => {
     mockPrisma.user.findUnique.mockResolvedValue(null)
 

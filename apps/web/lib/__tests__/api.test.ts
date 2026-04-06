@@ -7,23 +7,13 @@ function jsonResponse(
 ): Response {
   const ok = init.ok ?? true
   const status = init.status ?? (ok ? 200 : 400)
-  return {
-    ok,
+  if (status === 204) {
+    return new Response(null, { status: 204 })
+  }
+  return new Response(JSON.stringify(body), {
     status,
-    json: () => Promise.resolve(body),
-  } as Response
-}
-
-function rejectJsonResponse(
-  init: { ok?: boolean; status?: number } = {},
-): Response {
-  const ok = init.ok ?? false
-  const status = init.status ?? 500
-  return {
-    ok,
-    status,
-    json: () => Promise.reject(new Error('not json')),
-  } as Response
+    headers: { 'Content-Type': 'application/json' },
+  })
 }
 
 const defaultFetchInit = {
@@ -116,7 +106,7 @@ describe('ApiClient', () => {
 
   it('deleteDeal uses DELETE and handles 204', async () => {
     fetchMock.mockResolvedValueOnce(
-      jsonResponse(undefined, { ok: true, status: 204 }) as Response,
+      jsonResponse(undefined, { ok: true, status: 204 }),
     )
     await api.deleteDeal('d1')
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/deals/d1', {
@@ -166,7 +156,7 @@ describe('ApiClient', () => {
   })
 
   it('deletePayment uses DELETE', async () => {
-    fetchMock.mockResolvedValueOnce(jsonResponse(undefined, { ok: true, status: 204 }) as Response)
+    fetchMock.mockResolvedValueOnce(jsonResponse(undefined, { ok: true, status: 204 }))
     await api.deletePayment('pid')
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/payments/pid', {
       method: 'DELETE',
@@ -234,7 +224,7 @@ describe('ApiClient', () => {
   })
 
   it('deleteDeliverable uses DELETE', async () => {
-    fetchMock.mockResolvedValueOnce(jsonResponse(undefined, { ok: true, status: 204 }) as Response)
+    fetchMock.mockResolvedValueOnce(jsonResponse(undefined, { ok: true, status: 204 }))
     await api.deleteDeliverable('del1')
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/deliverables/del1', {
       method: 'DELETE',
@@ -257,7 +247,7 @@ describe('ApiClient', () => {
   })
 
   it('logout POSTs', async () => {
-    fetchMock.mockResolvedValueOnce(jsonResponse(undefined, { ok: true, status: 204 }) as Response)
+    fetchMock.mockResolvedValueOnce(jsonResponse(undefined, { ok: true, status: 204 }))
     await api.logout()
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/auth/logout', {
       method: 'POST',
@@ -281,9 +271,11 @@ describe('ApiClient', () => {
     await expect(api.getDeal('x')).rejects.toThrow('nope')
   })
 
-  it('throws Unknown error when error body is not JSON', async () => {
-    fetchMock.mockResolvedValueOnce(rejectJsonResponse({ ok: false, status: 502 }))
-    await expect(api.getDeal('x')).rejects.toThrow('Unknown error')
+  it('throws a helpful message when proxy returns non-JSON 5xx (API likely down)', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response('Internal Server Error', { status: 502, statusText: 'Bad Gateway' }),
+    )
+    await expect(api.getDeal('x')).rejects.toThrow(/Could not reach the API/)
   })
 
   it('uses same-origin paths when NEXT_PUBLIC_API_URL is unset', async () => {

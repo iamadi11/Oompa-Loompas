@@ -7,6 +7,25 @@ import { getSessionCookieName, getSessionSecret, getSessionTtlMs } from '../../l
 import { UnauthorizedError, ValidationError, sendError } from '../../lib/errors.js'
 import { hashSessionToken, newSessionToken } from '../../lib/session-token.js'
 
+/**
+ * Whether the session cookie should be `Secure`.
+ *
+ * If `NODE_ENV=production` but `WEB_URL` is `http://...`, a `Secure` cookie is never stored on
+ * plain HTTP — login returns 200 but the browser drops the cookie, so the app looks "logged out".
+ * Prefer deriving from `WEB_URL` when set; fall back to production for backwards compatibility.
+ *
+ * Override with `SESSION_COOKIE_SECURE=true|false` when needed.
+ */
+function sessionCookieSecure(): boolean {
+  const override = process.env['SESSION_COOKIE_SECURE']?.trim().toLowerCase()
+  if (override === 'false' || override === '0') return false
+  if (override === 'true' || override === '1') return true
+  const web = process.env['WEB_URL']?.trim() ?? ''
+  if (web.startsWith('http://')) return false
+  if (web.startsWith('https://')) return true
+  return process.env['NODE_ENV'] === 'production'
+}
+
 /** Must match on login and logout so browsers actually drop the cookie. */
 function sessionCookieBaseOptions(): {
   path: '/'
@@ -14,8 +33,7 @@ function sessionCookieBaseOptions(): {
   secure: boolean
   sameSite: 'lax'
 } {
-  const secure = process.env['NODE_ENV'] === 'production'
-  return { path: '/', httpOnly: true, secure, sameSite: 'lax' }
+  return { path: '/', httpOnly: true, secure: sessionCookieSecure(), sameSite: 'lax' }
 }
 
 export async function postLogin(

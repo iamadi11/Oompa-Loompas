@@ -58,10 +58,24 @@ class ApiClient {
     })
 
     if (!res.ok) {
-      const error = (await res.json().catch(() => ({ message: 'Unknown error' }))) as {
-        message: string
+      const raw = await res.text()
+      let message: string
+      try {
+        const parsed = JSON.parse(raw) as { message?: string; error?: string }
+        message = parsed.message ?? parsed.error ?? `HTTP ${res.status}`
+      } catch {
+        const snippet = raw.trim().slice(0, 200)
+        const likelyUnreachable =
+          [502, 503, 504].includes(res.status) ||
+          (res.status >= 500 &&
+            /\b(internal server error|bad gateway|service unavailable|gateway timeout)\b/i.test(
+              snippet,
+            ))
+        message = likelyUnreachable
+          ? 'Could not reach the API. If you are developing locally, start the API (pnpm --filter @oompa/api dev) and ensure Next.js can reach it (see API_URL in next.config).'
+          : `Request failed (${res.status})`
       }
-      throw new Error(error.message ?? `HTTP ${res.status}`)
+      throw new Error(message)
     }
 
     if (res.status === 204) return undefined as T
