@@ -1,10 +1,10 @@
 # UX / PWA checklist run log
 
-Date: **2026-04-07** — **QA pass (Browser MCP, curl API matrix, monorepo verify, production build spot-check)**
+Date: **2026-04-07** — **QA pass (Browser MCP shell sweep, curl API matrix, monorepo test/lint/typecheck, LoginForm hardening)**
 
-**Environment:** API `http://127.0.0.1:3001`, web dev `http://127.0.0.1:3000` with `API_URL=http://127.0.0.1:3001`. [`apps/web/package.json`](../../apps/web/package.json) pins **`next dev -p 3000`** so a global `PORT` env variable cannot bind the web app to the API port. **Do not set `NEXT_PUBLIC_API_URL`** for normal local dev (same-origin session cookie on `:3000`).
+**Environment:** API `http://127.0.0.1:3001`, web dev `http://127.0.0.1:3000` with `API_URL=http://127.0.0.1:3001`. **Ops:** freed ports **3000** / **3001** if in use; **`rm -rf apps/web/.next`** before `next dev` to avoid stale Turbopack chunks. [`apps/web/package.json`](../../apps/web/package.json) pins **`next dev -p 3000`**. **Do not set `NEXT_PUBLIC_API_URL`** for normal local dev (same-origin session cookie on `:3000`).
 
-**Production spot-check:** `pnpm --filter @oompa/web build` then `pnpm exec next start -p 3020` from `apps/web` — `GET /manifest.webmanifest` and `GET /serwist/sw.js` returned **200**.
+**Production spot-check (earlier):** `pnpm --filter @oompa/web build` then `pnpm exec next start -p 3020` from `apps/web` — `GET /manifest.webmanifest` and `GET /serwist/sw.js` returned **200**.
 
 ### Engineering changes this pass
 
@@ -12,7 +12,9 @@ Date: **2026-04-07** — **QA pass (Browser MCP, curl API matrix, monorepo verif
 | ---- | ------ |
 | Web dev port | [`apps/web/package.json`](../../apps/web/package.json) — `dev`: `next dev -p 3000` |
 | Production build | `build`: `NODE_ENV=production next build` — avoids prerender/runtime errors when a parent shell sets a non-production `NODE_ENV` (e.g. `test`) |
-| Login UX / automation | [`LoginForm.tsx`](../../apps/web/components/auth/LoginForm.tsx) — `role="form"` + `type="button"` submit (no native `<form method="post">` document POST to `/login`); controlled email/password state |
+| Login UX / automation | [`LoginForm.tsx`](../../apps/web/components/auth/LoginForm.tsx) — real `<form>` with **synchronous** `onSubmit` (`preventDefault` then `void runLogin()`); **`method="post"`**, no `name` on inputs (no creds in accidental GET query); on submit, merge **controlled state** with **ref `.value`** so tools that set the DOM without React `input` events still work; Vitest covers DOM-only values in [`LoginForm.test.tsx`](../../apps/web/components/auth/LoginForm.test.tsx). |
+| Session cookie `Secure` | [`handlers.ts`](../../apps/api/src/routes/auth/handlers.ts) — derive from `WEB_URL` / `SESSION_COOKIE_SECURE` (see prior pass) so HTTP dev is not stuck with dropped cookies when `NODE_ENV=production`. |
+| API client errors | [`api.ts`](../../apps/web/lib/api.ts) — clearer message when Next returns non-JSON **5xx** (API likely down). |
 
 ### Browser MCP vs [web-shell-pwa.md](../ux/web-shell-pwa.md)
 
@@ -21,7 +23,8 @@ Date: **2026-04-07** — **QA pass (Browser MCP, curl API matrix, monorepo verif
 | Marketing `/` — skip link, hero, CTAs | **Pass** | Skip to main content, Log in, Open your workspace, How it works; outcome copy |
 | `/offline` — H1 + Try home | **Pass** | Title `Offline · Oompa` |
 | `/login` — shell | **Pass** | Email, Password, Sign in, Back to product page |
-| **Sign in** via MCP (fill + click) | **Partial** | No `POST /api/v1/auth/login` in MCP network log; **curl** session flow and **Vitest** [`LoginForm.test.tsx`](../../apps/web/components/auth/LoginForm.test.tsx) **Pass**. Confirm in **real Chrome**. |
+| **Sign in** via MCP (slow type + click) | **Partial** | After hydration wait + `browser_type` (`slowly`) + Sign in, **no** `POST /api/v1/auth/login` in MCP network log and **no** session cookie (`/dashboard` → login). **curl** login + session probes and **Vitest** (including DOM-only field regression) **Pass**. Treat Cursor MCP as **shell/a11y** validation; confirm full login in **real Chrome**. |
+| Logged-in CRUD (deals, payments, deliverables, deletes, invoice) | **Not run (MCP)** | No stable logged-in MCP session this run; covered by **unit/integration** tests and **curl** API matrix. **Human / Playwright:** exercise every CTA, `confirm()` deletes, and **View invoice** (`target=_blank`). |
 | Auth gate `/deals` logged out | **Pass** | `http://127.0.0.1:3000/deals` → `/login?from=%2Fdeals` |
 | Global 404 | **Pass** | Title `Page not found · Oompa`; MCP a11y on **dev** may show Next overlay controls (Show Details / Reload) — prefer `curl` or prod build for marketing copy only |
 

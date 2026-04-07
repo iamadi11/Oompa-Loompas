@@ -93,6 +93,23 @@ describe('LoginForm', () => {
     })
   })
 
+  it('uses DOM input values when automation sets fields without React state (refs)', async () => {
+    const user = userEvent.setup()
+    loginMock.mockResolvedValueOnce({
+      data: { id: 'u1', email: 'dom@test.dev', roles: ['MEMBER'] },
+    })
+    render(<LoginForm />)
+    const emailEl = screen.getByRole('textbox', { name: /^email$/i }) as HTMLInputElement
+    const passEl = screen.getByLabelText(/^password$/i) as HTMLInputElement
+    emailEl.value = 'dom@test.dev'
+    passEl.value = 'secret'
+    await user.click(screen.getByRole('button', { name: /^sign in$/i }))
+    await waitFor(() => {
+      expect(loginMock).toHaveBeenCalledWith({ email: 'dom@test.dev', password: 'secret' })
+      expect(toastSuccess).toHaveBeenCalledWith('Signed in')
+    })
+  })
+
   it('shows pending label on submit while login is in flight', async () => {
     const user = userEvent.setup()
     let release: (() => void) | undefined

@@ -63,3 +63,13 @@ Cross-doc runs logged in:
 **Summary:** Local dev **3005** — home, deals (all + needs attention), attention queue: **Pass** after **`next dev` restart** when `/attention` had been **404**. Main nav **`aria-current`** verified via MCP `states: [current]`. **Nav link click** in MCP still does not perform client navigation (**tooling**). **Needs-attention empty** and **attention empty/error** paths still not live-exercised with this fixture.
 
 - **Payment invoice (v1):** [browser-ux-checklist-payment-invoice-html-v1-2026-04-06.md](./browser-ux-checklist-payment-invoice-html-v1-2026-04-06.md)
+
+---
+
+## Addendum — 2026-04-07 (agent)
+
+**Web:** `http://127.0.0.1:3000` (clean `.next`, `API_URL=http://127.0.0.1:3001`), **API:** `http://127.0.0.1:3001`. Ports **3000/3001** cleared if busy before start.
+
+**Cursor Browser MCP:** `/` marketing, `/offline`, `/deals` → login gate — **Pass** (snapshots). **Sign in** end-to-end — **Partial** (no `POST /api/v1/auth/login` in MCP network log; **Vitest** + **curl** session matrix — **Pass**). Logged-in CRUD — **not re-run** in MCP; see [ux-checklist-results.md](./ux-checklist-results.md).
+
+**Code:** [`LoginForm.tsx`](../../apps/web/components/auth/LoginForm.tsx) — sync `preventDefault`, ref + state merge on submit, regression test for DOM-only fills.
