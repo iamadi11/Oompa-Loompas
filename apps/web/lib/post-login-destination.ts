@@ -10,3 +10,12 @@ export function postLoginDestination(redirectFrom: string | null | undefined): R
   }
   return '/dashboard'
 }
+
+/**
+ * Full document navigation after login so the HTTP-only session cookie is always sent on the next
+ * request. Client `router.push` + `router.refresh` can race RSC fetches or refresh the wrong route.
+ */
+export function navigateAfterLogin(redirectFrom: string | null | undefined): void {
+  const path = postLoginDestination(redirectFrom)
+  window.location.assign(path)
+}

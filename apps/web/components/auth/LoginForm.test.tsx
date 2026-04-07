@@ -4,18 +4,9 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { LoginForm } from './LoginForm'
 
-const push = vi.fn()
-const refresh = vi.fn()
-
 const toastError = vi.hoisted(() => vi.fn())
 const toastSuccess = vi.hoisted(() => vi.fn())
-
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push,
-    refresh,
-  }),
-}))
+const navigateAfterLogin = vi.hoisted(() => vi.fn())
 
 vi.mock('sonner', () => ({
   toast: {
@@ -32,12 +23,21 @@ vi.mock('@/lib/api', () => ({
   },
 }))
 
+vi.mock('@/lib/post-login-destination', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/post-login-destination')>()
+  return {
+    ...actual,
+    navigateAfterLogin: (...args: unknown[]) => navigateAfterLogin(...args),
+  }
+})
+
 describe('LoginForm', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     loginMock.mockReset()
     toastError.mockReset()
     toastSuccess.mockReset()
+    navigateAfterLogin.mockReset()
   })
 
   it('shows validation toast when email and password are missing (action)', async () => {
@@ -74,8 +74,7 @@ describe('LoginForm', () => {
     await user.click(screen.getByRole('button', { name: /^sign in$/i }))
     await waitFor(() => {
       expect(toastSuccess).toHaveBeenCalledWith('Signed in')
-      expect(push).toHaveBeenCalledWith('/dashboard')
-      expect(refresh).toHaveBeenCalled()
+      expect(navigateAfterLogin).toHaveBeenCalledWith(null)
     })
   })
 
@@ -89,7 +88,7 @@ describe('LoginForm', () => {
     await user.type(screen.getByLabelText(/^password$/i), 'secret')
     await user.click(screen.getByRole('button', { name: /^sign in$/i }))
     await waitFor(() => {
-      expect(push).toHaveBeenCalledWith('/deals')
+      expect(navigateAfterLogin).toHaveBeenCalledWith('/deals')
     })
   })
 

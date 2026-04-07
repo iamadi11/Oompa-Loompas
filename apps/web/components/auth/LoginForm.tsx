@@ -1,10 +1,9 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { useCallback, useRef, useState, type FormEvent } from 'react'
 import { toast } from 'sonner'
 import { api } from '@/lib/api'
-import { postLoginDestination } from '@/lib/post-login-destination'
+import { navigateAfterLogin } from '@/lib/post-login-destination'
 
 export interface LoginFormProps {
   /** Post-login path from `?from=` (passed from server page — avoids `useSearchParams` suspend/hydration gaps). */
@@ -12,40 +11,40 @@ export interface LoginFormProps {
 }
 
 /**
- * Client-side login: `onSubmit` always `preventDefault()` so the browser never performs a real navigation.
- * `method="post"` avoids accidental GET submissions putting fields in the query string before hydration.
- * Inputs omit `name` for the same reason. Values use controlled state; on submit we also read
- * the DOM via refs so tooling that sets the input value without firing `input` (e.g. some
- * browser automation) still signs in.
+ * Client-side login: `onSubmit` always `preventDefault()` so the browser never performs a document navigation.
+ * The primary sign-in control is **`type="button"` + `onClick`**, not `type="submit"`, so automation tools that
+ * synthesize clicks hit the same handler as users (some runners fire a native `submit` that bypasses React).
+ * Inputs omit `name` so an accidental native submit does not put credentials in the URL. **Uncontrolled** inputs
+ * (`defaultValue` + refs) keep DOM/automation-filled values stable through re-renders.
  * `noValidate` keeps empty submits in JS so we show the same toast as before (native `required` would block).
  */
 export function LoginForm({ redirectFrom = null }: LoginFormProps) {
-  const router = useRouter()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const loginInFlightRef = useRef(false)
   const emailInputRef = useRef<HTMLInputElement>(null)
   const passwordInputRef = useRef<HTMLInputElement>(null)
 
   const runLogin = useCallback(async () => {
-    const emailVal = (email.trim() || emailInputRef.current?.value.trim() || '').trim()
-    const passwordVal = password || passwordInputRef.current?.value || ''
+    if (loginInFlightRef.current) return
+    const emailVal = (emailInputRef.current?.value.trim() || '').trim()
+    const passwordVal = passwordInputRef.current?.value || ''
     if (!emailVal || !passwordVal) {
       toast.error('Enter your email and password.')
       return
     }
+    loginInFlightRef.current = true
     setIsSubmitting(true)
     try {
       await api.login({ email: emailVal, password: passwordVal })
       toast.success('Signed in')
-      router.push(postLoginDestination(redirectFrom))
-      router.refresh()
+      navigateAfterLogin(redirectFrom)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Sign-in failed')
     } finally {
+      loginInFlightRef.current = false
       setIsSubmitting(false)
     }
-  }, [email, password, redirectFrom, router])
+  }, [redirectFrom])
 
   const handleSubmit = useCallback(
     (event: FormEvent<HTMLFormElement>) => {
@@ -57,7 +56,6 @@ export function LoginForm({ redirectFrom = null }: LoginFormProps) {
 
   return (
     <form
-      method="post"
       onSubmit={handleSubmit}
       noValidate
       aria-label="Sign in"
@@ -73,8 +71,13 @@ export function LoginForm({ redirectFrom = null }: LoginFormProps) {
           type="email"
           autoComplete="email"
           required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          defaultValue=""
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              passwordInputRef.current?.focus()
+            }
+          }}
           className="w-full rounded-xl border border-line/90 bg-white px-3 py-2.5 text-stone-900 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-700 focus:border-brand-600"
         />
       </div>
@@ -88,14 +91,20 @@ export function LoginForm({ redirectFrom = null }: LoginFormProps) {
           type="password"
           autoComplete="current-password"
           required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          defaultValue=""
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              void runLogin()
+            }
+          }}
           className="w-full rounded-xl border border-line/90 bg-white px-3 py-2.5 text-stone-900 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-700 focus:border-brand-600"
         />
       </div>
       <button
-        type="submit"
+        type="button"
         disabled={isSubmitting}
+        onClick={() => void runLogin()}
         className="w-full rounded-xl bg-brand-700 text-white text-sm font-semibold py-3 shadow-sm border border-brand-800/20 hover:bg-brand-800 disabled:opacity-60 transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-raised"
       >
         {isSubmitting ? 'Signing in…' : 'Sign in'}

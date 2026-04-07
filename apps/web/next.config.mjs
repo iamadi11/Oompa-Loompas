@@ -6,6 +6,8 @@ const apiUpstream = process.env.API_URL ?? 'http://localhost:3001'
 const nextConfig = {
   transpilePackages: ['@oompa/types', '@oompa/utils'],
   typedRoutes: true,
+  /** Lets Cursor browser MCP and other `http://127.0.0.1` dev clients load Turbopack/HMR assets (same machine, different host than `localhost`). */
+  allowedDevOrigins: ['127.0.0.1'],
   async rewrites() {
     return [
       {
