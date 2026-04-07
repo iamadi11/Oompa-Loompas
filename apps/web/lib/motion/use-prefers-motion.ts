@@ -3,14 +3,18 @@
 import { useReducedMotion } from 'motion/react'
 
 /**
- * `useReducedMotion()` returns `null` until the client evaluates `prefers-reduced-motion`.
- * Using `null` like "reduced" in `initial={{ opacity: 0 }}` leaves content invisible if the first
- * paint never completes the animation — common on `/` after SSR/hydration.
+ * Entrance animations that start from `opacity: 0` / off-screen transforms are **disabled** here on purpose.
  *
- * Only treat **confirmed** `false` as "full motion allowed" for entrance opacity/transform.
+ * `useReducedMotion()` can be `null` during SSR while the first client render may synchronously resolve
+ * to `false`, so `initial={{ opacity: 0 }}` no longer matches the server-rendered markup and Next.js
+ * surfaces a hydration error overlay. Hover / tap motion still uses `usePrefersReducedMotion()` where
+ * applied.
+ *
+ * Re-enable entrance only with a pattern that keeps server HTML and the first client render identical
+ * (e.g. mount-gated `initial` or `useSyncExternalStore` with a stable `getServerSnapshot`).
  */
 export function useAllowEntranceMotion(): boolean {
-  return useReducedMotion() === false
+  return false
 }
 
 /** Confirmed reduced-motion preference (ignore unknown `null`). */

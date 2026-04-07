@@ -138,7 +138,12 @@ export function DealForm({ deal, mode }: DealFormProps) {
   }
 
   return (
-    <form onSubmit={(e) => void handleSubmit(e)} noValidate className="flex flex-col gap-6">
+    <form
+      onSubmit={(e) => void handleSubmit(e)}
+      noValidate
+      className="flex flex-col gap-6"
+      autoComplete={mode === 'create' ? 'off' : undefined}
+    >
       {serverError && (
         <div
           className="rounded-xl bg-red-50 border border-red-200/90 px-4 py-3 text-sm text-red-800 shadow-sm"
@@ -182,6 +187,8 @@ export function DealForm({ deal, mode }: DealFormProps) {
           placeholder="80000"
           required
           error={fieldErrors['value']}
+          autoComplete="off"
+          inputMode="decimal"
         />
         <Select
           label="Currency"

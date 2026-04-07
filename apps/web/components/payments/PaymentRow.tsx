@@ -60,7 +60,7 @@ export function PaymentRow({ dealId, dealTitle, brandName, payment, onUpdate }: 
 
   return (
     <div
-      className={`flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 px-4 py-3 rounded-xl border shadow-sm ${
+      className={`scroll-mt-28 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 px-4 py-3 rounded-xl border shadow-sm ${
         payment.isOverdue ? 'border-red-200/90 bg-red-50/80' : 'border-line/70 bg-surface-raised'
       }`}
     >

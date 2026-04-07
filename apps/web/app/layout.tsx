@@ -55,7 +55,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${display.variable} ${sans.variable}`}>
-      <body className="min-h-screen antialiased font-sans bg-mesh-page bg-canvas text-stone-900">
+      <body className="min-h-screen scroll-pt-28 antialiased font-sans bg-mesh-page bg-canvas text-stone-900">
         <SerwistRegister>
           <BonesRegistryMount />
           <a

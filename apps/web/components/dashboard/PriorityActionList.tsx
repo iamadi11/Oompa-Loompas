@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { DashboardPriorityAction } from '@oompa/types'
-import { formatCurrency, relativeTime } from '@oompa/utils'
+import { formatCurrency } from '@oompa/utils'
+import { RelativeDueLabel } from '@/components/datetime/RelativeDueLabel'
 import { CopyPaymentReminderButton } from '@/components/payments/CopyPaymentReminderButton'
 
 type Props = {
@@ -25,9 +26,7 @@ export function PriorityActionList({ actions, className }: Props) {
                 </span>
                 <span className="text-sm text-stone-600">
                   {formatCurrency(action.amount, action.currency)}
-                  {action.dueDate !== null ? (
-                    <span className="text-stone-500"> · due {relativeTime(action.dueDate)}</span>
-                  ) : null}
+                  {action.dueDate !== null ? <RelativeDueLabel iso={action.dueDate} /> : null}
                 </span>
               </Link>
               <div className="shrink-0 border-t border-amber-200/60 pt-2 sm:border-t-0 sm:pt-0 sm:pl-1">
@@ -52,9 +51,7 @@ export function PriorityActionList({ actions, className }: Props) {
               </span>
               <span className="text-sm text-stone-600">
                 {action.deliverableTitle}
-                {action.dueDate !== null ? (
-                  <span className="text-stone-500"> · due {relativeTime(action.dueDate)}</span>
-                ) : null}
+                {action.dueDate !== null ? <RelativeDueLabel iso={action.dueDate} /> : null}
               </span>
             </Link>
           )}

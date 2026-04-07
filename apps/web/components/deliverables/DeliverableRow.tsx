@@ -72,7 +72,7 @@ export function DeliverableRow({ deliverable, onUpdate }: DeliverableRowProps) {
 
   return (
     <div
-      className={`flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 px-4 py-3 rounded-xl border shadow-sm ${
+      className={`scroll-mt-28 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 px-4 py-3 rounded-xl border shadow-sm ${
         deliverable.isOverdue
           ? 'border-red-200/90 bg-red-50/80'
           : isCompleted

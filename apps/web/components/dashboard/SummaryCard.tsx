@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'motion/react'
-import { useAllowEntranceMotion, usePrefersReducedMotion } from '@/lib/motion/use-prefers-motion'
+import { usePrefersReducedMotion } from '@/lib/motion/use-prefers-motion'
 
 interface SummaryCardProps {
   label: string
@@ -30,19 +30,18 @@ export function SummaryCard({
   value,
   accent = 'default',
   subtext,
-  motionIndex = 0,
+  motionIndex: _motionIndex = 0,
 }: SummaryCardProps) {
-  const allowEntrance = useAllowEntranceMotion()
   const prefersReduced = usePrefersReducedMotion()
 
   return (
     <motion.div
       className={`rounded-2xl border p-4 sm:p-5 ${ACCENT_STYLES[accent]}`}
-      initial={allowEntrance ? { opacity: 0, y: 20 } : false}
+      initial={false}
       animate={{ opacity: 1, y: 0 }}
       transition={{
         duration: 0.42,
-        delay: allowEntrance ? motionIndex * 0.08 : 0,
+        delay: 0,
         ease: [0.22, 1, 0.36, 1],
       }}
       {...(!prefersReduced ? { whileHover: { y: -2, transition: { duration: 0.2 } } } : {})}
