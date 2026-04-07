@@ -95,6 +95,8 @@ export default async function DealDetailPage({ params }: Props) {
       <div className={panelClass}>
         <PaymentSection
           dealId={deal.id}
+          dealTitle={deal.title}
+          brandName={deal.brandName}
           dealValue={deal.value}
           dealCurrency={deal.currency}
           initialPayments={payments}

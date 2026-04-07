@@ -42,6 +42,13 @@ export function paymentInvoiceHref(dealId: string, paymentId: string): string {
   return base ? `${base}${path}` : path
 }
 
+/** Same-origin absolute URL for sharing or pasting (browser only). */
+export function paymentInvoiceAbsoluteUrl(dealId: string, paymentId: string): string {
+  const href = paymentInvoiceHref(dealId, paymentId)
+  if (typeof window === 'undefined') return href
+  return new URL(href, window.location.origin).href
+}
+
 class ApiClient {
   private async request<T>(
     path: string,

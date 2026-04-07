@@ -20,6 +20,7 @@ export const DashboardOverduePaymentActionSchema = z.object({
   kind: z.literal('overdue_payment'),
   dealId: IdSchema,
   dealTitle: z.string(),
+  brandName: z.string(),
   paymentId: IdSchema,
   amount: z.number(),
   currency: CurrencySchema,

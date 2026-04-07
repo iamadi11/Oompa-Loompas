@@ -75,6 +75,7 @@ export function collectPriorityActionsFromDeals(deals: DbDealWithRelations[]): D
           kind: 'overdue_payment',
           dealId: deal.id,
           dealTitle: deal.title,
+          brandName: deal.brandName,
           paymentId: payment.id,
           amount,
           currency: payment.currency as Currency,

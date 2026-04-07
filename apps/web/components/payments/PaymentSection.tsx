@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/Button'
 
 interface PaymentSectionProps {
   dealId: string
+  dealTitle: string
+  brandName: string
   dealValue: number
   dealCurrency: Currency
   initialPayments: Payment[]
@@ -18,6 +20,8 @@ interface PaymentSectionProps {
 
 export function PaymentSection({
   dealId,
+  dealTitle,
+  brandName,
   dealValue,
   dealCurrency,
   initialPayments,
@@ -113,6 +117,8 @@ export function PaymentSection({
             <PaymentRow
               key={payment.id}
               dealId={dealId}
+              dealTitle={dealTitle}
+              brandName={brandName}
               payment={payment}
               onUpdate={handlePaymentChange}
             />

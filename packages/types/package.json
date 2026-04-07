@@ -1,6 +1,6 @@
 {
   "name": "@oompa/types",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Shared TypeScript types and Zod schemas",
   "main": "./dist/index.js",

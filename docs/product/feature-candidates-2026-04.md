@@ -35,4 +35,6 @@ Deals, payments, deliverables, dashboard summaries, **attention** queue for over
 
 **Shipped patch (2026-04-06):** Dev CORS for **`dev:clean` (port 3005)** + invoice a11y polish — [docs/releases/RELEASE-0.1.8.md](../releases/RELEASE-0.1.8.md).
 
+**Shipped slice (2026-04-08):** **Clipboard payment reminder** (deterministic message + invoice URL; no scheduled email yet) — [docs/decisions/2026-04-08-payment-reminder-copy.md](../decisions/2026-04-08-payment-reminder-copy.md), [docs/releases/RELEASE-0.2.1.md](../releases/RELEASE-0.2.1.md).
+
 Document each slice with a decision record before implementation ([docs/decisions/](../decisions/)).

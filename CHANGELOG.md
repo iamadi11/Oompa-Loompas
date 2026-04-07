@@ -2,6 +2,28 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.2.1] - 2026-04-08
+
+### `@oompa/types` **0.2.1**
+
+- **Dashboard / attention:** `overdue_payment` priority actions include **`brandName`** for client-side reminder text.
+
+### `@oompa/utils` **0.1.3**
+
+- **`buildPaymentReminderMessage`:** deterministic plain-text follow-up for a payment (optional due line + invoice URL).
+
+### `@oompa/api` **0.2.1**
+
+- **`collectPriorityActionsFromDeals`:** populates **`brandName`** on overdue payment actions.
+
+### `@oompa/web` **0.2.1**
+
+- **Copy reminder** on deal payment rows and overdue payment cards (overview + attention); **`paymentInvoiceAbsoluteUrl`** helper.
+
+### Documentation
+
+- [Decision](./docs/decisions/2026-04-08-payment-reminder-copy.md) · [Release](./docs/releases/RELEASE-0.2.1.md)
+
 ## [0.2.0] - 2026-04-06
 
 ### `@oompa/types` **0.2.0**

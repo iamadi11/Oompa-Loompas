@@ -372,6 +372,8 @@ describe('GET /api/v1/dashboard', () => {
     expect(payAction).toMatchObject({
       kind: 'overdue_payment',
       dealId: DEAL_ID_1,
+      dealTitle: 'Brand Deal A',
+      brandName: 'Acme Corp',
       paymentId: 'pay-2',
       amount: 40000,
     })

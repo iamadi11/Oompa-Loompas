@@ -5,15 +5,18 @@ import type { Payment } from '@oompa/types'
 import { formatCurrency, formatDate } from '@oompa/utils'
 import { api, paymentInvoiceHref } from '@/lib/api'
 import { PaymentStatusBadge } from './PaymentStatusBadge'
+import { CopyPaymentReminderButton } from './CopyPaymentReminderButton'
 import { Button } from '@/components/ui/Button'
 
 interface PaymentRowProps {
   dealId: string
+  dealTitle: string
+  brandName: string
   payment: Payment
   onUpdate: () => void
 }
 
-export function PaymentRow({ dealId, payment, onUpdate }: PaymentRowProps) {
+export function PaymentRow({ dealId, dealTitle, brandName, payment, onUpdate }: PaymentRowProps) {
   const [marking, setMarking] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
@@ -53,6 +56,7 @@ export function PaymentRow({ dealId, payment, onUpdate }: PaymentRowProps) {
   }
 
   const canMarkReceived = payment.status === 'PENDING' || payment.status === 'PARTIAL' || payment.isOverdue
+  const canCopyReminder = payment.status !== 'RECEIVED' && payment.status !== 'REFUNDED'
 
   return (
     <div
@@ -92,6 +96,17 @@ export function PaymentRow({ dealId, payment, onUpdate }: PaymentRowProps) {
         >
           View invoice
         </a>
+        {canCopyReminder ? (
+          <CopyPaymentReminderButton
+            dealId={dealId}
+            paymentId={payment.id}
+            dealTitle={dealTitle}
+            brandName={brandName}
+            amount={payment.amount}
+            currency={payment.currency as 'INR' | 'USD' | 'EUR' | 'GBP'}
+            dueDate={payment.dueDate}
+          />
+        ) : null}
         {canMarkReceived && (
           <Button
             variant="secondary"
