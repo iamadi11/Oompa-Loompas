@@ -2,6 +2,16 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.2.2] - 2026-04-09
+
+### `@oompa/web` **0.2.2**
+
+- **Deal pipeline stage strip:** status filter tabs (Draft / Negotiating / Active / Delivered / Paid / Cancelled) with per-status counts on the `/deals` page. Clicking a stage filters the list; all counts computed server-side from a single fetch.
+
+### Documentation
+
+- [Decision](./docs/decisions/2026-04-09-deal-pipeline-stage-strip.md) · [Architecture](./docs/architecture/deal-pipeline-stage-strip.md) · [UX](./docs/ux/deal-pipeline-stage-strip.md) · [Testing](./docs/testing/deal-pipeline-stage-strip.md) · [Instrumentation](./docs/instrumentation/deal-pipeline-stage-strip.md)
+
 ## [0.2.1] - 2026-04-08
 
 ### `@oompa/types` **0.2.1**
