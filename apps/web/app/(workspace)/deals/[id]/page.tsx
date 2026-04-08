@@ -13,8 +13,7 @@ interface Props {
   params: Promise<{ id: string }>
 }
 
-const panelClass =
-  'rounded-2xl border border-line/90 bg-surface-raised p-5 sm:p-6 shadow-card'
+const panelClass = 'rounded-2xl border border-line/90 bg-surface-raised p-5 sm:p-6 shadow-card'
 
 async function loadDeal(id: string): Promise<Deal | null> {
   try {
@@ -76,7 +75,9 @@ export default async function DealDetailPage({ params }: Props) {
   return (
     <div className="max-w-2xl space-y-6 pb-8">
       <div className="mb-2">
-        <p className="text-[0.65rem] font-semibold text-stone-500 uppercase tracking-[0.14em]">{deal.brandName}</p>
+        <p className="text-[0.65rem] font-semibold text-stone-500 uppercase tracking-[0.14em]">
+          {deal.brandName}
+        </p>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mt-2">
           <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-stone-900 flex-1 leading-tight">
             {deal.title}

@@ -50,10 +50,7 @@ export function paymentInvoiceAbsoluteUrl(dealId: string, paymentId: string): st
 }
 
 class ApiClient {
-  private async request<T>(
-    path: string,
-    options: RequestInit = {},
-  ): Promise<T> {
+  private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const base = getBrowserApiBase()
     const res = await fetch(`${base}${path}`, {
       credentials: 'include',
@@ -90,9 +87,7 @@ class ApiClient {
     return res.json() as Promise<T>
   }
 
-  async listDeals(
-    filters: Partial<DealListFilters> = {},
-  ): Promise<ApiResponse<Deal[]>> {
+  async listDeals(filters: Partial<DealListFilters> = {}): Promise<ApiResponse<Deal[]>> {
     const params = new URLSearchParams()
     Object.entries(filters).forEach(([k, v]) => {
       if (v !== undefined) params.set(k, String(v))
@@ -157,7 +152,10 @@ class ApiClient {
     return this.request<ApiResponse<Deliverable[]>>(`/api/v1/deals/${dealId}/deliverables`)
   }
 
-  async createDeliverable(dealId: string, data: CreateDeliverable): Promise<ApiResponse<Deliverable>> {
+  async createDeliverable(
+    dealId: string,
+    data: CreateDeliverable,
+  ): Promise<ApiResponse<Deliverable>> {
     return this.request<ApiResponse<Deliverable>>(`/api/v1/deals/${dealId}/deliverables`, {
       method: 'POST',
       body: JSON.stringify(data),

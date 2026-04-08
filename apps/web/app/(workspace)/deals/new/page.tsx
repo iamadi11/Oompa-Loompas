@@ -5,8 +5,7 @@ export const metadata: Metadata = {
   title: 'New deal',
 }
 
-const panelClass =
-  'rounded-2xl border border-line/90 bg-surface-raised p-5 sm:p-6 shadow-card'
+const panelClass = 'rounded-2xl border border-line/90 bg-surface-raised p-5 sm:p-6 shadow-card'
 
 export default function NewDealPage() {
   return (

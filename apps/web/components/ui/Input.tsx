@@ -13,7 +13,11 @@ export function Input({ label, error, hint, id, className = '', ...props }: Inpu
     <div className="flex flex-col gap-1.5">
       <label htmlFor={inputId} className="text-sm font-medium text-stone-700">
         {label}
-        {props.required && <span className="text-red-500 ml-0.5" aria-hidden="true">*</span>}
+        {props.required && (
+          <span className="text-red-500 ml-0.5" aria-hidden="true">
+            *
+          </span>
+        )}
       </label>
       <input
         id={inputId}

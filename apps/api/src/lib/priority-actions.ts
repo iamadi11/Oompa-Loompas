@@ -46,11 +46,12 @@ export type DbDealWithRelations = {
   }>
 }
 
-export function comparePriorityActions(a: DashboardPriorityAction, b: DashboardPriorityAction): number {
-  const timeA =
-    a.dueDate !== null ? new Date(a.dueDate).getTime() : Number.MAX_SAFE_INTEGER
-  const timeB =
-    b.dueDate !== null ? new Date(b.dueDate).getTime() : Number.MAX_SAFE_INTEGER
+export function comparePriorityActions(
+  a: DashboardPriorityAction,
+  b: DashboardPriorityAction,
+): number {
+  const timeA = a.dueDate !== null ? new Date(a.dueDate).getTime() : Number.MAX_SAFE_INTEGER
+  const timeB = b.dueDate !== null ? new Date(b.dueDate).getTime() : Number.MAX_SAFE_INTEGER
   if (timeA !== timeB) return timeA - timeB
   const kindRank = (k: DashboardPriorityAction['kind']) => (k === 'overdue_payment' ? 0 : 1)
   const kr = kindRank(a.kind) - kindRank(b.kind)
@@ -63,7 +64,9 @@ export function comparePriorityActions(a: DashboardPriorityAction, b: DashboardP
 /**
  * All overdue payments (PENDING/PARTIAL + past due) and overdue PENDING deliverables, sorted for display.
  */
-export function collectPriorityActionsFromDeals(deals: DbDealWithRelations[]): DashboardPriorityAction[] {
+export function collectPriorityActionsFromDeals(
+  deals: DbDealWithRelations[],
+): DashboardPriorityAction[] {
   const priorityActions: DashboardPriorityAction[] = []
 
   for (const deal of deals) {

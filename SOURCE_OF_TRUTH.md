@@ -1,8 +1,8 @@
 # SOURCE_OF_TRUTH.md
 
-Version: 1.1.0
+Version: 1.1.1
 Status: Immutable (Core System Definition)
-Last Updated: 2026-04-06
+Last Updated: 2026-04-08
 
 ---
 
@@ -199,14 +199,14 @@ This is FINAL.
 
 ## 3.4 Repo Structure
 
+Current repository (2026-04):
+
 /repo
 /apps
 /web
 /api
-/worker
 
 /packages
-/ui
 /db
 /types
 /utils
@@ -214,6 +214,11 @@ This is FINAL.
 
 /infra
 /docs
+
+Planned / optional modules (not present in this workspace today):
+
+- /apps/worker
+- /packages/ui
 
 ---
 

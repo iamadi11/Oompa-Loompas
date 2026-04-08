@@ -37,11 +37,7 @@ export function PaymentRow({ dealId, dealTitle, brandName, payment, onUpdate }: 
 
   async function removePayment() {
     const label = formatCurrency(payment.amount, payment.currency as 'INR' | 'USD' | 'EUR' | 'GBP')
-    if (
-      !window.confirm(
-        `Remove this ${label} payment milestone? This cannot be undone.`,
-      )
-    ) {
+    if (!window.confirm(`Remove this ${label} payment milestone? This cannot be undone.`)) {
       return
     }
     setDeleting(true)
@@ -55,7 +51,8 @@ export function PaymentRow({ dealId, dealTitle, brandName, payment, onUpdate }: 
     }
   }
 
-  const canMarkReceived = payment.status === 'PENDING' || payment.status === 'PARTIAL' || payment.isOverdue
+  const canMarkReceived =
+    payment.status === 'PENDING' || payment.status === 'PARTIAL' || payment.isOverdue
   const canCopyReminder = payment.status !== 'RECEIVED' && payment.status !== 'REFUNDED'
 
   return (

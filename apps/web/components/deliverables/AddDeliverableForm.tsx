@@ -74,7 +74,9 @@ export function AddDeliverableForm({ dealId, onSuccess, onCancel }: AddDeliverab
     const parsed = validate(CreateDeliverableSchema, payload)
     if (!parsed.success) {
       const errors: Record<string, string> = {}
-      parsed.errors.forEach((e) => { errors[e.path] = e.message })
+      parsed.errors.forEach((e) => {
+        errors[e.path] = e.message
+      })
       setFieldErrors(errors)
       return
     }
@@ -85,9 +87,7 @@ export function AddDeliverableForm({ dealId, onSuccess, onCancel }: AddDeliverab
       onSuccess()
     } catch (err) {
       const msg = err instanceof Error ? err.message : ''
-      setServerError(
-        msg && msg.trim().length > 0 ? msg : 'Failed to add deliverable. Try again.',
-      )
+      setServerError(msg && msg.trim().length > 0 ? msg : 'Failed to add deliverable. Try again.')
     } finally {
       setSubmitting(false)
     }

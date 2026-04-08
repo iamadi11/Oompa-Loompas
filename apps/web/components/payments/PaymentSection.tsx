@@ -51,11 +51,7 @@ export function PaymentSection({
           Payments
         </h2>
         {!showAddForm && (
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setShowAddForm(true)}
-          >
+          <Button variant="secondary" size="sm" onClick={() => setShowAddForm(true)}>
             + Add payment
           </Button>
         )}
@@ -68,13 +64,17 @@ export function PaymentSection({
         }`}
       >
         <div>
-          <p className="text-[0.65rem] text-stone-500 font-semibold uppercase tracking-[0.12em]">Contracted</p>
+          <p className="text-[0.65rem] text-stone-500 font-semibold uppercase tracking-[0.12em]">
+            Contracted
+          </p>
           <p className="text-lg font-bold tabular-nums text-stone-900 mt-1">
             {formatCurrency(summary.totalContracted, dealCurrency)}
           </p>
         </div>
         <div>
-          <p className="text-[0.65rem] text-stone-500 font-semibold uppercase tracking-[0.12em]">Received</p>
+          <p className="text-[0.65rem] text-stone-500 font-semibold uppercase tracking-[0.12em]">
+            Received
+          </p>
           <p className="text-lg font-bold tabular-nums text-emerald-800 mt-1">
             {formatCurrency(summary.totalReceived, dealCurrency)}
           </p>

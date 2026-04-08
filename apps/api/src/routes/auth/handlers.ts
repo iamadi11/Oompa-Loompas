@@ -91,10 +91,7 @@ export async function postLogin(
     })
 }
 
-export async function postLogout(
-  request: FastifyRequest,
-  reply: FastifyReply,
-): Promise<void> {
+export async function postLogout(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   const cookieName = getSessionCookieName()
   const token = request.cookies[cookieName]
   if (token) {
@@ -103,10 +100,7 @@ export async function postLogout(
     await prisma.session.deleteMany({ where: { tokenHash } })
   }
 
-  void reply
-    .clearCookie(cookieName, sessionCookieBaseOptions())
-    .status(204)
-    .send()
+  void reply.clearCookie(cookieName, sessionCookieBaseOptions()).status(204).send()
 }
 
 export function getMe(request: FastifyRequest, reply: FastifyReply): void {

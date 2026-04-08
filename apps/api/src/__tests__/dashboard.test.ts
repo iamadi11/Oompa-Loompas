@@ -2,11 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import type { DashboardPriorityAction } from '@oompa/types'
 import { buildServer } from '../server.js'
 import { prisma } from '@oompa/db'
-import {
-  mockSessionFindUnique,
-  testAuthCookieHeader,
-  TEST_USER_ID,
-} from './auth-test-helpers.js'
+import { mockSessionFindUnique, testAuthCookieHeader, TEST_USER_ID } from './auth-test-helpers.js'
 
 const auth = testAuthCookieHeader()
 
@@ -217,18 +213,20 @@ describe('GET /api/v1/dashboard', () => {
   it('RECEIVED payment past dueDate is not counted as overdue', async () => {
     const receivedPastDue = {
       ...mockDeal2,
-      payments: [{
-        id: 'pay-3',
-        dealId: DEAL_ID_2,
-        amount: makeDecimal(45000),
-        currency: 'INR',
-        status: 'RECEIVED',
-        dueDate: pastDate, // past due but RECEIVED
-        receivedAt: new Date(),
-        notes: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }],
+      payments: [
+        {
+          id: 'pay-3',
+          dealId: DEAL_ID_2,
+          amount: makeDecimal(45000),
+          currency: 'INR',
+          status: 'RECEIVED',
+          dueDate: pastDate, // past due but RECEIVED
+          receivedAt: new Date(),
+          notes: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
     }
     mockPrisma.deal.findMany.mockResolvedValue([receivedPastDue])
 
@@ -252,18 +250,20 @@ describe('GET /api/v1/dashboard', () => {
   it('future dueDate PENDING payment is not overdue', async () => {
     const futurePending = {
       ...mockDeal2,
-      payments: [{
-        id: 'pay-4',
-        dealId: DEAL_ID_2,
-        amount: makeDecimal(45000),
-        currency: 'INR',
-        status: 'PENDING',
-        dueDate: futureDate,
-        receivedAt: null,
-        notes: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }],
+      payments: [
+        {
+          id: 'pay-4',
+          dealId: DEAL_ID_2,
+          amount: makeDecimal(45000),
+          currency: 'INR',
+          status: 'PENDING',
+          dueDate: futureDate,
+          receivedAt: null,
+          notes: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
     }
     mockPrisma.deal.findMany.mockResolvedValue([futurePending])
 

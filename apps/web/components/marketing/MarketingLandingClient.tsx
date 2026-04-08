@@ -20,7 +20,9 @@ export function MarketingLandingClient() {
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between py-4">
-          <span className="font-display text-xl font-semibold tracking-tight text-stone-900">{APP_DISPLAY_NAME}</span>
+          <span className="font-display text-xl font-semibold tracking-tight text-stone-900">
+            {APP_DISPLAY_NAME}
+          </span>
           <Link
             href="/login"
             className={`${ctaClass} border border-line/90 bg-surface-raised text-stone-800 hover:bg-canvas`}
@@ -54,8 +56,8 @@ export function MarketingLandingClient() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0 }}
           >
-            One calm workspace for deals, payment milestones, and deliverables. Built for creators who run a studio,
-            not a spreadsheet.
+            One calm workspace for deals, payment milestones, and deliverables. Built for creators
+            who run a studio, not a spreadsheet.
           </motion.p>
           <motion.div
             className="mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4"
@@ -64,7 +66,9 @@ export function MarketingLandingClient() {
             transition={{ duration: 0.48, delay: 0 }}
           >
             <motion.div
-              {...(!prefersReduced ? { whileHover: { scale: 1.02 }, whileTap: { scale: 0.98 } } : {})}
+              {...(!prefersReduced
+                ? { whileHover: { scale: 1.02 }, whileTap: { scale: 0.98 } }
+                : {})}
             >
               <Link
                 href="/login"

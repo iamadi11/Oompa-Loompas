@@ -35,7 +35,12 @@ export function RecentDealRow({ deal, motionIndex: _motionIndex = 0 }: RecentDea
         ease: [0.22, 1, 0.36, 1],
       }}
       {...(!prefersReduced
-        ? { whileHover: { x: 4, transition: { type: 'spring' as const, stiffness: 300, damping: 22 } } }
+        ? {
+            whileHover: {
+              x: 4,
+              transition: { type: 'spring' as const, stiffness: 300, damping: 22 },
+            },
+          }
         : {})}
     >
       <div className="min-w-0 flex-1">
@@ -57,9 +62,7 @@ export function RecentDealRow({ deal, motionIndex: _motionIndex = 0 }: RecentDea
         <p className="text-sm font-bold tabular-nums text-stone-900">
           {formatCurrency(deal.value, deal.currency)}
         </p>
-        <p className="text-xs text-stone-500 tabular-nums">
-          {receivedPct}% received
-        </p>
+        <p className="text-xs text-stone-500 tabular-nums">{receivedPct}% received</p>
       </div>
     </MotionLink>
   )

@@ -6,58 +6,16 @@ import {
   type UpdatePayment,
   CreatePaymentSchema,
   UpdatePaymentSchema,
-  computeIsOverdue,
 } from '@oompa/types'
 import { buildPaymentInvoiceHtml, validate } from '@oompa/utils'
 import { findDealIdForUser } from '../../lib/deal-scope.js'
-import {
-  NotFoundError,
-  UnauthorizedError,
-  ValidationError,
-  sendError,
-} from '../../lib/errors.js'
+import { NotFoundError, UnauthorizedError, ValidationError, sendError } from '../../lib/errors.js'
+import { serializePayment, toCreatePaymentData, toUpdatePaymentData } from './service.js'
 import {
   readPaymentInvoiceDocumentLabel,
   readPaymentInvoiceIssuerEnv,
   readPaymentInvoicePlaceOfSupply,
 } from '../../lib/payment-invoice-env.js'
-
-type DbPayment = {
-  id: string
-  dealId: string
-  amount: Prisma.Decimal
-  currency: string
-  status: string
-  dueDate: Date | null
-  receivedAt: Date | null
-  notes: string | null
-  createdAt: Date
-  updatedAt: Date
-}
-
-function serializePayment(payment: DbPayment) {
-  const dueDate = payment.dueDate
-  const status = payment.status as
-    | 'PENDING'
-    | 'PARTIAL'
-    | 'RECEIVED'
-    | 'OVERDUE'
-    | 'REFUNDED'
-
-  return {
-    id: payment.id,
-    dealId: payment.dealId,
-    amount: Number(payment.amount),
-    currency: payment.currency,
-    status,
-    dueDate: dueDate?.toISOString() ?? null,
-    receivedAt: payment.receivedAt?.toISOString() ?? null,
-    notes: payment.notes,
-    isOverdue: computeIsOverdue(dueDate, status),
-    createdAt: payment.createdAt.toISOString(),
-    updatedAt: payment.updatedAt.toISOString(),
-  }
-}
 
 export async function listPayments(
   request: FastifyRequest<{ Params: { dealId: string } }>,
@@ -104,17 +62,8 @@ export async function createPayment(
     return sendError(reply, new ValidationError(parsed.errors.map((e) => e.message).join(', ')))
   }
 
-  const { amount, currency, status, dueDate, notes } = parsed.data
-
   const payment = await prisma.payment.create({
-    data: {
-      dealId,
-      amount: new Prisma.Decimal(amount),
-      currency: (currency ?? 'INR'),
-      status: (status ?? 'PENDING'),
-      dueDate: dueDate ? new Date(dueDate) : null,
-      notes: notes ?? null,
-    },
+    data: toCreatePaymentData(dealId, parsed.data),
   })
 
   void reply.status(201).send({ data: serializePayment(payment) })
@@ -147,22 +96,7 @@ export async function updatePayment(
 
   const payment = await prisma.payment.update({
     where: { id },
-    data: {
-      ...(updates.amount !== undefined && { amount: new Prisma.Decimal(updates.amount) }),
-      ...(updates.currency !== undefined && {
-        currency: updates.currency,
-      }),
-      ...(updates.status !== undefined && {
-        status: updates.status,
-      }),
-      ...(updates.dueDate !== undefined && {
-        dueDate: updates.dueDate ? new Date(updates.dueDate) : null,
-      }),
-      ...(updates.receivedAt !== undefined && {
-        receivedAt: updates.receivedAt ? new Date(updates.receivedAt) : null,
-      }),
-      ...(updates.notes !== undefined && { notes: updates.notes }),
-    },
+    data: toUpdatePaymentData(updates),
   })
 
   void reply.status(200).send({ data: serializePayment(payment) })

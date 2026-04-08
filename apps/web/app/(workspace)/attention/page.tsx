@@ -54,8 +54,8 @@ export default async function AttentionPage() {
           You are caught up
         </h1>
         <p id="attention-empty-desc" className="text-stone-600 leading-relaxed">
-          No overdue payments or deliverables right now. When something slips, it will show up here and on your
-          overview.
+          No overdue payments or deliverables right now. When something slips, it will show up here
+          and on your overview.
         </p>
         <Link href="/dashboard" className={`inline-flex ${linkClass}`}>
           Back to overview
@@ -76,7 +76,8 @@ export default async function AttentionPage() {
             Needs your attention
           </h1>
           <p id="attention-queue-summary" className="mt-2 text-sm text-stone-600">
-            {data.actions.length} overdue {data.actions.length === 1 ? 'item' : 'items'} — most overdue first.
+            {data.actions.length} overdue {data.actions.length === 1 ? 'item' : 'items'} — most
+            overdue first.
           </p>
         </div>
         <Link href="/dashboard" className={`${linkClass} sm:shrink-0 w-fit`}>

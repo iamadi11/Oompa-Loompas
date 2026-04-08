@@ -1,11 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { buildServer } from '../server.js'
 import { prisma, Prisma } from '@oompa/db'
-import {
-  mockSessionFindUnique,
-  testAuthCookieHeader,
-  TEST_USER_ID,
-} from './auth-test-helpers.js'
+import { mockSessionFindUnique, testAuthCookieHeader, TEST_USER_ID } from './auth-test-helpers.js'
 
 const auth = testAuthCookieHeader()
 

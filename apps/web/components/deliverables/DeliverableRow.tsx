@@ -49,11 +49,7 @@ export function DeliverableRow({ deliverable, onUpdate }: DeliverableRowProps) {
   }
 
   async function handleDelete() {
-    if (
-      !window.confirm(
-        `Remove deliverable "${deliverable.title}"? This cannot be undone.`,
-      )
-    ) {
+    if (!window.confirm(`Remove deliverable "${deliverable.title}"? This cannot be undone.`)) {
       return
     }
     setUpdating(true)
@@ -76,8 +72,8 @@ export function DeliverableRow({ deliverable, onUpdate }: DeliverableRowProps) {
         deliverable.isOverdue
           ? 'border-red-200/90 bg-red-50/80'
           : isCompleted
-          ? 'border-emerald-200/90 bg-emerald-50/70'
-          : 'border-line/70 bg-surface-raised'
+            ? 'border-emerald-200/90 bg-emerald-50/70'
+            : 'border-line/70 bg-surface-raised'
       }`}
     >
       <div className="min-w-0 flex-1">
@@ -95,20 +91,19 @@ export function DeliverableRow({ deliverable, onUpdate }: DeliverableRowProps) {
           >
             {deliverable.title}
           </span>
-          {isCompleted && (
-            <span className="text-xs font-medium text-green-700">Completed</span>
-          )}
-          {isCancelled && (
-            <span className="text-xs font-medium text-stone-400">Cancelled</span>
-          )}
+          {isCompleted && <span className="text-xs font-medium text-green-700">Completed</span>}
+          {isCancelled && <span className="text-xs font-medium text-stone-400">Cancelled</span>}
           {deliverable.isOverdue && (
-            <span className="text-xs font-semibold text-red-600 uppercase tracking-wide">Overdue</span>
+            <span className="text-xs font-semibold text-red-600 uppercase tracking-wide">
+              Overdue
+            </span>
           )}
         </div>
         <div className="mt-0.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-stone-500">
           {deliverable.dueDate && (
             <span>
-              Due {formatDate(deliverable.dueDate, { day: 'numeric', month: 'short', year: 'numeric' })}
+              Due{' '}
+              {formatDate(deliverable.dueDate, { day: 'numeric', month: 'short', year: 'numeric' })}
             </span>
           )}
           {deliverable.completedAt && (
@@ -116,9 +111,7 @@ export function DeliverableRow({ deliverable, onUpdate }: DeliverableRowProps) {
               Completed {formatDate(deliverable.completedAt, { day: 'numeric', month: 'short' })}
             </span>
           )}
-          {deliverable.notes && (
-            <span className="truncate max-w-xs">{deliverable.notes}</span>
-          )}
+          {deliverable.notes && <span className="truncate max-w-xs">{deliverable.notes}</span>}
         </div>
       </div>
 

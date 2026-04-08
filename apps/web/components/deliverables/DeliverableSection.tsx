@@ -31,26 +31,23 @@ export function DeliverableSection({ dealId, initialDeliverables }: DeliverableS
     <section aria-labelledby="deliverables-heading">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          <h2 id="deliverables-heading" className="font-display text-lg font-semibold text-stone-900">
+          <h2
+            id="deliverables-heading"
+            className="font-display text-lg font-semibold text-stone-900"
+          >
             Deliverables
           </h2>
           {deliverables.length > 0 && (
             <span className="text-xs text-stone-500">
               {completedCount}/{deliverables.length} done
               {overdueCount > 0 && (
-                <span className="ml-2 text-red-600 font-medium">
-                  · {overdueCount} overdue
-                </span>
+                <span className="ml-2 text-red-600 font-medium">· {overdueCount} overdue</span>
               )}
             </span>
           )}
         </div>
         {!showAddForm && (
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setShowAddForm(true)}
-          >
+          <Button variant="secondary" size="sm" onClick={() => setShowAddForm(true)}>
             + Add deliverable
           </Button>
         )}

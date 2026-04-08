@@ -44,9 +44,12 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-      # `pnpm format:check` is not run here: the root script targets the whole repo and
-      # currently includes many non–CI-generated paths that fail Prettier. Use locally
-      # or add a scoped `format:check:workspace` when ready.
+      - name: Boundary check
+        run: pnpm boundary:check
+
+      # Scoped to apps/* and packages/*; see root `.prettierignore` for generated paths.
+      - name: Format check (workspace)
+        run: pnpm format:check:workspace
 
       - name: Test
         run: pnpm test

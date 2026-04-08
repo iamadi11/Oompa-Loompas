@@ -1,11 +1,7 @@
 import { WorkspacePageMotion } from '@/components/motion/WorkspacePageMotion'
 import { AppShellHeader } from '@/components/shell/MainNav'
 
-export default function WorkspaceLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function WorkspaceLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="sticky top-0 z-40 border-b border-line/80 bg-surface-raised/85 backdrop-blur-md shadow-header">

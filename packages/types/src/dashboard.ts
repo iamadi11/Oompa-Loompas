@@ -36,7 +36,9 @@ export const DashboardOverdueDeliverableActionSchema = z.object({
   deliverableTitle: z.string(),
   dueDate: z.string().datetime().nullable(),
 })
-export type DashboardOverdueDeliverableAction = z.infer<typeof DashboardOverdueDeliverableActionSchema>
+export type DashboardOverdueDeliverableAction = z.infer<
+  typeof DashboardOverdueDeliverableActionSchema
+>
 
 export const DashboardPriorityActionSchema = z.discriminatedUnion('kind', [
   DashboardOverduePaymentActionSchema,

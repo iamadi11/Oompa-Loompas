@@ -6,7 +6,9 @@ import { isDealsNeedsAttentionFilter } from '@/lib/deals-page'
 import { getServerApiBaseUrl } from '@/lib/get-server-api-base-url'
 import { serverApiFetch } from '@/lib/server-api-fetch'
 
-async function getDeals(needsAttention: boolean): Promise<{ deals: Deal[]; loadError: string | null }> {
+async function getDeals(
+  needsAttention: boolean,
+): Promise<{ deals: Deal[]; loadError: string | null }> {
   const apiBase = getServerApiBaseUrl()
   const qs = new URLSearchParams({ limit: '100', sortOrder: 'desc' })
   if (needsAttention) qs.set('needsAttention', 'true')
@@ -86,8 +88,12 @@ export default async function DealsPage({ searchParams }: Props) {
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-6">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">Pipeline</p>
-          <h1 className="mt-1 font-display text-2xl sm:text-3xl font-semibold tracking-tight text-stone-900">Deals</h1>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+            Pipeline
+          </p>
+          <h1 className="mt-1 font-display text-2xl sm:text-3xl font-semibold tracking-tight text-stone-900">
+            Deals
+          </h1>
           <p className="text-sm text-stone-600 mt-1">
             {needsAttention
               ? deals.length === 1
@@ -110,7 +116,12 @@ export default async function DealsPage({ searchParams }: Props) {
               viewBox="0 0 24 24"
               aria-hidden="true"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
             </svg>
             Add deal
           </Link>

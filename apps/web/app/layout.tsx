@@ -48,11 +48,7 @@ export const viewport: Viewport = {
   maximumScale: 5,
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${display.variable} ${sans.variable}`}>
       <body className="min-h-screen scroll-pt-28 antialiased font-sans bg-mesh-page bg-canvas text-stone-900">

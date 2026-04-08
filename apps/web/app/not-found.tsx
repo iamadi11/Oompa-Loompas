@@ -14,7 +14,8 @@ export default function GlobalNotFound() {
           This page does not exist
         </h1>
         <p className="text-sm text-stone-600 leading-relaxed">
-          The link may be broken or the page was removed. If you were signed out, sign in again from the home page.
+          The link may be broken or the page was removed. If you were signed out, sign in again from
+          the home page.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
           <Link

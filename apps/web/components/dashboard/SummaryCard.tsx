@@ -46,13 +46,15 @@ export function SummaryCard({
       }}
       {...(!prefersReduced ? { whileHover: { y: -2, transition: { duration: 0.2 } } } : {})}
     >
-      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-stone-500">{label}</p>
-      <p className={`mt-2 text-xl sm:text-2xl font-bold tabular-nums tracking-tight ${VALUE_STYLES[accent]}`}>
+      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-stone-500">
+        {label}
+      </p>
+      <p
+        className={`mt-2 text-xl sm:text-2xl font-bold tabular-nums tracking-tight ${VALUE_STYLES[accent]}`}
+      >
         {value}
       </p>
-      {subtext && (
-        <p className="mt-1.5 text-xs text-stone-500 leading-snug">{subtext}</p>
-      )}
+      {subtext && <p className="mt-1.5 text-xs text-stone-500 leading-snug">{subtext}</p>}
     </motion.div>
   )
 }

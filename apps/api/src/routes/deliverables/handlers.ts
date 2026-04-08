@@ -8,12 +8,7 @@ import {
 import { validate } from '@oompa/utils'
 import { CreateDeliverableSchema, UpdateDeliverableSchema } from './schema.js'
 import { findDealIdForUser } from '../../lib/deal-scope.js'
-import {
-  NotFoundError,
-  UnauthorizedError,
-  ValidationError,
-  sendError,
-} from '../../lib/errors.js'
+import { NotFoundError, UnauthorizedError, ValidationError, sendError } from '../../lib/errors.js'
 
 type DbDeliverable = {
   id: string

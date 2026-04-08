@@ -51,7 +51,9 @@ export function AddPaymentForm({ dealId, dealCurrency, onSuccess, onCancel }: Ad
     const parsed = validate(CreatePaymentSchema, payload)
     if (!parsed.success) {
       const errors: Record<string, string> = {}
-      parsed.errors.forEach((e) => { errors[e.path] = e.message })
+      parsed.errors.forEach((e) => {
+        errors[e.path] = e.message
+      })
       setFieldErrors(errors)
       return
     }
@@ -68,11 +70,18 @@ export function AddPaymentForm({ dealId, dealCurrency, onSuccess, onCancel }: Ad
   }
 
   return (
-    <form onSubmit={(e) => void handleSubmit(e)} noValidate className="flex flex-col gap-4 pt-4 border-t border-line/70">
+    <form
+      onSubmit={(e) => void handleSubmit(e)}
+      noValidate
+      className="flex flex-col gap-4 pt-4 border-t border-line/70"
+    >
       <h3 className="text-sm font-semibold text-stone-800">Add payment milestone</h3>
 
       {serverError && (
-        <div className="rounded-xl bg-red-50 border border-red-200/90 px-4 py-3 text-sm text-red-800 shadow-sm" role="alert">
+        <div
+          className="rounded-xl bg-red-50 border border-red-200/90 px-4 py-3 text-sm text-red-800 shadow-sm"
+          role="alert"
+        >
           {serverError}
         </div>
       )}

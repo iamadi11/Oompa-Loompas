@@ -48,7 +48,12 @@ export function ShellAuthActions({ className = '', variant = 'inline', onNavigat
   }
 
   if (me === undefined) {
-    return <span className={`inline-block h-9 w-16 rounded-md bg-surface-raised/50 animate-pulse ${className}`} aria-hidden />
+    return (
+      <span
+        className={`inline-block h-9 w-16 rounded-md bg-surface-raised/50 animate-pulse ${className}`}
+        aria-hidden
+      />
+    )
   }
 
   if (me === null) {
@@ -56,16 +61,15 @@ export function ShellAuthActions({ className = '', variant = 'inline', onNavigat
   }
 
   const isAdmin = me.roles.includes(Roles.ADMIN)
-  const flex = variant === 'stacked' ? 'flex flex-col items-stretch gap-0.5' : 'flex flex-row items-center gap-1'
+  const flex =
+    variant === 'stacked'
+      ? 'flex flex-col items-stretch gap-0.5'
+      : 'flex flex-row items-center gap-1'
 
   return (
     <div className={`${flex} ${className}`}>
       {isAdmin ? (
-        <Link
-          href="/admin"
-          className={actionLink}
-          {...(onNavigate ? { onClick: onNavigate } : {})}
-        >
+        <Link href="/admin" className={actionLink} {...(onNavigate ? { onClick: onNavigate } : {})}>
           Admin
         </Link>
       ) : null}

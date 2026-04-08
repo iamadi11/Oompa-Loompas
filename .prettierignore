@@ -1,0 +1,14 @@
+# Generated / vendor — keep scoped format:check green without chasing tool output
+node_modules
+dist
+build
+.next
+coverage
+*.tsbuildinfo
+pnpm-lock.yaml
+
+# Prisma SQL migrations are hand-edited but often intentionally un-prettified
+packages/db/prisma/migrations
+
+# Next.js regenerates this file; formatting causes noisy diffs
+apps/web/next-env.d.ts

@@ -28,10 +28,7 @@ function computeDominantCurrency(deals: DbDealWithRelations[]): Currency {
   return (dominant?.[0] ?? 'INR') as Currency
 }
 
-export async function getDashboard(
-  request: FastifyRequest,
-  reply: FastifyReply,
-): Promise<void> {
+export async function getDashboard(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   const userId = request.authUser?.id
   if (!userId) {
     sendError(reply, new UnauthorizedError())

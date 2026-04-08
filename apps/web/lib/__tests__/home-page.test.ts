@@ -25,7 +25,7 @@ describe('resolveHomeOverviewState', () => {
 
   it('returns empty when there are no deals', () => {
     expect(
-      resolveHomeOverviewState(minimalDashboard({ totalDealsCount: 0, activeDealsCount: 0 }))
+      resolveHomeOverviewState(minimalDashboard({ totalDealsCount: 0, activeDealsCount: 0 })),
     ).toEqual({ kind: 'empty' })
   })
 

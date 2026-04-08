@@ -10,7 +10,7 @@ export type HomeOverviewState =
  * Conflating the two misleads creators into thinking their deal data is empty.
  */
 export function resolveHomeOverviewState(
-  data: DashboardSummary | null | undefined
+  data: DashboardSummary | null | undefined,
 ): HomeOverviewState {
   if (data == null) {
     return { kind: 'unavailable' }

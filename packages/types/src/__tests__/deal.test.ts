@@ -1,0 +1,119 @@
+import { describe, expect, it } from 'vitest'
+import {
+  CreateDealSchema,
+  DealListFiltersSchema,
+  DealSchema,
+  DealStatusSchema,
+  isValidStatusTransition,
+  UpdateDealSchema,
+} from '../deal.js'
+
+const iso = '2024-01-15T12:00:00.000Z'
+const dealId = '550e8400-e29b-41d4-a716-446655440001'
+
+const fullDeal = {
+  id: dealId,
+  title: 'T',
+  brandName: 'B',
+  value: 100,
+  currency: 'INR' as const,
+  status: 'DRAFT' as const,
+  startDate: null,
+  endDate: null,
+  notes: null,
+  createdAt: iso,
+  updatedAt: iso,
+}
+
+describe('DealSchema', () => {
+  it('parses a complete deal', () => {
+    expect(DealSchema.parse(fullDeal)).toMatchObject({ title: 'T', value: 100 })
+  })
+
+  it('applies default currency and status', () => {
+    const { currency, status, ...rest } = fullDeal
+    const parsed = DealSchema.parse({
+      ...rest,
+      currency: undefined,
+      status: undefined,
+    } as unknown as typeof fullDeal)
+    expect(parsed.currency).toBe('INR')
+    expect(parsed.status).toBe('DRAFT')
+  })
+
+  it('rejects non-positive value', () => {
+    expect(() => DealSchema.parse({ ...fullDeal, value: 0 })).toThrow()
+  })
+})
+
+describe('CreateDealSchema', () => {
+  it('parses minimal create payload', () => {
+    expect(
+      CreateDealSchema.parse({
+        title: 'x',
+        brandName: 'y',
+        value: 1,
+      }),
+    ).toMatchObject({ title: 'x', brandName: 'y', value: 1, currency: 'INR' })
+  })
+
+  it('requires positive value with message', () => {
+    const r = CreateDealSchema.safeParse({
+      title: 'x',
+      brandName: 'y',
+      value: -1,
+    })
+    expect(r.success).toBe(false)
+  })
+})
+
+describe('UpdateDealSchema', () => {
+  it('allows partial updates', () => {
+    expect(UpdateDealSchema.parse({ title: 'only' })).toEqual({ title: 'only' })
+    expect(UpdateDealSchema.parse({})).toEqual({})
+  })
+})
+
+describe('DealListFiltersSchema', () => {
+  it('coerces page and limit from strings', () => {
+    expect(
+      DealListFiltersSchema.parse({
+        page: '2',
+        limit: '10',
+      }),
+    ).toEqual(
+      expect.objectContaining({
+        page: 2,
+        limit: 10,
+        sortBy: 'createdAt',
+        sortOrder: 'desc',
+      }),
+    )
+  })
+
+  it('accepts needsAttention flag', () => {
+    expect(DealListFiltersSchema.parse({ needsAttention: 'true' })).toMatchObject({
+      needsAttention: 'true',
+    })
+  })
+})
+
+describe('DealStatusSchema', () => {
+  it('rejects unknown status', () => {
+    expect(() => DealStatusSchema.parse('UNKNOWN')).toThrow()
+  })
+})
+
+describe('isValidStatusTransition', () => {
+  it('allows DRAFT to NEGOTIATING', () => {
+    expect(isValidStatusTransition('DRAFT', 'NEGOTIATING')).toBe(true)
+  })
+
+  it('disallows DRAFT to PAID', () => {
+    expect(isValidStatusTransition('DRAFT', 'PAID')).toBe(false)
+  })
+
+  it('PAID has no outbound transitions', () => {
+    expect(isValidStatusTransition('PAID', 'ACTIVE')).toBe(false)
+  })
+})

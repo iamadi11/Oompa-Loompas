@@ -35,13 +35,15 @@ export default async function HomePage() {
     return (
       <div className="flex flex-col gap-8 py-8 sm:py-14 max-w-xl">
         <div className="space-y-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-800/90">Start here</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-800/90">
+            Start here
+          </p>
           <h1 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-stone-900 leading-[1.15]">
             Your outcomes, composed — not just counted.
           </h1>
           <p className="text-base sm:text-lg text-stone-600 leading-relaxed">
-            Track deals and payments in one calm surface. Built for creators who treat their work like a studio, not a
-            spreadsheet.
+            Track deals and payments in one calm surface. Built for creators who treat their work
+            like a studio, not a spreadsheet.
           </p>
         </div>
         <Link
@@ -125,7 +127,10 @@ export default async function HomePage() {
 
       <section aria-labelledby="recent-deals-heading">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
-          <h2 id="recent-deals-heading" className="font-display text-lg font-semibold text-stone-900">
+          <h2
+            id="recent-deals-heading"
+            className="font-display text-lg font-semibold text-stone-900"
+          >
             Recent deals
           </h2>
           <Link

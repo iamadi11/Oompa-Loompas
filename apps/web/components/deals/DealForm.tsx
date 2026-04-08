@@ -31,7 +31,10 @@ const STATUS_OPTIONS = [
   { value: 'CANCELLED', label: 'Cancelled' },
 ]
 
-function statusSelectOptions(mode: 'create' | 'edit', currentStatus: string): typeof STATUS_OPTIONS {
+function statusSelectOptions(
+  mode: 'create' | 'edit',
+  currentStatus: string,
+): typeof STATUS_OPTIONS {
   if (mode === 'create') return STATUS_OPTIONS
   const cur = currentStatus as DealStatus
   const allowed = new Set<DealStatus>([cur, ...DEAL_STATUS_TRANSITIONS[cur]])
@@ -87,7 +90,9 @@ export function DealForm({ deal, mode }: DealFormProps) {
     const parsed = validate(schema, payload)
     if (!parsed.success) {
       const errors: Record<string, string> = {}
-      parsed.errors.forEach((e) => { errors[e.path] = e.message })
+      parsed.errors.forEach((e) => {
+        errors[e.path] = e.message
+      })
       setFieldErrors(errors)
       return
     }
@@ -98,7 +103,9 @@ export function DealForm({ deal, mode }: DealFormProps) {
         const result = await api.createDeal(parsed.data as CreateDeal)
         const id = result?.data?.id
         if (!id) {
-          setServerError('Deal was created but the server response was incomplete. Check the deals list or try again.')
+          setServerError(
+            'Deal was created but the server response was incomplete. Check the deals list or try again.',
+          )
           return
         }
         router.push(`/deals/${id}`)
@@ -242,7 +249,8 @@ export function DealForm({ deal, mode }: DealFormProps) {
         <div className="pt-8 mt-2 border-t border-red-100 rounded-b-xl">
           <h3 className="text-sm font-semibold text-red-900">Danger zone</h3>
           <p className="text-sm text-stone-600 mt-1 mb-4 leading-relaxed">
-            Delete this deal and all of its payment milestones and deliverables. This cannot be undone.
+            Delete this deal and all of its payment milestones and deliverables. This cannot be
+            undone.
           </p>
           <Button
             type="button"

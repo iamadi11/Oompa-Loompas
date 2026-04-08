@@ -20,6 +20,7 @@ export interface LoginFormProps {
  */
 export function LoginForm({ redirectFrom = null }: LoginFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
   const loginInFlightRef = useRef(false)
   const emailInputRef = useRef<HTMLInputElement>(null)
   const passwordInputRef = useRef<HTMLInputElement>(null)
@@ -29,17 +30,22 @@ export function LoginForm({ redirectFrom = null }: LoginFormProps) {
     const emailVal = (emailInputRef.current?.value.trim() || '').trim()
     const passwordVal = passwordInputRef.current?.value || ''
     if (!emailVal || !passwordVal) {
-      toast.error('Enter your email and password.')
+      const msg = 'Enter your email and password.'
+      setFormError(msg)
+      toast.error(msg)
       return
     }
     loginInFlightRef.current = true
     setIsSubmitting(true)
+    setFormError(null)
     try {
       await api.login({ email: emailVal, password: passwordVal })
       toast.success('Signed in')
       navigateAfterLogin(redirectFrom)
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Sign-in failed')
+      const msg = err instanceof Error ? err.message : 'Sign-in failed'
+      setFormError(msg)
+      toast.error(msg)
     } finally {
       loginInFlightRef.current = false
       setIsSubmitting(false)
@@ -55,12 +61,7 @@ export function LoginForm({ redirectFrom = null }: LoginFormProps) {
   )
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      noValidate
-      aria-label="Sign in"
-      className="space-y-5"
-    >
+    <form onSubmit={handleSubmit} noValidate aria-label="Sign in" className="space-y-5">
       <div className="space-y-2">
         <label htmlFor="login-email" className="block text-sm font-medium text-stone-800">
           Email
@@ -71,7 +72,9 @@ export function LoginForm({ redirectFrom = null }: LoginFormProps) {
           type="email"
           autoComplete="email"
           required
+          aria-invalid={Boolean(formError)}
           defaultValue=""
+          onInput={() => setFormError(null)}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault()
@@ -91,7 +94,9 @@ export function LoginForm({ redirectFrom = null }: LoginFormProps) {
           type="password"
           autoComplete="current-password"
           required
+          aria-invalid={Boolean(formError)}
           defaultValue=""
+          onInput={() => setFormError(null)}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault()
@@ -109,6 +114,11 @@ export function LoginForm({ redirectFrom = null }: LoginFormProps) {
       >
         {isSubmitting ? 'Signing in…' : 'Sign in'}
       </button>
+      {formError ? (
+        <p role="alert" aria-live="polite" className="text-sm text-red-700">
+          {formError}
+        </p>
+      ) : null}
     </form>
   )
 }

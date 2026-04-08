@@ -1,10 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { api, getBrowserApiBase, paymentInvoiceHref } from '@/lib/api'
 
-function jsonResponse(
-  body: unknown,
-  init: { ok?: boolean; status?: number } = {},
-): Response {
+function jsonResponse(body: unknown, init: { ok?: boolean; status?: number } = {}): Response {
   const ok = init.ok ?? true
   const status = init.status ?? (ok ? 200 : 400)
   if (status === 204) {
@@ -105,9 +102,7 @@ describe('ApiClient', () => {
   })
 
   it('deleteDeal uses DELETE and handles 204', async () => {
-    fetchMock.mockResolvedValueOnce(
-      jsonResponse(undefined, { ok: true, status: 204 }),
-    )
+    fetchMock.mockResolvedValueOnce(jsonResponse(undefined, { ok: true, status: 204 }))
     await api.deleteDeal('d1')
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/deals/d1', {
       method: 'DELETE',
@@ -133,15 +128,12 @@ describe('ApiClient', () => {
       status: 'PENDING' as const,
     }
     await api.createPayment('d', body)
-    expect(fetchMock).toHaveBeenCalledWith(
-      'http://localhost:3001/api/v1/deals/d/payments',
-      {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      },
-    )
+    expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/deals/d/payments', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
   })
 
   it('updatePayment PATCHes payment id route', async () => {
@@ -201,15 +193,12 @@ describe('ApiClient', () => {
       dueDate: null,
     }
     await api.createDeliverable('d2', body)
-    expect(fetchMock).toHaveBeenCalledWith(
-      'http://localhost:3001/api/v1/deals/d2/deliverables',
-      {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      },
-    )
+    expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/deals/d2/deliverables', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
   })
 
   it('updateDeliverable PATCHes by id', async () => {
@@ -258,7 +247,9 @@ describe('ApiClient', () => {
   })
 
   it('getMe GETs session user', async () => {
-    fetchMock.mockResolvedValueOnce(jsonResponse({ data: { id: 'u1', email: 'a@b.co', roles: ['MEMBER'] } }))
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse({ data: { id: 'u1', email: 'a@b.co', roles: ['MEMBER'] } }),
+    )
     await api.getMe()
     expect(fetchMock).toHaveBeenCalledWith(
       'http://localhost:3001/api/v1/auth/me',
@@ -282,7 +273,10 @@ describe('ApiClient', () => {
     vi.unstubAllEnvs()
     fetchMock.mockResolvedValueOnce(jsonResponse({ data: [] }))
     await api.listDeals()
-    expect(fetchMock).toHaveBeenCalledWith('/api/v1/deals', expect.objectContaining(defaultFetchInit))
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/v1/deals',
+      expect.objectContaining(defaultFetchInit),
+    )
   })
 })
 

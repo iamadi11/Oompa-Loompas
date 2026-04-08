@@ -31,6 +31,8 @@ describe('RelativeDueLabel', () => {
     render(<RelativeDueLabel iso={iso} />)
     await vi.runAllTimersAsync()
 
-    expect(screen.getByText(new RegExp(relative.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))).toBeInTheDocument()
+    expect(
+      screen.getByText(new RegExp(relative.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))),
+    ).toBeInTheDocument()
   })
 })

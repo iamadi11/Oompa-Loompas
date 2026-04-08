@@ -30,9 +30,11 @@ export function formatCurrency(amount: number, currency: Currency = 'INR'): stri
  * Returns the currency symbol for a given currency code.
  */
 export function getCurrencySymbol(currency: Currency): string {
-  return new Intl.NumberFormat('en', { style: 'currency', currency, minimumFractionDigits: 0 })
-    .formatToParts(0)
-    .find((p) => p.type === 'currency')?.value ?? currency
+  return (
+    new Intl.NumberFormat('en', { style: 'currency', currency, minimumFractionDigits: 0 })
+      .formatToParts(0)
+      .find((p) => p.type === 'currency')?.value ?? currency
+  )
 }
 
 /**

@@ -11,9 +11,12 @@
     "typecheck": "pnpm -r typecheck",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\" --ignore-path .gitignore",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\" --ignore-path .gitignore",
-    "db:use-local-pg": "node scripts/use-local-postgres-url.cjs"
+    "format:check:workspace": "prettier --check \"apps/**/*.{ts,tsx,js,jsx,json,md}\" \"packages/**/*.{ts,tsx,js,jsx,json,md}\"",
+    "db:use-local-pg": "node scripts/use-local-postgres-url.cjs",
+    "boundary:check": "depcruise --config .dependency-cruiser.cjs apps/api/src apps/web"
   },
   "devDependencies": {
+    "dependency-cruiser": "^17.3.10",
     "prettier": "^3.5.3",
     "typescript": "^5.9.3"
   },

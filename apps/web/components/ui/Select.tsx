@@ -27,7 +27,11 @@ export function Select({
     <div className="flex flex-col gap-1.5">
       <label htmlFor={selectId} className="text-sm font-medium text-stone-700">
         {label}
-        {props.required && <span className="text-red-500 ml-0.5" aria-hidden="true">*</span>}
+        {props.required && (
+          <span className="text-red-500 ml-0.5" aria-hidden="true">
+            *
+          </span>
+        )}
       </label>
       <select
         id={selectId}

@@ -32,7 +32,10 @@ export function DealCard({ deal, motionIndex: _motionIndex = 0 }: DealCardProps)
       }}
       {...(!prefersReduced
         ? {
-            whileHover: { y: -4, transition: { type: 'spring' as const, stiffness: 380, damping: 24 } },
+            whileHover: {
+              y: -4,
+              transition: { type: 'spring' as const, stiffness: 380, damping: 24 },
+            },
             whileTap: { scale: 0.99 },
           }
         : {})}

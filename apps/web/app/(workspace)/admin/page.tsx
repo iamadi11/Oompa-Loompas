@@ -42,7 +42,8 @@ export default async function AdminPage() {
         RBAC probe succeeded (<span className="font-mono text-stone-800">{body.data.scope}</span>).
       </p>
       <p className="text-xs text-stone-500">
-        Extend this area with operational tools as the product grows; keep permissions enforced on the API.
+        Extend this area with operational tools as the product grows; keep permissions enforced on
+        the API.
       </p>
     </div>
   )

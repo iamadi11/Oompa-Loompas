@@ -18,7 +18,7 @@ export type DealListEmptyContent = {
 export function getDealListEmptyContent(variant: DealListEmptyVariant): DealListEmptyContent {
   if (variant === 'needsAttention') {
     return {
-      title: "Nothing needs you right now",
+      title: 'Nothing needs you right now',
       description:
         'No overdue payments or deliverables on your deals. Open the full list or capture a new commitment when you are ready.',
       primaryHref: '/deals',
@@ -29,7 +29,8 @@ export function getDealListEmptyContent(variant: DealListEmptyVariant): DealList
   }
   return {
     title: 'No deals yet',
-    description: 'Record a brand commitment once — see value, milestones, and follow-ups in one place.',
+    description:
+      'Record a brand commitment once — see value, milestones, and follow-ups in one place.',
     primaryHref: '/deals/new',
     primaryLabel: 'Add your first deal',
     secondaryHref: '/dashboard',

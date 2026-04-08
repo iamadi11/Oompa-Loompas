@@ -19,10 +19,16 @@ export function PriorityActionsSection({ actions, totalCount }: Props) {
       aria-describedby="priority-actions-desc"
       className="rounded-2xl border border-amber-300/50 bg-gradient-to-br from-amber-50/95 via-surface-raised to-amber-50/40 p-4 sm:p-5 shadow-card"
     >
-      <h2 id="priority-actions-heading" className="font-display text-lg font-semibold text-amber-950">
+      <h2
+        id="priority-actions-heading"
+        className="font-display text-lg font-semibold text-amber-950"
+      >
         What to do next
       </h2>
-      <p id="priority-actions-desc" className="mt-1.5 text-sm text-amber-950/80 leading-relaxed max-w-2xl">
+      <p
+        id="priority-actions-desc"
+        className="mt-1.5 text-sm text-amber-950/80 leading-relaxed max-w-2xl"
+      >
         Overdue payments and deliverables — open the deal to follow up or update status.
       </p>
       <PriorityActionList actions={actions} className="mt-4 flex flex-col gap-2" />

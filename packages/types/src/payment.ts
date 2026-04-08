@@ -1,13 +1,7 @@
 import { z } from 'zod'
 import { CurrencySchema, IdSchema } from './common.js'
 
-export const PaymentStatusSchema = z.enum([
-  'PENDING',
-  'PARTIAL',
-  'RECEIVED',
-  'OVERDUE',
-  'REFUNDED',
-])
+export const PaymentStatusSchema = z.enum(['PENDING', 'PARTIAL', 'RECEIVED', 'OVERDUE', 'REFUNDED'])
 export type PaymentStatus = z.infer<typeof PaymentStatusSchema>
 
 export const PaymentSchema = z.object({
@@ -26,9 +20,7 @@ export const PaymentSchema = z.object({
 export type Payment = z.infer<typeof PaymentSchema>
 
 export const CreatePaymentSchema = z.object({
-  amount: z
-    .number({ required_error: 'Amount is required' })
-    .positive('Amount must be positive'),
+  amount: z.number({ required_error: 'Amount is required' }).positive('Amount must be positive'),
   currency: CurrencySchema.optional(),
   status: PaymentStatusSchema.optional(),
   dueDate: z.string().datetime().nullable().optional(),
@@ -59,10 +51,7 @@ export type PaymentSummary = z.infer<typeof PaymentSummarySchema>
  * Computes whether a payment is overdue.
  * Overdue = has a due date in the past AND status is still PENDING or PARTIAL.
  */
-export function computeIsOverdue(
-  dueDate: Date | null,
-  status: PaymentStatus,
-): boolean {
+export function computeIsOverdue(dueDate: Date | null, status: PaymentStatus): boolean {
   if (!dueDate) return false
   if (status === 'RECEIVED' || status === 'REFUNDED') return false
   return dueDate.getTime() < Date.now()
