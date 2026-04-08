@@ -46,6 +46,7 @@ describe('payments service helpers', () => {
     })
     expect(out).toEqual(
       expect.objectContaining({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         amount: expect.any(Prisma.Decimal),
         dueDate: null,
         receivedAt: new Date('2024-03-01T00:00:00.000Z'),

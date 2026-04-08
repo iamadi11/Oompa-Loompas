@@ -40,6 +40,7 @@ describe('deals service helpers', () => {
     expect(where).toEqual(
       expect.objectContaining({
         userId: 'u1',
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         AND: expect.any(Array),
       }),
     )
