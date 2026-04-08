@@ -5,6 +5,7 @@ import { formatCurrency } from '@oompa/utils'
 import { StatusBadge } from '@/components/ui/Badge'
 import { DealForm } from '@/components/deals/DealForm'
 import { DealNotFoundContent } from '@/components/deals/DealNotFoundContent'
+import { ShareProposalButton } from '@/components/deals/ShareProposalButton'
 import { PaymentSection } from '@/components/payments/PaymentSection'
 import { DeliverableSection } from '@/components/deliverables/DeliverableSection'
 import { serverApiFetch } from '@/lib/server-api-fetch'
@@ -102,6 +103,10 @@ export default async function DealDetailPage({ params }: Props) {
           dealCurrency={deal.currency}
           initialPayments={payments}
         />
+      </div>
+
+      <div className={panelClass}>
+        <ShareProposalButton dealId={deal.id} initialShareToken={deal.shareToken} />
       </div>
 
       <div className={panelClass}>

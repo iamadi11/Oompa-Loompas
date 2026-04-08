@@ -173,6 +173,19 @@ class ApiClient {
     return this.request<void>(`/api/v1/deliverables/${id}`, { method: 'DELETE' })
   }
 
+  async shareProposal(dealId: string): Promise<{ data: { shareToken: string; shareUrl: string } }> {
+    return this.request<{ data: { shareToken: string; shareUrl: string } }>(
+      `/api/v1/deals/${dealId}/share`,
+      { method: 'POST', body: JSON.stringify({}) },
+    )
+  }
+
+  async revokeShare(dealId: string): Promise<{ data: { shareToken: null } }> {
+    return this.request<{ data: { shareToken: null } }>(`/api/v1/deals/${dealId}/share`, {
+      method: 'DELETE',
+    })
+  }
+
   async login(body: LoginBody): Promise<MeResponse> {
     return this.request<MeResponse>('/api/v1/auth/login', {
       method: 'POST',

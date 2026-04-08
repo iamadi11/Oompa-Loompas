@@ -30,10 +30,43 @@ export const DealSchema = z.object({
   startDate: z.string().datetime().nullable(),
   endDate: z.string().datetime().nullable(),
   notes: z.string().max(5000).nullable(),
+  shareToken: z.string().length(64).nullable().optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 })
 export type Deal = z.infer<typeof DealSchema>
+
+/** Read-only view of a deal returned on the public proposal page (no userId, no shareToken). */
+export const DealProposalViewSchema = z.object({
+  title: z.string(),
+  brandName: z.string(),
+  value: z.number(),
+  currency: CurrencySchema,
+  status: DealStatusSchema,
+  startDate: z.string().datetime().nullable(),
+  endDate: z.string().datetime().nullable(),
+  notes: z.string().nullable(),
+  deliverables: z.array(
+    z.object({
+      id: IdSchema,
+      title: z.string(),
+      platform: z.string(),
+      type: z.string(),
+      dueDate: z.string().datetime().nullable(),
+      status: z.string(),
+    }),
+  ),
+  payments: z.array(
+    z.object({
+      id: IdSchema,
+      amount: z.number(),
+      currency: CurrencySchema,
+      status: z.string(),
+      dueDate: z.string().datetime().nullable(),
+    }),
+  ),
+})
+export type DealProposalView = z.infer<typeof DealProposalViewSchema>
 
 export const CreateDealSchema = z.object({
   title: z.string().min(1, 'Title is required').max(255),

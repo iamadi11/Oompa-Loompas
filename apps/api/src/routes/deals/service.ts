@@ -11,6 +11,7 @@ export type DbDeal = {
   startDate: Date | null
   endDate: Date | null
   notes: string | null
+  shareToken: string | null
   createdAt: Date
   updatedAt: Date
 }
@@ -26,6 +27,7 @@ export function serializeDeal(deal: DbDeal) {
     startDate: deal.startDate?.toISOString() ?? null,
     endDate: deal.endDate?.toISOString() ?? null,
     notes: deal.notes,
+    shareToken: deal.shareToken,
     createdAt: deal.createdAt.toISOString(),
     updatedAt: deal.updatedAt.toISOString(),
   }

@@ -1,5 +1,13 @@
 import type { FastifyInstance } from 'fastify'
-import { listDeals, getDeal, createDeal, updateDeal, deleteDeal } from './handlers.js'
+import {
+  listDeals,
+  getDeal,
+  createDeal,
+  updateDeal,
+  deleteDeal,
+  shareProposal,
+  revokeShare,
+} from './handlers.js'
 
 export async function dealRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get('/', listDeals)
@@ -7,4 +15,6 @@ export async function dealRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post('/', createDeal)
   fastify.patch('/:id', updateDeal)
   fastify.delete('/:id', deleteDeal)
+  fastify.post('/:id/share', shareProposal)
+  fastify.delete('/:id/share', revokeShare)
 }

@@ -2,6 +2,30 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.2.3] - 2026-04-09
+
+### `@oompa/types` **0.2.3**
+
+- **`DealProposalView`:** read-only schema for the public proposal page (title, brandName, value, currency, status, dates, deliverables, payments).
+- **`DealSchema`:** added optional `shareToken` field.
+
+### `@oompa/api` **0.2.3**
+
+- **`POST /api/v1/deals/:id/share`:** generates a 64-char cryptographically random share token and returns `{ shareToken, shareUrl }`.
+- **`DELETE /api/v1/deals/:id/share`:** revokes the token (sets to null).
+- **`GET /api/v1/share/:token`** (PUBLIC, no auth): returns `DealProposalView` — title, value, deliverables, payments.
+- **`generateShareToken`:** `crypto.randomBytes(32).toString('hex')` utility.
+- **`serializeDeal`:** now includes `shareToken` in API responses.
+
+### `@oompa/web` **0.2.3**
+
+- **`ShareProposalButton`:** client component on deal detail page — generates/copies/revokes the public share link.
+- **`/p/[token]`:** public proposal page — no auth, no workspace shell, shows deal title, value, deliverables, and payments with "Shared via Oompa · View only" footer.
+
+### Documentation
+
+- [Decision](./docs/decisions/2026-04-09-shareable-proposal-link.md) · [Architecture](./docs/architecture/shareable-proposal-link.md) · [UX](./docs/ux/shareable-proposal-link.md) · [Testing](./docs/testing/shareable-proposal-link.md) · [Instrumentation](./docs/instrumentation/shareable-proposal-link.md)
+
 ## [0.2.2] - 2026-04-09
 
 ### `@oompa/web` **0.2.2**

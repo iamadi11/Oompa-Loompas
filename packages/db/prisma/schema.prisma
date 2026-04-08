@@ -89,17 +89,18 @@ enum DeliverableType {
 }
 
 model Deal {
-  id        String     @id @default(uuid())
-  userId    String     @map("user_id")
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     String     @db.VarChar(255)
-  brandName String     @map("brand_name") @db.VarChar(255)
-  value     Decimal    @db.Decimal(15, 2)
-  currency  Currency   @default(INR)
-  status    DealStatus @default(DRAFT)
-  startDate DateTime?  @map("start_date")
-  endDate   DateTime?  @map("end_date")
-  notes     String?    @db.Text
+  id         String     @id @default(uuid())
+  userId     String     @map("user_id")
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title      String     @db.VarChar(255)
+  brandName  String     @map("brand_name") @db.VarChar(255)
+  value      Decimal    @db.Decimal(15, 2)
+  currency   Currency   @default(INR)
+  status     DealStatus @default(DRAFT)
+  startDate  DateTime?  @map("start_date")
+  endDate    DateTime?  @map("end_date")
+  notes      String?    @db.Text
+  shareToken String?    @unique @map("share_token") @db.VarChar(64)
 
   payments     Payment[]
   deliverables Deliverable[]

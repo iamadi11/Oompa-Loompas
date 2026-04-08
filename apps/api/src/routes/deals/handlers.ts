@@ -16,6 +16,7 @@ import {
   UnauthorizedError,
   sendError,
 } from '../../lib/errors.js'
+import { generateShareToken } from '../../lib/share-token.js'
 
 export async function listDeals(
   request: FastifyRequest<{ Querystring: DealListFilters }>,
@@ -174,4 +175,48 @@ export async function deleteDeal(
 
   await prisma.deal.delete({ where: { id } })
   void reply.status(204).send()
+}
+
+export async function shareProposal(
+  request: FastifyRequest<{ Params: { id: string } }>,
+  reply: FastifyReply,
+): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
+  const { id } = request.params
+  const existing = await prisma.deal.findUnique({ where: { id, userId } })
+  if (!existing) {
+    return sendError(reply, new NotFoundError('Deal', id))
+  }
+
+  const shareToken = generateShareToken()
+  const updated = await prisma.deal.update({
+    where: { id },
+    data: { shareToken },
+  })
+
+  const shareUrl = `${process.env['WEB_URL'] ?? 'http://localhost:3000'}/p/${updated.shareToken ?? ''}`
+  void reply.status(200).send({ data: { shareToken: updated.shareToken, shareUrl } })
+}
+
+export async function revokeShare(
+  request: FastifyRequest<{ Params: { id: string } }>,
+  reply: FastifyReply,
+): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
+  const { id } = request.params
+  const existing = await prisma.deal.findUnique({ where: { id, userId } })
+  if (!existing) {
+    return sendError(reply, new NotFoundError('Deal', id))
+  }
+
+  await prisma.deal.update({ where: { id }, data: { shareToken: null } })
+  void reply.status(200).send({ data: { shareToken: null } })
 }

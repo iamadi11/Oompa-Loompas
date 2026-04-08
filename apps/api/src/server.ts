@@ -13,6 +13,7 @@ import { attentionRoutes } from './routes/attention/index.js'
 import { healthV1Routes } from './routes/health/index.js'
 import { createAuthRoutes } from './routes/auth/index.js'
 import { adminRoutes } from './routes/admin/index.js'
+import { shareRoutes } from './routes/share/index.js'
 
 export async function buildServer() {
   getSessionSecret()
@@ -37,6 +38,7 @@ export async function buildServer() {
 
   await fastify.register(healthV1Routes, { prefix: '/api/v1' })
   await fastify.register(createAuthRoutes(fastify), { prefix: '/api/v1/auth' })
+  await fastify.register(shareRoutes, { prefix: '/api/v1/share' })
 
   /** Encapsulated scope so `authenticate` runs only under `/api/v1/*` (not global). */
   await fastify.register(
