@@ -7,14 +7,23 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     scroll-padding-top: 5.5rem;
+    color-scheme: dark;
   }
 
   body {
-    @apply bg-canvas text-stone-900 bg-mesh-page min-h-screen;
+    @apply bg-canvas text-stone-900 min-h-screen;
+    background-image: radial-gradient(ellipse 130% 90% at 100% -20%, rgba(225,43,43,0.07) 0%, transparent 55%),
+      radial-gradient(ellipse 80% 60% at -5% 110%, rgba(225,43,43,0.05) 0%, transparent 50%);
   }
 
+  /* Dark scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #111111; }
+  ::-webkit-scrollbar-thumb { background: #2D2D2D; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #E12B2B; }
+
   *:focus-visible {
-    @apply outline-2 outline-offset-2 outline-brand-700;
+    @apply outline-2 outline-offset-2 outline-brand-600;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -29,11 +38,20 @@
 }
 
 @layer utilities {
-  .text-gradient-gold {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-800 via-gold-rich to-brand-600;
+  .text-gradient-brand {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #F87171 0%, #E12B2B 50%, #C41E1E 100%);
   }
 
-  .border-gradient-gold {
-    border-image: linear-gradient(135deg, rgba(201, 162, 39, 0.55), rgba(61, 41, 20, 0.25)) 1;
+  /* Glass card surface */
+  .glass {
+    background: rgba(26, 26, 26, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  /* Red number glow — use on key revenue metrics */
+  .text-glow-red {
+    text-shadow: 0 0 28px rgba(225, 43, 43, 0.45);
   }
 }

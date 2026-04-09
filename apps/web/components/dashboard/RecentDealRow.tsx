@@ -15,7 +15,7 @@ interface RecentDealRowProps {
   motionIndex?: number
 }
 
-export function RecentDealRow({ deal, motionIndex: _motionIndex = 0 }: RecentDealRowProps) {
+export function RecentDealRow({ deal, motionIndex = 0 }: RecentDealRowProps) {
   const { paymentSummary } = deal
   const prefersReduced = usePrefersReducedMotion()
   const receivedPct =
@@ -26,18 +26,23 @@ export function RecentDealRow({ deal, motionIndex: _motionIndex = 0 }: RecentDea
   return (
     <MotionLink
       href={`/deals/${deal.id}` as Route}
-      className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 px-4 py-3.5 rounded-xl border border-line/80 bg-surface-raised shadow-sm hover:border-line-strong hover:shadow-card transition-all duration-200 motion-reduce:transition-none group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
-      initial={false}
+      className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 px-4 py-3.5 rounded-xl border border-line/80 bg-surface-raised shadow-sm hover:border-brand-700/50 hover:shadow-card transition-all duration-200 motion-reduce:transition-none group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+      initial={prefersReduced ? false : { opacity: 0, x: -12 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{
-        duration: 0.38,
-        delay: 0,
-        ease: [0.22, 1, 0.36, 1],
-      }}
+      transition={
+        prefersReduced
+          ? { duration: 0 }
+          : {
+              type: 'spring',
+              stiffness: 340,
+              damping: 26,
+              delay: motionIndex * 0.06,
+            }
+      }
       {...(!prefersReduced
         ? {
             whileHover: {
-              x: 4,
+              x: 5,
               transition: { type: 'spring' as const, stiffness: 300, damping: 22 },
             },
           }
@@ -45,12 +50,12 @@ export function RecentDealRow({ deal, motionIndex: _motionIndex = 0 }: RecentDea
     >
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="font-semibold text-sm text-stone-900 truncate group-hover:text-brand-800 transition-colors">
+          <span className="font-semibold text-sm text-stone-900 truncate group-hover:text-brand-400 transition-colors">
             {deal.title}
           </span>
           <StatusBadge status={deal.status} />
           {paymentSummary.hasOverdue && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800 border border-red-200/80">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-950/40 text-red-400 border border-red-800/40">
               Overdue
             </span>
           )}

@@ -12,31 +12,35 @@ const MotionLink = motion.create(Link)
 
 interface DealCardProps {
   deal: Deal
-  /** Stagger index for list entrance (dashboard / deals list). */
   motionIndex?: number
 }
 
-export function DealCard({ deal, motionIndex: _motionIndex = 0 }: DealCardProps) {
+export function DealCard({ deal, motionIndex = 0 }: DealCardProps) {
   const prefersReduced = usePrefersReducedMotion()
 
   return (
     <MotionLink
       href={`/deals/${deal.id}` as Route}
-      className="block rounded-2xl border border-line/90 bg-surface-raised p-4 sm:p-5 shadow-card transition-all duration-200 motion-reduce:transition-none hover:border-brand-400/70 hover:shadow-card-hover group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
-      initial={false}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        duration: 0.4,
-        delay: 0,
-        ease: [0.22, 1, 0.36, 1],
-      }}
+      className="block rounded-2xl border border-line/90 bg-surface-raised p-4 sm:p-5 shadow-card transition-shadow duration-200 motion-reduce:transition-none hover:border-brand-700/60 hover:shadow-card-hover group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+      initial={prefersReduced ? false : { opacity: 0, y: 24, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={
+        prefersReduced
+          ? { duration: 0 }
+          : {
+              type: 'spring',
+              stiffness: 340,
+              damping: 26,
+              delay: motionIndex * 0.06,
+            }
+      }
       {...(!prefersReduced
         ? {
             whileHover: {
-              y: -4,
-              transition: { type: 'spring' as const, stiffness: 380, damping: 24 },
+              y: -6,
+              transition: { type: 'spring' as const, stiffness: 380, damping: 22 },
             },
-            whileTap: { scale: 0.99 },
+            whileTap: { scale: 0.97 },
           }
         : {})}
     >
@@ -45,7 +49,7 @@ export function DealCard({ deal, motionIndex: _motionIndex = 0 }: DealCardProps)
           <p className="text-[0.65rem] font-semibold text-stone-500 uppercase tracking-[0.12em] truncate">
             {deal.brandName}
           </p>
-          <h3 className="mt-1 font-display text-base sm:text-lg font-semibold text-stone-900 group-hover:text-brand-800 transition-colors truncate leading-snug">
+          <h3 className="mt-1 font-display text-base sm:text-lg font-semibold text-stone-900 group-hover:text-brand-400 transition-colors truncate leading-snug">
             {deal.title}
           </h3>
         </div>

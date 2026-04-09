@@ -8,13 +8,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const VARIANT_STYLES = {
   primary:
-    'bg-brand-700 text-white shadow-sm hover:bg-brand-800 focus-visible:ring-brand-600 disabled:bg-brand-300 border border-brand-800/20',
+    'bg-brand-700 text-white shadow-sm hover:bg-brand-800 hover:shadow-glow-sm focus-visible:ring-brand-600 disabled:bg-brand-900 border border-brand-600/20 transition-shadow',
   secondary:
-    'bg-surface-raised text-stone-800 border border-line-strong/90 hover:bg-surface focus-visible:ring-stone-400 shadow-sm',
+    'bg-surface-raised text-stone-800 border border-line-strong/70 hover:bg-surface hover:border-line-strong focus-visible:ring-stone-500 shadow-sm',
   danger:
-    'bg-red-700 text-white hover:bg-red-800 focus-visible:ring-red-600 disabled:bg-red-300 shadow-sm',
+    'bg-red-800 text-white hover:bg-red-900 focus-visible:ring-red-600 disabled:bg-red-950 shadow-sm border border-red-700/20',
   ghost:
-    'text-stone-600 hover:text-stone-900 hover:bg-surface-raised/80 focus-visible:ring-stone-400',
+    'text-stone-600 hover:text-stone-900 hover:bg-surface-raised/80 focus-visible:ring-stone-500',
 }
 
 const SIZE_STYLES = {

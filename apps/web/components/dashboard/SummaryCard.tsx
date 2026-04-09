@@ -13,16 +13,23 @@ interface SummaryCardProps {
 
 const ACCENT_STYLES = {
   default: 'bg-surface-raised border-line/90 shadow-card',
-  green: 'bg-surface-raised border-emerald-200/80 shadow-card',
-  red: 'bg-red-50/90 border-red-200/90 shadow-card',
-  yellow: 'bg-amber-50/80 border-amber-200/80 shadow-card',
+  green: 'bg-surface-raised border-emerald-700/40 shadow-card',
+  red: 'bg-surface-raised border-brand-700/50 shadow-card',
+  yellow: 'bg-surface-raised border-amber-700/40 shadow-card',
 }
 
 const VALUE_STYLES = {
   default: 'text-stone-900',
-  green: 'text-emerald-800',
-  red: 'text-red-800',
-  yellow: 'text-amber-900',
+  green: 'text-emerald-400',
+  red: 'text-brand-400',
+  yellow: 'text-amber-300',
+}
+
+const LABEL_ACCENT_STYLES = {
+  default: 'text-stone-500',
+  green: 'text-emerald-600',
+  red: 'text-brand-600',
+  yellow: 'text-amber-500',
 }
 
 export function SummaryCard({
@@ -30,27 +37,39 @@ export function SummaryCard({
   value,
   accent = 'default',
   subtext,
-  motionIndex: _motionIndex = 0,
+  motionIndex = 0,
 }: SummaryCardProps) {
   const prefersReduced = usePrefersReducedMotion()
 
   return (
     <motion.div
       className={`rounded-2xl border p-4 sm:p-5 ${ACCENT_STYLES[accent]}`}
-      initial={false}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        duration: 0.42,
-        delay: 0,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-      {...(!prefersReduced ? { whileHover: { y: -2, transition: { duration: 0.2 } } } : {})}
+      initial={prefersReduced ? false : { opacity: 0, y: 20, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={
+        prefersReduced
+          ? { duration: 0 }
+          : {
+              type: 'spring',
+              stiffness: 360,
+              damping: 28,
+              delay: motionIndex * 0.07,
+            }
+      }
+      {...(!prefersReduced
+        ? {
+            whileHover: {
+              y: -4,
+              transition: { type: 'spring', stiffness: 400, damping: 22 },
+            },
+          }
+        : {})}
     >
-      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-stone-500">
+      <p className={`text-[0.65rem] font-semibold uppercase tracking-[0.14em] ${LABEL_ACCENT_STYLES[accent]}`}>
         {label}
       </p>
       <p
-        className={`mt-2 text-xl sm:text-2xl font-bold tabular-nums tracking-tight ${VALUE_STYLES[accent]}`}
+        className={`mt-2 text-xl sm:text-2xl font-bold tabular-nums tracking-tight ${VALUE_STYLES[accent]} ${accent === 'red' ? 'text-glow-red' : ''}`}
       >
         {value}
       </p>

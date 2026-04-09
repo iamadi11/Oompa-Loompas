@@ -32,7 +32,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <LoginForm redirectFrom={redirectFrom} />
         </div>
         <p className="text-center text-xs text-stone-500">
-          <Link href="/" className="text-brand-800 hover:text-brand-900 font-medium">
+          <Link href="/" className="text-brand-400 hover:text-brand-300 font-medium">
             Back to product page
           </Link>
         </p>

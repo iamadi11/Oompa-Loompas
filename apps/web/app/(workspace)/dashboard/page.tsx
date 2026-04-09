@@ -35,7 +35,7 @@ export default async function HomePage() {
     return (
       <div className="flex flex-col gap-8 py-8 sm:py-14 max-w-xl">
         <div className="space-y-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-800/90">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-600/90">
             Start here
           </p>
           <h1 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-stone-900 leading-[1.15]">
@@ -135,7 +135,7 @@ export default async function HomePage() {
           </h2>
           <Link
             href="/deals"
-            className="text-sm font-semibold text-brand-800 hover:text-brand-900 w-fit rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+            className="text-sm font-semibold text-brand-400 hover:text-brand-300 w-fit rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
           >
             View all
           </Link>
