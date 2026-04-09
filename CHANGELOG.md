@@ -2,6 +2,26 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.2.4] - 2026-04-09
+
+### `@oompa/types` **0.2.4**
+
+- **`DealNextAction`:** type `{ targetStatus, label, description }` for contextual status advance suggestions.
+- **`computeDealNextAction(status, payments, deliverables)`:** pure function — returns the next recommended action for a deal or `null` if none applies. Handles vacuous-truth cases (0 active deliverables → DELIVERED allowed) and excludes CANCELLED deliverables / REFUNDED payments.
+
+### `@oompa/api` **0.2.4**
+
+- **`service.test.ts` fixture fix:** added `shareToken: null` to `serializeDeal` test fixture (pre-existing gap from 0.2.3 when `shareToken` was added to `DbDeal`).
+
+### `@oompa/web` **0.2.4**
+
+- **`DealNextActionBanner`:** contextual banner on the deal detail page that detects when a deal is ready to advance to its next status and offers a one-click CTA. Banner disappears for terminal states (PAID, CANCELLED). Entrance animation (mount-gated fade-up) + button spring hover/tap; respects `prefers-reduced-motion`.
+- **`PriorityActionList`:** promoted to `'use client'` — staggered entrance motion on action items (6ms delay per item); respects `prefers-reduced-motion`.
+
+### Documentation
+
+- [Decision](./docs/decisions/2026-04-09-deal-next-action-prompt.md) · [Architecture](./docs/architecture/deal-next-action-prompt.md) · [UX](./docs/ux/deal-next-action-prompt.md) · [Testing](./docs/testing/deal-next-action-prompt.md) · [Instrumentation](./docs/instrumentation/deal-next-action-prompt.md) · [Release](./docs/releases/RELEASE-0.2.4.md) · [Retro](./docs/retros/2026-04-09-deal-next-action-prompt.md)
+
 ## [0.2.3] - 2026-04-09
 
 ### `@oompa/types` **0.2.3**

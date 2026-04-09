@@ -107,3 +107,84 @@ export type DealListFilters = z.infer<typeof DealListFiltersSchema>
 export function isValidStatusTransition(from: DealStatus, to: DealStatus): boolean {
   return DEAL_STATUS_TRANSITIONS[from].includes(to)
 }
+
+/**
+ * Computes the suggested next status for a deal based on its current state,
+ * payment statuses, and deliverable statuses.
+ *
+ * Purpose: drive the "What should I do next?" banner on the deal detail page.
+ * Inputs:
+ *   status       — current DealStatus
+ *   payments     — array of objects with a `status` string field
+ *   deliverables — array of objects with a `status` string field
+ * Outputs: DealNextAction (targetStatus + label + description) or null if no advance is suggested.
+ * Edge cases:
+ *   - Empty payments/deliverables arrays count as "all done" (vacuously true).
+ *   - CANCELLED deliverables and REFUNDED payments are excluded from blocking conditions.
+ * Failure modes: always returns a value — pure function, no I/O.
+ */
+export type DealNextAction = {
+  targetStatus: DealStatus
+  label: string
+  description: string
+}
+
+export function computeDealNextAction(
+  status: DealStatus,
+  payments: ReadonlyArray<{ status: string }>,
+  deliverables: ReadonlyArray<{ status: string }>,
+): DealNextAction | null {
+  switch (status) {
+    case 'DRAFT':
+      return {
+        targetStatus: 'NEGOTIATING',
+        label: 'Start negotiating',
+        description: 'This deal is in draft. Move it forward when you\'re ready to negotiate.',
+      }
+
+    case 'NEGOTIATING':
+      return {
+        targetStatus: 'ACTIVE',
+        label: 'Mark as Active',
+        description: 'Terms confirmed? Move this deal to Active to start tracking work.',
+      }
+
+    case 'ACTIVE': {
+      // All non-CANCELLED deliverables must be COMPLETED.
+      const activeDeliverables = deliverables.filter((d) => d.status !== 'CANCELLED')
+      const allDone = activeDeliverables.every((d) => d.status === 'COMPLETED')
+      if (allDone) {
+        return {
+          targetStatus: 'DELIVERED',
+          label: 'Mark as Delivered',
+          description:
+            activeDeliverables.length > 0
+              ? 'All deliverables are complete. Mark this deal as delivered.'
+              : 'Ready to mark this deal as delivered?',
+        }
+      }
+      return null
+    }
+
+    case 'DELIVERED': {
+      // All non-REFUNDED payments must be RECEIVED.
+      const activePayments = payments.filter((p) => p.status !== 'REFUNDED')
+      const allReceived = activePayments.every((p) => p.status === 'RECEIVED')
+      if (allReceived) {
+        return {
+          targetStatus: 'PAID',
+          label: 'Close deal',
+          description:
+            activePayments.length > 0
+              ? 'All payments received. Close this deal.'
+              : 'Ready to close this deal?',
+        }
+      }
+      return null
+    }
+
+    case 'PAID':
+    case 'CANCELLED':
+      return null
+  }
+}

@@ -1,264 +1,257 @@
 # CLAUDE.md — AI Development Rules
 
-> Derived from SOURCE_OF_TRUTH.md (v1.1.0, immutable).
-> In any conflict: SOURCE_OF_TRUTH.md wins.
-> This file governs ALL autonomous and AI-assisted work in this repository.
+> Authority: SOURCE_OF_TRUTH.md (v1.2.0). In conflict: SOT wins.
+> Version: 2.0 — compressed for token efficiency, inline architectural knowledge.
 
 ---
 
-## 0. AUTHORITY
+## 0. MANDATORY FIRST STEP
 
-`SOURCE_OF_TRUTH.md` is the single decision authority for this project.
-Read it before any ambiguous decision. Default to: **user outcome → determinism → simplicity**.
+**Use code-review-graph MCP before ANY file read/search.**
 
----
-
-## 1. CONTEXT OPTIMIZATION (NON-NEGOTIABLE)
-
-**ALWAYS use code-review-graph MCP BEFORE any file search or read.**
-
-| Goal | Use |
-|------|-----|
-| Explore code / find symbols | `semantic_search_nodes` or `query_graph` |
+| Goal | Tool |
+|------|------|
+| Find symbols / explore code | `semantic_search_nodes` or `query_graph` |
 | Understand change impact | `get_impact_radius` |
-| Review a change | `detect_changes` + `get_review_context` |
-| Trace callers/callees/tests | `query_graph` with pattern |
+| Review changes | `detect_changes` + `get_review_context` |
+| Find callers / tests | `query_graph` pattern=`callers_of` / `tests_for` |
 | Architecture overview | `get_architecture_overview` + `list_communities` |
-| Execution paths | `get_affected_flows` |
 | Renames / dead code | `refactor_tool` |
+| After bulk edits | `build_or_update_graph` |
 
-Fall back to Grep/Glob/Read **only** when the graph cannot satisfy the query (missing symbol, generated file, config outside graph, human-specified path).
-
-**Full-repo reads are forbidden.** Never grep the entire repo when a graph query suffices.
+Full-repo grep/glob/read = **FORBIDDEN** when graph suffices.
 
 ---
 
-## 2. MANDATORY EXECUTION WORKFLOW
-
-Every implementation task MUST follow these steps in order. No step may be skipped.
+## 1. EXECUTION WORKFLOW (ALL 8 STEPS, NO SKIPS)
 
 ```
-1. RESEARCH   → technical feasibility, UX validation, alternatives (§6)
-2. PLAN       → scope, approach, risks, rollback sketch if stateful
-3. TEST FIRST → define acceptance criteria, cases, failure modes before writing code
-4. IMPLEMENT  → small, incremental units only
-5. TEST       → run automated tests; fix until green (≥90% coverage)
-6. VALIDATE   → real browser for UI; full user flow for features
+1. RESEARCH   → feasibility, UX, alternatives; primary sources cited
+2. PLAN       → scope, risks, rollback sketch
+3. TEST FIRST → acceptance criteria + failure modes before any code
+4. IMPLEMENT  → small atomic units; each compiles + tests pass
+5. TEST RUN   → all green, ≥90% coverage
+6. VALIDATE   → real browser (preview_* tools); full user flow
 7. DOCUMENT   → purpose, inputs, outputs, edge cases, failure modes
-8. INSTRUMENT → confirm post-deploy measurement or learning milestone for outcome-bearing work
+8. INSTRUMENT → post-deploy signal or learning milestone (outcome work only)
 ```
 
-**No research → no development.** If research is missing, do it first.
+No research → no development. No test definition → no implementation.
 
 ---
 
-## 3. AUTONOMY RULES
+## 2. SYSTEM: WHAT IS BUILT (inline knowledge — no docs read needed)
 
-- **Proceed without asking.** Only escalate to human when:
-  1. Blocked after all retry approaches are exhausted
-  2. Ambiguity genuinely cannot be resolved deterministically
-  3. Organizational policy requires human approval (credentials, legal, app store)
+**Stack:** TypeScript strict, Next.js 16 PWA (Serwist), Fastify API, PostgreSQL, Redis-ready, **Framer Motion** (all animations — respect `prefers-reduced-motion` via `useReducedMotion()`).
 
-- **On failure:** retry with alternative approach → escalate to planner → mark blocked with reasoning. No silent failures.
+### Domain Model (Deal is root entity)
+```
+User → Deal (1:many)
+Deal → Payment (1:many)   ← invoice, reminder, overdue detection
+Deal → Deliverable (1:many) ← completion tracking, overdue detection
+Deal → shareToken (nullable) ← public read-only proposal URL /p/:token
+```
 
-- **Small changes only.** Each change must: compile, pass tests, be reversible.
+### Deal Lifecycle
+`DRAFT → NEGOTIATING → ACTIVE → DELIVERED → PAID` (or `CANCELLED` at any point).
+Smart next-action banner on `/deals/:id` prompts status advance:
+- DRAFT → NEGOTIATING: always
+- NEGOTIATING → ACTIVE: always
+- ACTIVE → DELIVERED: all non-cancelled deliverables COMPLETED (or 0 deliverables)
+- DELIVERED → PAID: all non-refunded payments RECEIVED (or 0 payments)
+- PAID/CANCELLED: no banner
 
-- **Priority order when conflicts arise:**
-  1. User Outcome (revenue impact)
-  2. System Determinism
-  3. Simplicity
-  4. Developer Velocity
-  5. Extensibility
+### Overdue Rules (centralized in `@oompa/types`)
+- Payment overdue: `dueDate < now && status NOT IN (RECEIVED, REFUNDED)` → `computeIsOverdue()`
+- Deliverable overdue: `dueDate < now && status NOT IN (COMPLETED, CANCELLED)` → `computeIsDeliverableOverdue()`
+- Next action: `computeDealNextAction(status, payments, deliverables) → DealNextAction | null`
+- Payment summary: `computePaymentSummary(dealValue, payments) → { totalContracted, totalReceived, totalOutstanding, hasOverdue }`
 
-- **If forced to choose:** Speed vs Correctness → Correctness | Flexibility vs Simplicity → Simplicity | Automation vs Control → Automation | Intelligence vs Trust → Trust
+### API Surface
+- `GET/POST/PATCH/DELETE /api/v1/deals` — CRUD, filter `?status=`, `?needsAttention=true`
+- `GET/POST/PATCH/DELETE /api/v1/deals/:id/payments` + `GET/PATCH/DELETE /api/v1/payments/:id`
+- `GET /api/v1/deals/:id/payments/:paymentId/invoice` — deterministic HTML invoice (no auth required for link, but session checked)
+- `POST/DELETE /api/v1/deals/:id/share` → generate/revoke share token
+- `GET /api/v1/share/:token` (PUBLIC) — DealProposalView
+- `GET /api/v1/dashboard` — aggregated summary + 10 priority actions
+- `GET /api/v1/attention` — full priority actions (unbounded)
+- `POST/POST/GET /api/v1/auth/login|logout|me`
+
+### Priority Actions Ordering
+Sort: oldest dueDate first → payments before deliverables → alphabetical ID tiebreak. Dashboard: cap 10. Attention: unbounded.
+
+### Invoice
+- Sequential `INV-########` persisted on `payments.invoice_number`
+- Issuer env: `INVOICE_ISSUER_NAME`, `INVOICE_ISSUER_ADDRESS`, `INVOICE_PLACE_OF_SUPPLY`
+- Network-only — never cache financial artifacts offline
+
+### PWA / Offline Rules
+- Serwist service worker: precache static assets only
+- All `/api/*`: network-only (NEVER serve stale financial data)
+- Offline on revenue paths: show deterministic "connection required" banner
+- Motion: `useReducedMotion()` disables animations when user prefers
+
+### Auth & Tenancy
+- Session cookie (HTTP-only). No JWT in localStorage.
+- All deal/payment/deliverable endpoints scoped to `req.authUser.id`
+- Public routes: marketing landing, `/p/:token` proposal page, `/api/v1/share/:token`
+
+### Error State Rules
+- Home: API failure → "unavailable" state. Zero deals → "empty portfolio" state. Never conflate.
+- Needs attention, 0 overdue → "You're all caught up" (not generic empty)
+- Zero deals → "No deals yet" + "Add deal" CTA
 
 ---
 
-## 4. ARCHITECTURE (FINAL — DO NOT DEVIATE)
+## 3. ARCHITECTURE CONSTRAINTS
 
-- **Modular Monolith** inside a **Monorepo**. Not microservices, not polyrepo, not serverless-first.
+- **Modular Monolith + Monorepo.** Not microservices / serverless-first / polyrepo.
 - Modules: `Deal`, `Payment`, `Deliverable`, `Notification`, `Intelligence`
 - Data flow: `Input → Validate → Normalize → Process → Output` — no step skipped
-- **No cross-module leakage.** No circular dependencies.
-- **Composition over inheritance.** Explicit contracts only.
-- Breaking changes to module boundaries or public APIs require migration path + in-repo notes for all consumers.
+- No cross-module leakage. No circular deps. Composition over inheritance.
+- Shared types/contracts in `/packages/types` only — never duplicated.
+- Breaking contract changes: migration path + in-repo consumer notes required.
 
 ```
-/apps/web        → Next.js frontend
-/apps/api        → Fastify backend
-/apps/worker     → Background workers
-/packages/ui     → Shared UI components
-/packages/db     → Database layer
-/packages/types  → Shared types
-/packages/utils  → Shared utilities
-/packages/config → Shared config
-/infra           → Infrastructure
-/docs            → Documentation
+/apps/web     → Next.js 16, React 19, Tailwind CSS, Framer Motion, Serwist PWA
+/apps/api     → Fastify, Zod, Prisma
+/apps/worker  → (Phase 2) BullMQ
+/packages/db  → Prisma schema + migrations + seed
+/packages/types → Zod schemas + pure business logic functions (NO side effects)
+/packages/utils → formatCurrency, buildPaymentReminderMessage
+/packages/config → shared ESLint + TS config
 ```
 
 ---
 
-## 5. STACK & STANDARDS
+## 4. UX & MOTION RULES
 
-- **TypeScript (strict mode mandatory)** — no `any`, no implicit types
-- **Next.js** (web), **Fastify** (API), **PostgreSQL** (DB), **Redis** (cache/queue)
-- **ESLint + Prettier enforced** — must pass before merge
-- Shared types/contracts live in `/packages/types`; never duplicated across packages
-
----
-
-## 6. TESTING REQUIREMENTS
-
-- **≥90% coverage** — non-negotiable
-- **Three layers required:** Unit → Integration → End-to-End
-- **Deterministic outputs only** — no flaky tests
-- **Edge cases required** — not optional
-- **Every bug must include:** failing test + fix + regression protection (§5.3)
-- Tests for a module must be checked via `query_graph pattern="tests_for"` before claiming coverage
+- Every screen answers: **"What should I do next?"**
+- `<100ms` perceived response — optimistic updates
+- **Framer Motion** for: page transitions, card enters, state changes, success celebrations, list reorders
+- `useReducedMotion()` wraps all motion — graceful static fallback always provided
+- WCAG 2.2 AA on all flows; revenue paths keyboard-operable + visible focus
+- Real browser validation mandatory (use `preview_*` tools — never skip)
+- Feel: intentional, premium, human-crafted — NOT generated/templated/cluttered
+- `aria-current="page"` on active nav links. Document title = active view.
+- Mobile-first. Test on 375px viewport.
 
 ---
 
-## 7. RELEASE GATES (must all pass before merge/deploy)
+## 5. TESTING
 
-1. CI passes: typecheck + lint + full test suite for affected packages
-2. Database/schema migrations are forward-compatible OR have explicit rollback plan
-3. User-facing changes pass real-browser validation (§7.5)
-4. Outcome-bearing features have documented post-deploy measurement (§2.5)
-5. Performance budgets on core routes not breached (§7.7) — or justification recorded
-6. No secrets or credentials in source, logs, or agent output
+- **≥90% coverage** on all changed packages
+- Unit → Integration → E2E (E2E waiver Phase 1; compensating: API tests + coverage + browser MCP checklists)
+- Every bug: failing test + fix + regression protection
+- Deterministic outputs only — no flaky tests
 
 ---
 
-## 8. SECURITY & SECRETS
+## 6. RELEASE GATES (all must pass)
 
-- **Secrets live only in:** environment variables, secret managers, platform stores
-- **Never in:** source code, prompts, logs, agent transcripts, CLAUDE.md
-- Dependency changes use locked manifests; high-risk upgrades require explicit verification
-- Auth, authorization, PII boundaries must be explicit in module contracts
-- Agents must NOT broaden data access "for convenience"
-
----
-
-## 9. ANTI-PATTERNS (FORBIDDEN — ZERO TOLERANCE)
-
-Never do any of the following:
-
-- Build without research first
-- Implement before test definition
-- Large untested changes (keep changes small and atomic)
-- Assumption-driven logic (no hidden assumptions, no implicit state)
-- Cross-module leakage or circular dependencies
-- Secrets in source, logs, or output
-- Full-repo grep/glob/read when code-review-graph suffices
-- Outcome-bearing features without post-deploy measurement
-- Breaking module contracts without migration + deprecation notice
-- Core revenue paths shipped below WCAG 2.2 AA without recorded exception
-- Merging web changes that breach documented performance budgets without justification
-- Silent failures at any layer
-- Non-deterministic behavior
-- Force-pushing to main/master
+1. `pnpm typecheck` clean
+2. `pnpm lint` clean
+3. `pnpm test` green, ≥90% coverage affected packages
+4. DB migrations forward-compatible or rollback documented
+5. Real browser validation complete
+6. Performance budgets within targets or justification recorded
+7. No secrets in source/logs/output
+8. `detect_changes` + `get_affected_flows` confirm impact covered
+9. Post-deploy signal defined for outcome-bearing features
+10. Semantic version bump + CHANGELOG entry
 
 ---
 
-## 10. UX RULES
-
-- Every screen must answer: **"What should I do next?"**
-- Perceived response: **<100ms** — use optimistic updates
-- **WCAG 2.2 Level AA** on all user-facing flows; core revenue paths (onboarding, deals, payments, invoicing) must be keyboard-operable with visible focus
-- Real browser testing is mandatory for UI changes — not optional
-- The product must feel: intentional, premium, human-crafted — NOT generated or templated
-- **Web / PWA (§7.8):** Installable web client with deterministic offline messaging for revenue paths; shell, motion, and reduced-motion rules in `docs/ux/web-shell-pwa.md` and `docs/architecture/pwa-web-client.md`
-
----
-
-## 11. BUILD vs REJECT DECISION
-
-Before building anything, ALL must be true:
-1. Increases revenue OR reduces risk
-2. Can be automated OR reduces manual effort
-3. Is the simplest viable system
-
-If any fail → reject or redesign. Do not build it.
-
-**Kill a feature if:**
-- No measurable revenue impact within 2 iterations
-- Increases cognitive load without outcome gain
-- Introduces non-deterministic behavior
-
----
-
-## 12. DOCUMENTATION STANDARD
-
-Every component must define in its documentation:
-- Purpose
-- Inputs
-- Outputs
-- Edge cases
-- Failure modes
-
----
-
-## 13. OBSERVABILITY
-
-All outcome-bearing features require before shipping:
-- Named events, metrics, or queries tied to the hypothesis
-- Baseline or comparison path where practical
-- Staged rollout or feature flags for payment/pricing/UX material changes
-
-Post-deploy: confirm health via logs + metrics + tracing. If error rates or latency breach thresholds, execute rollback before speculative fixes.
-
----
-
-## 14. MULTI-AGENT ROLES (NO OVERLAP)
+## 7. AGENT ROLES (no overlap)
 
 | Agent | Responsibility |
 |-------|---------------|
-| Planner | Decomposes goals into atomic tasks; defines inputs, outputs, success criteria |
-| Researcher | Validates technical feasibility; produces structured research artifact |
-| Developer | Implements (small units only); runs tests until green |
-| Tester | Validates test coverage; writes missing tests |
-| Reviewer | Runs `detect_changes` + `get_review_context`; checks contracts and anti-patterns |
-| Optimizer | Identifies inefficiencies; suggests and applies safe refactors |
-
-Strict I/O contracts between agents. Schema-defined communication only.
+| Planner | Decompose goals into atomic tasks; define I/O + success criteria |
+| Researcher | Feasibility + alternatives; structured artifact output |
+| Developer | Small atomic units; tests green before handoff |
+| Tester | Coverage verification + missing tests + regression protection |
+| Reviewer | `detect_changes` + `get_review_context`; contract + anti-pattern audit |
+| Optimizer | Dead code, perf improvements, safe refactors |
 
 ---
 
-## 15. DATA STEWARDSHIP
+## 8. BUILD vs REJECT
 
-- Collect minimum data required for stated outcomes — new fields need a stated purpose
-- Retention and deletion expectations must be documented per domain
-- Do NOT infer consent, shorten retention, or bypass policy for velocity
-- Cross-border data handling must follow a strategy recorded in `/docs`
+Build only if ALL true:
+1. Increases revenue OR reduces risk
+2. Automates or meaningfully reduces manual effort
+3. Simplest viable system
 
----
-
-## 16. CODE-REVIEW-GRAPH MCP TOOLS
-
-| Tool | When to use |
-|------|------------|
-| `detect_changes` | Before any review — risk-scored change analysis |
-| `get_review_context` | Source snippets for review — token-efficient |
-| `get_impact_radius` | Before any refactor or breaking change |
-| `get_affected_flows` | Which execution paths are impacted |
-| `query_graph` | Callers, callees, imports, tests, dependencies |
-| `semantic_search_nodes` | Find functions/classes by name or keyword |
-| `get_architecture_overview` | High-level codebase structure |
-| `list_communities` | Major module breakdown |
-| `refactor_tool` | Renames, dead code detection |
-| `build_or_update_graph` | After bulk file changes |
-| `list_graph_stats` | Verify graph is built and current |
-
-The graph auto-updates via PostToolUse hook on Edit/Write/Bash.
+Kill if: no measurable revenue impact in 2 iterations, OR increases cognitive load without outcome gain, OR introduces non-deterministic behavior.
 
 ---
 
-## 17. HUMAN ESCALATION (LAST RESORT ONLY)
+## 9. SECURITY & DATA
 
-Only escalate when ALL of the following are true:
-1. Tried at least two different approaches
-2. Failure is documented with reasoning
-3. Cannot be resolved deterministically from SOURCE_OF_TRUTH.md
-4. Or: organizational policy explicitly requires human approval
+- Secrets: env vars / secret managers ONLY — never source, prompts, logs, transcripts
+- Locked dependency manifests; verify high-risk upgrades explicitly
+- Minimum data collection — new fields need stated purpose
+- Agents must NOT broaden data access "for convenience"
+- Production data must NOT go to external LLMs without contract + written policy
 
-In all other cases → **proceed autonomously**.
+---
+
+## 10. AUTONOMY
+
+Proceed without asking. Escalate ONLY when:
+1. Blocked after 2+ retry approaches (document all)
+2. Ambiguity cannot be deterministically resolved from SOURCE_OF_TRUTH.md
+3. Org policy requires human approval (credentials, legal, app store)
+
+Priority when conflicts: **User Outcome > Determinism > Simplicity > Dev Velocity > Extensibility**
+
+---
+
+## 11. PHASE ROADMAP (current: Phase 1 completion → Phase 2)
+
+**Phase 1 — Deal + Payment Intelligence**
+- [x] Deal CRUD + status lifecycle + pipeline strip
+- [x] Payment milestones + overdue detection + invoice HTML
+- [x] Deliverable tracking
+- [x] Dashboard + priority actions + attention queue
+- [x] Clipboard payment reminder
+- [x] Shareable proposal link
+- [x] Deal next-action prompt (smart status advance)
+- [ ] **Email-to-deal capture** (CRITICAL — removes 80% of creation friction)
+- [ ] **Scheduled payment reminders** (email/push — closes the revenue loop)
+- [ ] Client/brand profiles (CRM lite)
+- [ ] Deal duplication + templates
+- [ ] CSV export (accountant workflow)
+
+**Phase 2 — Workflow Automation**
+- [ ] BullMQ worker process + job queue
+- [ ] Email reminder automation
+- [ ] Multi-user workspace (manager access)
+- [ ] Payment reconciliation (bank match → deal)
+- [ ] PWA push notifications
+
+**Phase 3 — Pricing Intelligence**
+- [ ] Explainable rate floor (rules-first; history required; never black-box)
+- [ ] Deal risk scoring (brand payment behavior)
+
+**Phase 4 — Financial Infrastructure**
+- [ ] Payment processor integration
+- [ ] Invoice-to-payment reconciliation
+- [ ] Multi-currency conversion
+
+---
+
+## 12. ANTI-PATTERNS (ZERO TOLERANCE)
+
+- Build without research first
+- Implement before test definition
+- Large untested changes
+- `any` types or implicit types
+- Cross-module leakage or circular dependencies
+- Secrets in source / logs / agent output
+- Full-repo grep/glob when graph suffices
+- Outcome-bearing features without post-deploy measurement
+- Black-box AI decisions on money or contracts
+- Silent failures at any layer
+- Force-push to main
+- Stale financial data served offline

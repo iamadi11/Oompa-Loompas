@@ -6,6 +6,7 @@ import { StatusBadge } from '@/components/ui/Badge'
 import { DealForm } from '@/components/deals/DealForm'
 import { DealNotFoundContent } from '@/components/deals/DealNotFoundContent'
 import { ShareProposalButton } from '@/components/deals/ShareProposalButton'
+import { DealNextActionBanner } from '@/components/deals/DealNextActionBanner'
 import { PaymentSection } from '@/components/payments/PaymentSection'
 import { DeliverableSection } from '@/components/deliverables/DeliverableSection'
 import { serverApiFetch } from '@/lib/server-api-fetch'
@@ -89,6 +90,13 @@ export default async function DealDetailPage({ params }: Props) {
           {formatCurrency(deal.value, deal.currency)}
         </p>
       </div>
+
+      <DealNextActionBanner
+        dealId={deal.id}
+        dealStatus={deal.status}
+        payments={payments}
+        deliverables={deliverables}
+      />
 
       <div className={panelClass}>
         <DeliverableSection dealId={deal.id} initialDeliverables={deliverables} />

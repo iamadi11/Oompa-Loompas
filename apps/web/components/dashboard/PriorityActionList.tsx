@@ -1,8 +1,14 @@
+'use client'
+
 import Link from 'next/link'
+import { motion } from 'motion/react'
 import type { DashboardPriorityAction } from '@oompa/types'
 import { formatCurrency } from '@oompa/utils'
 import { RelativeDueLabel } from '@/components/datetime/RelativeDueLabel'
 import { CopyPaymentReminderButton } from '@/components/payments/CopyPaymentReminderButton'
+import { usePrefersReducedMotion } from '@/lib/motion/use-prefers-motion'
+
+const MotionLi = motion.li
 
 type Props = {
   actions: DashboardPriorityAction[]
@@ -11,10 +17,21 @@ type Props = {
 }
 
 export function PriorityActionList({ actions, className }: Props) {
+  const prefersReduced = usePrefersReducedMotion()
+
   return (
     <ul role="list" className={className ?? 'flex flex-col gap-2'}>
-      {actions.map((action) => (
-        <li key={actionKey(action)}>
+      {actions.map((action, i) => (
+        <MotionLi
+          key={actionKey(action)}
+          initial={false}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            duration: 0.3,
+            delay: prefersReduced ? 0 : i * 0.06,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+        >
           {action.kind === 'overdue_payment' ? (
             <div className="flex flex-col gap-2 rounded-xl border border-amber-200/70 bg-surface-raised p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-3">
               <Link
@@ -55,7 +72,7 @@ export function PriorityActionList({ actions, className }: Props) {
               </span>
             </Link>
           )}
-        </li>
+        </MotionLi>
       ))}
     </ul>
   )
