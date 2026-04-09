@@ -1,0 +1,5 @@
+{
+  "framework": "nextjs",
+  "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
+  "buildCommand": "cd ../.. && pnpm --filter @oompa/types build && pnpm --filter @oompa/utils build && pnpm --filter @oompa/web build"
+}
