@@ -271,6 +271,34 @@ describe('ApiClient', () => {
     })
   })
 
+  it('downloadDealsPortfolioCsv GETs export without JSON headers and returns blob', async () => {
+    const csv = 'deal_id,title\n'
+    fetchMock.mockResolvedValueOnce(
+      new Response(new Blob([csv], { type: 'text/csv' }), {
+        status: 200,
+        headers: { 'Content-Type': 'text/csv; charset=utf-8' },
+      }),
+    )
+    const blob = await api.downloadDealsPortfolioCsv()
+    expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/deals/export', {
+      credentials: 'include',
+    })
+    expect(blob.type).toMatch(/^text\/csv/)
+    expect(await blob.text()).toBe(csv)
+  })
+
+  it('downloadDealsPortfolioCsv throws with server JSON message when not ok', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ message: 'Forbidden' }, { ok: false, status: 403 }))
+    await expect(api.downloadDealsPortfolioCsv()).rejects.toThrow('Forbidden')
+  })
+
+  it('downloadDealsPortfolioCsv throws helpful message on non-JSON 5xx', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response('Bad Gateway', { status: 502, statusText: 'Bad Gateway' }),
+    )
+    await expect(api.downloadDealsPortfolioCsv()).rejects.toThrow(/Could not reach the API/)
+  })
+
   it('login POSTs credentials', async () => {
     fetchMock.mockResolvedValueOnce(
       jsonResponse({ data: { id: 'u1', email: 'a@b.co', roles: ['ADMIN'] } }),

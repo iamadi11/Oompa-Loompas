@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import type { Deal, DealStatus } from '@oompa/types'
 import { DealList } from '@/components/deals/DealList'
 import { DealPipelineStrip } from '@/components/deals/DealPipelineStrip'
+import { ExportDealsCsvButton } from '@/components/deals/ExportDealsCsvButton'
 import {
   isDealsNeedsAttentionFilter,
   getDealStatusFilter,
@@ -138,27 +139,32 @@ export default async function DealsPage({ searchParams }: Props) {
           </h1>
           <p className="text-sm text-stone-600 mt-1">{dealCountLabel}</p>
         </div>
-        {!loadError && (needsAttention || allDeals.length > 0) && (
-          <Link
-            href="/deals/new"
-            className="inline-flex w-fit items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-700 text-white text-sm font-semibold shadow-sm border border-brand-800/20 hover:bg-brand-800 transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            Add deal
-          </Link>
+        {!loadError && (
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end sm:gap-3 w-full sm:w-auto">
+            <ExportDealsCsvButton />
+            {(needsAttention || allDeals.length > 0) && (
+              <Link
+                href="/deals/new"
+                className="inline-flex w-fit items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-700 text-white text-sm font-semibold shadow-sm border border-brand-800/20 hover:bg-brand-800 transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                Add deal
+              </Link>
+            )}
+          </div>
         )}
       </div>
       <DealList

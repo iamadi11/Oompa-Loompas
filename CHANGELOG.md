@@ -2,6 +2,25 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.4.1] - 2026-04-11
+
+### `@oompa/utils` **0.2.0**
+
+- **`buildDealsPortfolioCsv` / `escapeCsvCell` / `dealsPortfolioExportFilename`:** deterministic RFC 4180-style CSV builder for deal portfolio rows (CRLF; quoted fields when needed).
+
+### `@oompa/api` **0.4.1**
+
+- **`GET /api/v1/deals/export`:** authenticated download of all deals for the session user as UTF-8 CSV (BOM-prefixed for Excel). Columns: deal id, title, brand, status, contract value, currency, dates, notes. Ordered by `createdAt` descending; capped at 5000 rows per export.
+
+### `@oompa/web` **0.4.1**
+
+- **`ExportDealsCsvButton`:** deals list header action; same-origin fetch with session cookie, then browser download via object URL.
+- **`api.downloadDealsPortfolioCsv()`:** binary GET helper (no JSON `Content-Type` on request).
+
+### Documentation
+
+- [Decision](./docs/decisions/2026-04-11-deals-portfolio-csv-export.md) · [Architecture](./docs/architecture/deals-portfolio-csv-export.md) · [UX](./docs/ux/deals-portfolio-csv-export.md) · [Testing](./docs/testing/deals-portfolio-csv-export.md) · [Instrumentation](./docs/instrumentation/deals-portfolio-csv-export.md) · [Release](./docs/releases/RELEASE-0.4.1.md) · [Retro](./docs/retros/2026-04-11-deals-portfolio-csv-export.md)
+
 ## [0.4.0] - 2026-04-10
 
 ### `@oompa/api` **0.4.0**

@@ -220,8 +220,9 @@ Priority when conflicts: **User Outcome > Determinism > Simplicity > Dev Velocit
 - [ ] **Email-to-deal capture** (CRITICAL — removes 80% of creation friction)
 - [ ] **Scheduled payment reminders** (email/push — closes the revenue loop)
 - [ ] Client/brand profiles (CRM lite)
-- [ ] Deal duplication + templates
-- [ ] CSV export (accountant workflow)
+- [x] Deal duplication
+- [ ] Deal templates
+- [x] CSV export (accountant workflow)
 
 **Phase 2 — Workflow Automation**
 - [ ] BullMQ worker process + job queue

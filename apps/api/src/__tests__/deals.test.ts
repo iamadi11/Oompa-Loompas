@@ -123,6 +123,48 @@ describe('GET /api/v1/deals', () => {
   })
 })
 
+describe('GET /api/v1/deals/export', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
+  })
+
+  it('returns 200 CSV with BOM, disposition attachment, and scoped query', async () => {
+    mockPrisma.deal.findMany.mockResolvedValue([mockDeal])
+
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'GET',
+      url: '/api/v1/deals/export',
+      headers: auth,
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(String(response.headers['content-type'])).toContain('text/csv')
+    expect(String(response.headers['content-disposition'])).toMatch(/^attachment;/)
+    expect(response.body.startsWith('\uFEFF')).toBe(true)
+    expect(response.body).toContain('deal_id')
+    expect(response.body).toContain(mockDeal.id)
+    expect(mockPrisma.deal.findMany).toHaveBeenCalledWith({
+      where: { userId: TEST_USER_ID },
+      orderBy: { createdAt: 'desc' },
+      take: 5000,
+    })
+    await fastify.close()
+  })
+
+  it('returns 401 when not authenticated', async () => {
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'GET',
+      url: '/api/v1/deals/export',
+    })
+
+    expect(response.statusCode).toBe(401)
+    await fastify.close()
+  })
+})
+
 describe('GET /api/v1/deals/:id', () => {
   beforeEach(() => {
     vi.clearAllMocks()

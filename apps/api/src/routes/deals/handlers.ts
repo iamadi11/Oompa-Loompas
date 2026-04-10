@@ -6,7 +6,7 @@ import {
   type DealListFilters,
   isValidStatusTransition,
 } from '@oompa/types'
-import { validate } from '@oompa/utils'
+import { buildDealsPortfolioCsv, dealsPortfolioExportFilename, validate } from '@oompa/utils'
 import { CreateDealSchema, UpdateDealSchema, DealListFiltersSchema } from './schema.js'
 import { buildDealWhere, serializeDeal, toCreateDealData, toUpdateDealData } from './service.js'
 import {
@@ -17,6 +17,32 @@ import {
   sendError,
 } from '../../lib/errors.js'
 import { generateShareToken } from '../../lib/share-token.js'
+
+/** Hard cap so export stays bounded under pathological portfolios. */
+const DEALS_EXPORT_MAX = 5000
+
+export async function exportDealsCsv(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
+  const rows = await prisma.deal.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+    take: DEALS_EXPORT_MAX,
+  })
+
+  const serialized = rows.map(serializeDeal)
+  const body = `\uFEFF${buildDealsPortfolioCsv(serialized)}`
+  const filename = dealsPortfolioExportFilename(new Date())
+
+  void reply
+    .header('Content-Type', 'text/csv; charset=utf-8')
+    .header('Content-Disposition', `attachment; filename="${filename}"`)
+    .status(200)
+    .send(body)
+}
 
 export async function listDeals(
   request: FastifyRequest<{ Querystring: DealListFilters }>,
