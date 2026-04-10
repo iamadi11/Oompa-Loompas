@@ -28,6 +28,7 @@ const mockDeal = {
   startDate: null,
   endDate: null,
   notes: null,
+  shareToken: null,
   createdAt: new Date('2026-04-04T00:00:00.000Z'),
   updatedAt: new Date('2026-04-04T00:00:00.000Z'),
 }
@@ -391,6 +392,175 @@ describe('DELETE /api/v1/deals/:id', () => {
     })
 
     expect(response.statusCode).toBe(404)
+    await fastify.close()
+  })
+})
+
+describe('POST /api/v1/deals/:id/duplicate', () => {
+  const mockDealWithRelations = {
+    ...mockDeal,
+    payments: [
+      {
+        id: 'pay-1',
+        dealId: mockDeal.id,
+        amount: { toNumber: () => 40000, toString: () => '40000' },
+        currency: 'INR',
+        status: 'PENDING',
+        dueDate: null,
+        receivedAt: null,
+        notes: 'Advance',
+        invoiceNumber: null,
+        createdAt: new Date('2026-04-04T00:00:00.000Z'),
+        updatedAt: new Date('2026-04-04T00:00:00.000Z'),
+      },
+    ],
+    deliverables: [
+      {
+        id: 'del-1',
+        dealId: mockDeal.id,
+        title: 'Instagram Reel',
+        platform: 'INSTAGRAM',
+        type: 'REEL',
+        dueDate: null,
+        status: 'PENDING',
+        completedAt: null,
+        notes: null,
+        createdAt: new Date('2026-04-04T00:00:00.000Z'),
+        updatedAt: new Date('2026-04-04T00:00:00.000Z'),
+      },
+    ],
+  }
+
+  const mockNewDeal = {
+    id: '550e8400-e29b-41d4-a716-000000000001',
+    title: 'Nike Reel Campaign (Copy)',
+    brandName: 'Nike',
+    value: { toNumber: () => 80000, toString: () => '80000' },
+    currency: 'INR',
+    status: 'DRAFT',
+    startDate: null,
+    endDate: null,
+    notes: null,
+    shareToken: null,
+    createdAt: new Date('2026-04-10T00:00:00.000Z'),
+    updatedAt: new Date('2026-04-10T00:00:00.000Z'),
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
+  })
+
+  it('duplicates a deal and returns 201 with new deal data', async () => {
+    mockPrisma.deal.findFirst.mockResolvedValue(mockDealWithRelations)
+    mockPrisma.deal.create.mockResolvedValue(mockNewDeal)
+
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'POST',
+      url: `/api/v1/deals/${mockDeal.id}/duplicate`,
+      headers: auth,
+    })
+
+    expect(response.statusCode).toBe(201)
+    const body = response.json()
+    expect(body.data.title).toBe('Nike Reel Campaign (Copy)')
+    expect(body.data.status).toBe('DRAFT')
+    expect(body.data.shareToken).toBeNull()
+    await fastify.close()
+  })
+
+  it('creates duplicate with DRAFT status regardless of source status', async () => {
+    mockPrisma.deal.findFirst.mockResolvedValue({ ...mockDealWithRelations, status: 'PAID' })
+    mockPrisma.deal.create.mockResolvedValue(mockNewDeal)
+
+    const fastify = await buildServer()
+    await fastify.inject({
+      method: 'POST',
+      url: `/api/v1/deals/${mockDeal.id}/duplicate`,
+      headers: auth,
+    })
+
+    expect(mockPrisma.deal.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ status: 'DRAFT' }),
+      }),
+    )
+    await fastify.close()
+  })
+
+  it('clears startDate, endDate and does not inherit shareToken', async () => {
+    const shareToken = 'a'.repeat(64)
+    mockPrisma.deal.findFirst.mockResolvedValue({
+      ...mockDealWithRelations,
+      startDate: new Date('2026-05-01'),
+      endDate: new Date('2026-06-01'),
+      shareToken,
+    })
+    mockPrisma.deal.create.mockResolvedValue(mockNewDeal)
+
+    const fastify = await buildServer()
+    await fastify.inject({
+      method: 'POST',
+      url: `/api/v1/deals/${mockDeal.id}/duplicate`,
+      headers: auth,
+    })
+
+    expect(mockPrisma.deal.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ startDate: null, endDate: null }),
+      }),
+    )
+    // shareToken must not appear in the create payload
+    expect(mockPrisma.deal.create).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ shareToken: expect.anything() }),
+      }),
+    )
+    await fastify.close()
+  })
+
+  it('works for deal with no payments or deliverables', async () => {
+    mockPrisma.deal.findFirst.mockResolvedValue({
+      ...mockDealWithRelations,
+      payments: [],
+      deliverables: [],
+    })
+    mockPrisma.deal.create.mockResolvedValue(mockNewDeal)
+
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'POST',
+      url: `/api/v1/deals/${mockDeal.id}/duplicate`,
+      headers: auth,
+    })
+
+    expect(response.statusCode).toBe(201)
+    await fastify.close()
+  })
+
+  it('returns 404 when source deal not found', async () => {
+    mockPrisma.deal.findFirst.mockResolvedValue(null)
+
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/api/v1/deals/550e8400-e29b-41d4-a716-000000000000/duplicate',
+      headers: auth,
+    })
+
+    expect(response.statusCode).toBe(404)
+    await fastify.close()
+  })
+
+  it('returns 401 when not authenticated', async () => {
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'POST',
+      url: `/api/v1/deals/${mockDeal.id}/duplicate`,
+    })
+
+    expect(response.statusCode).toBe(401)
     await fastify.close()
   })
 })

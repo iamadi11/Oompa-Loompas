@@ -258,6 +258,19 @@ describe('ApiClient', () => {
     })
   })
 
+  it('duplicateDeal POSTs to duplicate endpoint and returns new deal', async () => {
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse({ data: { id: 'new-id', title: 'Deal (Copy)', status: 'DRAFT' } }, { status: 201 }),
+    )
+    await api.duplicateDeal('d1')
+    expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/deals/d1/duplicate', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    })
+  })
+
   it('login POSTs credentials', async () => {
     fetchMock.mockResolvedValueOnce(
       jsonResponse({ data: { id: 'u1', email: 'a@b.co', roles: ['ADMIN'] } }),

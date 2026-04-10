@@ -174,6 +174,13 @@ class ApiClient {
     return this.request<void>(`/api/v1/deliverables/${id}`, { method: 'DELETE' })
   }
 
+  async duplicateDeal(id: string): Promise<ApiResponse<Deal>> {
+    return this.request<ApiResponse<Deal>>(`/api/v1/deals/${id}/duplicate`, {
+      method: 'POST',
+      body: JSON.stringify({}),
+    })
+  }
+
   async shareProposal(dealId: string): Promise<{ data: { shareToken: string; shareUrl: string } }> {
     return this.request<{ data: { shareToken: string; shareUrl: string } }>(
       `/api/v1/deals/${dealId}/share`,

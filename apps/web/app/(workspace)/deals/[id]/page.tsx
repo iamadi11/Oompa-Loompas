@@ -6,6 +6,7 @@ import { StatusBadge } from '@/components/ui/Badge'
 import { DealForm } from '@/components/deals/DealForm'
 import { DealNotFoundContent } from '@/components/deals/DealNotFoundContent'
 import { ShareProposalButton } from '@/components/deals/ShareProposalButton'
+import { DuplicateDealButton } from '@/components/deals/DuplicateDealButton'
 import { DealNextActionBanner } from '@/components/deals/DealNextActionBanner'
 import { PaymentSection } from '@/components/payments/PaymentSection'
 import { DeliverableSection } from '@/components/deliverables/DeliverableSection'
@@ -115,6 +116,10 @@ export default async function DealDetailPage({ params }: Props) {
 
       <div className={panelClass}>
         <ShareProposalButton dealId={deal.id} initialShareToken={deal.shareToken} />
+      </div>
+
+      <div className={panelClass}>
+        <DuplicateDealButton dealId={deal.id} />
       </div>
 
       <div className={panelClass}>

@@ -2,6 +2,21 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.4.0] - 2026-04-10
+
+### `@oompa/api` **0.4.0**
+
+- **`POST /api/v1/deals/:id/duplicate`:** creates a copy of an existing deal as a new DRAFT. Clones title (appended with " (Copy)"), brandName, value, currency, notes. All payments cloned as PENDING (no dueDate, no invoiceNumber). All deliverables cloned as PENDING (no dueDate). startDate, endDate, and shareToken are cleared.
+
+### `@oompa/web` **0.4.0**
+
+- **`DuplicateDealButton`:** client component on the deal detail page. One click duplicates the deal and navigates the creator directly to the new DRAFT for editing.
+- **`api.duplicateDeal(id)`:** added to the API client.
+
+### Documentation
+
+- [Decision](./docs/decisions/2026-04-10-deal-duplication.md) · [Architecture](./docs/architecture/deal-duplication.md) · [UX](./docs/ux/deal-duplication.md) · [Testing](./docs/testing/deal-duplication.md) · [Instrumentation](./docs/instrumentation/deal-duplication.md) · [Retro](./docs/retros/2026-04-10-deal-duplication.md)
+
 ## [0.2.4] - 2026-04-09
 
 ### `@oompa/types` **0.2.4**

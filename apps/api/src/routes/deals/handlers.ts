@@ -202,6 +202,71 @@ export async function shareProposal(
   void reply.status(200).send({ data: { shareToken: updated.shareToken, shareUrl } })
 }
 
+export async function duplicateDeal(
+  request: FastifyRequest<{ Params: { id: string } }>,
+  reply: FastifyReply,
+): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
+  const { id } = request.params
+
+  const existing = await prisma.deal.findFirst({
+    where: { id, userId },
+    include: { payments: true, deliverables: true },
+  })
+  if (!existing) {
+    return sendError(reply, new NotFoundError('Deal', id))
+  }
+
+  const newDeal = await prisma.deal.create({
+    data: {
+      userId,
+      title: `${existing.title} (Copy)`,
+      brandName: existing.brandName,
+      value: existing.value,
+      currency: existing.currency,
+      status: 'DRAFT',
+      startDate: null,
+      endDate: null,
+      notes: existing.notes,
+      ...(existing.payments.length > 0 && {
+        payments: {
+          createMany: {
+            data: existing.payments.map((p) => ({
+              amount: p.amount,
+              currency: p.currency,
+              status: 'PENDING' as const,
+              dueDate: null,
+              receivedAt: null,
+              notes: p.notes,
+            })),
+          },
+        },
+      }),
+      ...(existing.deliverables.length > 0 && {
+        deliverables: {
+          createMany: {
+            data: existing.deliverables.map((d) => ({
+              title: d.title,
+              platform: d.platform,
+              type: d.type,
+              status: 'PENDING' as const,
+              dueDate: null,
+              completedAt: null,
+              notes: d.notes,
+            })),
+          },
+        },
+      }),
+    },
+  })
+
+  void reply.status(201).send({ data: serializeDeal(newDeal) })
+}
+
 export async function revokeShare(
   request: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
