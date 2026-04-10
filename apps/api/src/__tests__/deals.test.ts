@@ -19,6 +19,9 @@ const mockPrisma = prisma as typeof prisma & {
   payment: {
     findMany: ReturnType<typeof vi.fn>
   }
+  deliverable: {
+    findMany: ReturnType<typeof vi.fn>
+  }
 }
 
 const mockDeal = {
@@ -221,6 +224,105 @@ describe('GET /api/v1/deals/export/payments', () => {
     })
 
     expect(response.statusCode).toBe(401)
+    await fastify.close()
+  })
+})
+
+describe('GET /api/v1/deals/export/deliverables', () => {
+  const mockDeliverableRow = {
+    id: '770e8400-e29b-41d4-a716-446655440002',
+    dealId: mockDeal.id,
+    deal: { id: mockDeal.id, title: mockDeal.title, brandName: mockDeal.brandName },
+    title: 'Instagram Reel',
+    platform: 'INSTAGRAM',
+    type: 'REEL',
+    status: 'PENDING',
+    dueDate: null,
+    completedAt: null,
+    notes: null,
+    createdAt: new Date('2026-04-04T00:00:00.000Z'),
+    updatedAt: new Date('2026-04-04T00:00:00.000Z'),
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
+  })
+
+  it('returns 200 CSV with BOM and scoped deliverable query', async () => {
+    mockPrisma.deliverable.findMany.mockResolvedValue([mockDeliverableRow])
+
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'GET',
+      url: '/api/v1/deals/export/deliverables',
+      headers: auth,
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(String(response.headers['content-type'])).toContain('text/csv')
+    expect(response.body.startsWith('\uFEFF')).toBe(true)
+    expect(response.body).toContain('deliverable_id')
+    expect(response.body).toContain(mockDeliverableRow.id)
+    expect(mockPrisma.deliverable.findMany).toHaveBeenCalledWith({
+      where: { deal: { userId: TEST_USER_ID } },
+      include: { deal: { select: { id: true, title: true, brandName: true } } },
+      orderBy: [{ dealId: 'asc' }, { createdAt: 'asc' }],
+      take: 10_000,
+    })
+    await fastify.close()
+  })
+
+  it('returns 401 when not authenticated', async () => {
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'GET',
+      url: '/api/v1/deals/export/deliverables',
+    })
+
+    expect(response.statusCode).toBe(401)
+    await fastify.close()
+  })
+
+  it('returns 200 with header row only when no deliverables', async () => {
+    mockPrisma.deliverable.findMany.mockResolvedValue([])
+
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'GET',
+      url: '/api/v1/deals/export/deliverables',
+      headers: auth,
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(response.body.startsWith('\uFEFF')).toBe(true)
+    const lines = response.body.replace(/^\uFEFF/, '').split('\r\n')
+    expect(lines.length).toBe(1)
+    expect(lines[0]).toContain('deliverable_id')
+    await fastify.close()
+  })
+
+  it('serializes dueDate and completedAt when present', async () => {
+    mockPrisma.deliverable.findMany.mockResolvedValue([
+      {
+        ...mockDeliverableRow,
+        dueDate: new Date('2026-06-01T00:00:00.000Z'),
+        completedAt: new Date('2026-06-02T00:00:00.000Z'),
+        notes: 'Done',
+      },
+    ])
+
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'GET',
+      url: '/api/v1/deals/export/deliverables',
+      headers: auth,
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(response.body).toContain('2026-06-01T00:00:00.000Z')
+    expect(response.body).toContain('2026-06-02T00:00:00.000Z')
+    expect(response.body).toContain('Done')
     await fastify.close()
   })
 })

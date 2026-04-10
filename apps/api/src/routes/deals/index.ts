@@ -1,5 +1,6 @@
 import type { FastifyInstance } from 'fastify'
 import {
+  exportDeliverablesCsv,
   exportPaymentsCsv,
   exportDealsCsv,
   listDeals,
@@ -13,6 +14,7 @@ import {
 } from './handlers.js'
 
 export async function dealRoutes(fastify: FastifyInstance): Promise<void> {
+  fastify.get('/export/deliverables', exportDeliverablesCsv)
   fastify.get('/export/payments', exportPaymentsCsv)
   fastify.get('/export', exportDealsCsv)
   fastify.get('/', listDeals)

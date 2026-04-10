@@ -8,10 +8,13 @@ import {
 } from '@oompa/types'
 import {
   buildDealsPortfolioCsv,
+  buildDeliverablesPortfolioCsv,
   buildPaymentsPortfolioCsv,
   dealsPortfolioExportFilename,
+  deliverablesPortfolioExportFilename,
   paymentsPortfolioExportFilename,
   validate,
+  type DeliverablePortfolioCsvRow,
   type PaymentPortfolioCsvRow,
 } from '@oompa/utils'
 import { CreateDealSchema, UpdateDealSchema, DealListFiltersSchema } from './schema.js'
@@ -28,6 +31,46 @@ import { generateShareToken } from '../../lib/share-token.js'
 /** Hard cap so export stays bounded under pathological portfolios. */
 const DEALS_EXPORT_MAX = 5000
 const PAYMENTS_EXPORT_MAX = 10_000
+const DELIVERABLES_EXPORT_MAX = 10_000
+
+export async function exportDeliverablesCsv(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
+  const deliverables = await prisma.deliverable.findMany({
+    where: { deal: { userId } },
+    include: { deal: { select: { id: true, title: true, brandName: true } } },
+    orderBy: [{ dealId: 'asc' }, { createdAt: 'asc' }],
+    take: DELIVERABLES_EXPORT_MAX,
+  })
+
+  const csvRows: DeliverablePortfolioCsvRow[] = deliverables.map((d) => ({
+    deliverableId: d.id,
+    dealId: d.deal.id,
+    dealTitle: d.deal.title,
+    brandName: d.deal.brandName,
+    title: d.title,
+    platform: d.platform,
+    type: d.type,
+    status: d.status,
+    dueDate: d.dueDate?.toISOString() ?? null,
+    completedAt: d.completedAt?.toISOString() ?? null,
+    notes: d.notes,
+    createdAt: d.createdAt.toISOString(),
+    updatedAt: d.updatedAt.toISOString(),
+  }))
+
+  const body = `\uFEFF${buildDeliverablesPortfolioCsv(csvRows)}`
+  const filename = deliverablesPortfolioExportFilename(new Date())
+
+  void reply
+    .header('Content-Type', 'text/csv; charset=utf-8')
+    .header('Content-Disposition', `attachment; filename="${filename}"`)
+    .status(200)
+    .send(body)
+}
 
 export async function exportPaymentsCsv(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   const userId = request.authUser?.id

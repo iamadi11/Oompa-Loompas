@@ -320,6 +320,27 @@ describe('ApiClient', () => {
     await expect(api.downloadPaymentsPortfolioCsv()).rejects.toThrow('No')
   })
 
+  it('downloadDeliverablesPortfolioCsv GETs export/deliverables and returns blob', async () => {
+    const csv = 'deliverable_id\n'
+    fetchMock.mockResolvedValueOnce(
+      new Response(new Blob([csv], { type: 'text/csv' }), {
+        status: 200,
+        headers: { 'Content-Type': 'text/csv; charset=utf-8' },
+      }),
+    )
+    const blob = await api.downloadDeliverablesPortfolioCsv()
+    expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/deals/export/deliverables', {
+      credentials: 'include',
+    })
+    expect(blob.type).toMatch(/^text\/csv/)
+    expect(await blob.text()).toBe(csv)
+  })
+
+  it('downloadDeliverablesPortfolioCsv throws with server JSON message when not ok', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ message: 'Nope' }, { ok: false, status: 403 }))
+    await expect(api.downloadDeliverablesPortfolioCsv()).rejects.toThrow('Nope')
+  })
+
   it('login POSTs credentials', async () => {
     fetchMock.mockResolvedValueOnce(
       jsonResponse({ data: { id: 'u1', email: 'a@b.co', roles: ['ADMIN'] } }),

@@ -2,6 +2,24 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.4.3] - 2026-04-13
+
+### `@oompa/utils` **0.2.2**
+
+- **`buildDeliverablesPortfolioCsv` / `deliverablesPortfolioExportFilename`:** CSV rows for deliverables with parent deal id, title, brand, platform, type, status, dates, notes.
+
+### `@oompa/api` **0.4.3**
+
+- **`GET /api/v1/deals/export/deliverables`:** authenticated CSV of all deliverables for deals owned by the user. Joins deal title/brand; ordered by `dealId` then deliverable `createdAt`; capped at 10,000 rows. UTF-8 BOM; filename `oompa-deliverables-portfolio-YYYY-MM-DD.csv`.
+
+### `@oompa/web` **0.4.3**
+
+- **`ExportDeliverablesCsvButton`** on deals page; **`api.downloadDeliverablesPortfolioCsv()`**.
+
+### Documentation
+
+- [Decision](./docs/decisions/2026-04-13-deliverables-portfolio-csv-export.md) · [Architecture](./docs/architecture/deliverables-portfolio-csv-export.md) · [UX](./docs/ux/deliverables-portfolio-csv-export.md) · [Testing](./docs/testing/deliverables-portfolio-csv-export.md) · [Instrumentation](./docs/instrumentation/deliverables-portfolio-csv-export.md) · [Release](./docs/releases/RELEASE-0.4.3.md) · [Retro](./docs/retros/2026-04-13-deliverables-portfolio-csv-export.md)
+
 ## [0.4.2] - 2026-04-12
 
 ### `@oompa/utils` **0.2.1**
