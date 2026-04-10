@@ -3,7 +3,7 @@
 ## Module: Deal (Intelligence-adjacent read)
 
 ## Data Flow
-Input (session) → Validate auth → Normalize (none) → Process (`prisma.deal.groupBy`) → Output JSON `{ data: DealBrandSummary[] }`
+Input (session) → Validate auth → Normalize (none) → Process (`prisma.deal.groupBy` by brand + currency, merge) → Output JSON `{ data: DealBrandSummary[] }`
 
 ## Data Model Changes
 None. Uses existing `deals.brand_name` and `deals.user_id`.
@@ -11,7 +11,7 @@ None. Uses existing `deals.brand_name` and `deals.user_id`.
 ## API Contract
 - **Method/path:** `GET /api/v1/deals/brands`
 - **Auth:** Session cookie; 401 if missing.
-- **Response:** `{ data: { brandName: string; dealCount: number }[] }` sorted by `brandName` ascending.
+- **Response:** `{ data: DealBrandSummary[] }` — one row per brand, `contractedTotals` per currency, sorted by `brandName` ascending.
 - **Versioning:** additive under `/api/v1/deals/*`; route registered before `/:id` to avoid param capture.
 
 ## Events

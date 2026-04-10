@@ -1,5 +1,7 @@
 import Link from 'next/link'
+import type { Route } from 'next'
 import type { DealStatus } from '@oompa/types'
+import { dealsListSearchHref } from '@/lib/deals-page'
 
 /**
  * Horizontal strip showing per-status deal counts.
@@ -42,9 +44,11 @@ const STATUS_DOT: Record<DealStatus, string> = {
 type Props = {
   counts: Record<DealStatus, number>
   activeStatus: DealStatus | null
+  /** When set, pipeline tab links keep `brandName` in the query string. */
+  brandName?: string | null
 }
 
-export function DealPipelineStrip({ counts, activeStatus }: Props) {
+export function DealPipelineStrip({ counts, activeStatus, brandName = null }: Props) {
   const totalActive = Object.values(counts).reduce((sum, n) => sum + n, 0)
 
   return (
@@ -54,7 +58,7 @@ export function DealPipelineStrip({ counts, activeStatus }: Props) {
     >
       {/* All tab */}
       <Link
-        href="/deals"
+        href={dealsListSearchHref({ status: null, brandName }) as Route}
         className={pipelineTabClass(activeStatus === null)}
         aria-current={activeStatus === null ? 'page' : undefined}
       >
@@ -68,7 +72,7 @@ export function DealPipelineStrip({ counts, activeStatus }: Props) {
         return (
           <Link
             key={status}
-            href={`/deals?status=${status}`}
+            href={dealsListSearchHref({ status, brandName }) as Route}
             className={pipelineTabClass(isActive, count === 0)}
             aria-current={isActive ? 'page' : undefined}
           >

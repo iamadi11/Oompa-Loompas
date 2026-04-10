@@ -136,10 +136,26 @@ describe('GET /api/v1/deals/brands', () => {
     mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
   })
 
-  it('returns 200 with distinct brands ordered ascending', async () => {
+  it('returns 200 with brands merged by name and totals per currency', async () => {
     mockPrisma.deal.groupBy.mockResolvedValue([
-      { brandName: 'Acme', _count: { id: 2 } },
-      { brandName: 'Nike', _count: { id: 1 } },
+      {
+        brandName: 'Acme',
+        currency: 'INR',
+        _count: { id: 2 },
+        _sum: { value: 30000 },
+      },
+      {
+        brandName: 'Acme',
+        currency: 'USD',
+        _count: { id: 1 },
+        _sum: { value: 1000 },
+      },
+      {
+        brandName: 'Nike',
+        currency: 'INR',
+        _count: { id: 1 },
+        _sum: { value: 5000 },
+      },
     ])
 
     const fastify = await buildServer()
@@ -152,14 +168,26 @@ describe('GET /api/v1/deals/brands', () => {
     expect(response.statusCode).toBe(200)
     const body = response.json()
     expect(body.data).toEqual([
-      { brandName: 'Acme', dealCount: 2 },
-      { brandName: 'Nike', dealCount: 1 },
+      {
+        brandName: 'Acme',
+        dealCount: 3,
+        contractedTotals: [
+          { currency: 'INR', amount: 30000 },
+          { currency: 'USD', amount: 1000 },
+        ],
+      },
+      {
+        brandName: 'Nike',
+        dealCount: 1,
+        contractedTotals: [{ currency: 'INR', amount: 5000 }],
+      },
     ])
     expect(mockPrisma.deal.groupBy).toHaveBeenCalledWith({
-      by: ['brandName'],
+      by: ['brandName', 'currency'],
       where: { userId: TEST_USER_ID },
       _count: { id: true },
-      orderBy: { brandName: 'asc' },
+      _sum: { value: true },
+      orderBy: [{ brandName: 'asc' }, { currency: 'asc' }],
     })
     await fastify.close()
   })

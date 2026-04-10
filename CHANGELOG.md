@@ -2,6 +2,25 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.4.6] - 2026-04-11
+
+### `@oompa/types` **0.2.6**
+
+- **`DealBrandSummary`:** adds **`contractedTotals`** `{ currency, amount }[]` (sums per currency; no cross-currency mixing). **`DealBrandContractedTotalSchema`** exported.
+
+### `@oompa/api` **0.4.6**
+
+- **`GET /api/v1/deals/brands`:** `groupBy` on `brandName` + `currency` with `_sum` of deal value; response rows merged by brand with sorted currency segments.
+
+### `@oompa/web` **0.4.6**
+
+- **`/deals/brands`** brand directory table (deals count, contracted per currency, link to filtered deals).
+- **Deals list:** honors **`?brandName=`** on server fetch; **Pipeline / Needs attention** pills and **DealPipelineStrip** preserve brand query; **Clear brand filter** + document title when filtered.
+
+### Documentation
+
+- [Decision](./docs/decisions/2026-04-11-brand-directory.md) · [Architecture](./docs/architecture/brand-directory.md) · [UX](./docs/ux/brand-directory.md) · [Testing](./docs/testing/brand-directory.md) · [Instrumentation](./docs/instrumentation/brand-directory.md) · [Release](./docs/releases/RELEASE-0.4.6.md) · [Retro](./docs/retros/2026-04-11-brand-directory.md)
+
 ## [0.4.5] - 2026-04-11
 
 ### `@oompa/utils` **0.2.3**

@@ -45,3 +45,37 @@ function firstSearchParamValue(value: string | string[] | undefined): string | u
   if (value === undefined) return undefined
   return Array.isArray(value) ? value[0] : value
 }
+
+/**
+ * Returns trimmed brand filter from `?brandName=` when non-empty; API applies case-insensitive contains match.
+ */
+export function getDealBrandFilter(
+  searchParams: Record<string, string | string[] | undefined>,
+): string | null {
+  const raw = firstSearchParamValue(searchParams['brandName'])
+  if (raw === undefined) return null
+  const t = raw.trim()
+  return t.length > 0 ? t : null
+}
+
+/** Link target that clears `brandName` while preserving pipeline / needs-attention / status filters. */
+export function dealsPageHrefWithoutBrandFilter(opts: {
+  needsAttention: boolean
+  statusFilter: DealStatus | null
+}): string {
+  if (opts.needsAttention) return '/deals?needsAttention=true'
+  if (opts.statusFilter) return `/deals?status=${opts.statusFilter}`
+  return '/deals'
+}
+
+/** Query string for pipeline strip links while preserving an optional brand filter. */
+export function dealsListSearchHref(opts: {
+  status: DealStatus | null
+  brandName: string | null
+}): string {
+  const q = new URLSearchParams()
+  if (opts.status) q.set('status', opts.status)
+  if (opts.brandName) q.set('brandName', opts.brandName)
+  const s = q.toString()
+  return s ? `/deals?${s}` : '/deals'
+}

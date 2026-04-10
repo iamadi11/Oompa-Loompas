@@ -149,8 +149,8 @@ Secondary:
 ## 2.4 Evolution Path
 
 **Phase 1 → Deal + Payment Intelligence** (current — completion in progress)
-- Core shipped: Deal CRUD, payment milestones, deliverable tracking, dashboard, invoices, proposal links, pipeline strip, next-action prompt, deal duplication, portfolio CSV export (deals, payment milestones, deliverables, attention queue), distinct brand suggestions on deal create/edit (from existing deals; no separate client table)
-- Remaining: email-to-deal capture, scheduled reminders, dedicated client/brand profiles (CRM lite)
+- Core shipped: Deal CRUD, payment milestones, deliverable tracking, dashboard, invoices, proposal links, pipeline strip, next-action prompt, deal duplication, portfolio CSV export (deals, payment milestones, deliverables, attention queue), brand directory (`/deals/brands`) with per-currency contracted totals + `?brandName=` filter on deal list, distinct brand suggestions on deal form (datalist)
+- Remaining: email-to-deal capture, scheduled reminders, richer client profiles (contacts, notes, history beyond brand aggregates)
 
 **Phase 1.5 → PWA + Engagement Layer** (overlaps Phase 1 completion)
 - PWA push notifications for payment due alerts

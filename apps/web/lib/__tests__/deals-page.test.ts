@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { isDealsNeedsAttentionFilter, getDealStatusFilter, computeStatusCounts } from '@/lib/deals-page'
+import {
+  isDealsNeedsAttentionFilter,
+  getDealStatusFilter,
+  getDealBrandFilter,
+  dealsPageHrefWithoutBrandFilter,
+  dealsListSearchHref,
+  computeStatusCounts,
+} from '@/lib/deals-page'
 import type { Deal } from '@oompa/types'
 
 describe('isDealsNeedsAttentionFilter', () => {
@@ -66,6 +73,54 @@ const baseDeal: Deal = {
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
 }
+
+describe('getDealBrandFilter', () => {
+  it('returns null when absent or blank', () => {
+    expect(getDealBrandFilter({})).toBeNull()
+    expect(getDealBrandFilter({ brandName: '' })).toBeNull()
+    expect(getDealBrandFilter({ brandName: '  ' })).toBeNull()
+  })
+
+  it('returns trimmed brand string', () => {
+    expect(getDealBrandFilter({ brandName: '  Nike  ' })).toBe('Nike')
+  })
+
+  it('uses first value when brandName is an array', () => {
+    expect(getDealBrandFilter({ brandName: ['Acme', 'Other'] })).toBe('Acme')
+  })
+})
+
+describe('dealsListSearchHref', () => {
+  it('returns /deals when no filters', () => {
+    expect(dealsListSearchHref({ status: null, brandName: null })).toBe('/deals')
+  })
+
+  it('adds status and brand when both set', () => {
+    expect(dealsListSearchHref({ status: 'ACTIVE', brandName: 'Nike & Co' })).toBe(
+      '/deals?status=ACTIVE&brandName=Nike+%26+Co',
+    )
+  })
+})
+
+describe('dealsPageHrefWithoutBrandFilter', () => {
+  it('preserves needs attention mode', () => {
+    expect(
+      dealsPageHrefWithoutBrandFilter({ needsAttention: true, statusFilter: null }),
+    ).toBe('/deals?needsAttention=true')
+  })
+
+  it('preserves status when not in needs-attention mode', () => {
+    expect(
+      dealsPageHrefWithoutBrandFilter({ needsAttention: false, statusFilter: 'ACTIVE' }),
+    ).toBe('/deals?status=ACTIVE')
+  })
+
+  it('returns plain deals path when no other filter', () => {
+    expect(
+      dealsPageHrefWithoutBrandFilter({ needsAttention: false, statusFilter: null }),
+    ).toBe('/deals')
+  })
+})
 
 describe('computeStatusCounts', () => {
   it('returns all-zero counts for an empty list', () => {

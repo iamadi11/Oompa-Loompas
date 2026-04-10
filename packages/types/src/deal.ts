@@ -104,10 +104,18 @@ export const DealListFiltersSchema = z.object({
 })
 export type DealListFilters = z.infer<typeof DealListFiltersSchema>
 
-/** Distinct brand string from the creator's deals, with deal count (for autocomplete / reuse hints). */
+/** Contracted deal value summed for one brand within a single currency (no cross-currency mixing). */
+export const DealBrandContractedTotalSchema = z.object({
+  currency: CurrencySchema,
+  amount: z.number(),
+})
+export type DealBrandContractedTotal = z.infer<typeof DealBrandContractedTotalSchema>
+
+/** Distinct brand from the creator's portfolio: deal count plus totals per currency. */
 export const DealBrandSummarySchema = z.object({
   brandName: z.string(),
   dealCount: z.number().int().nonnegative(),
+  contractedTotals: z.array(DealBrandContractedTotalSchema),
 })
 export type DealBrandSummary = z.infer<typeof DealBrandSummarySchema>
 

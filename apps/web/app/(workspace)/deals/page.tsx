@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import type { Metadata } from 'next'
+import type { Metadata, Route } from 'next'
 import type { Deal, DealStatus } from '@oompa/types'
 import { DealList } from '@/components/deals/DealList'
 import { DealPipelineStrip } from '@/components/deals/DealPipelineStrip'
@@ -9,17 +9,23 @@ import { ExportDeliverablesCsvButton } from '@/components/deals/ExportDeliverabl
 import {
   isDealsNeedsAttentionFilter,
   getDealStatusFilter,
+  getDealBrandFilter,
+  dealsPageHrefWithoutBrandFilter,
+  dealsListSearchHref,
   computeStatusCounts,
 } from '@/lib/deals-page'
 import { getServerApiBaseUrl } from '@/lib/get-server-api-base-url'
 import { serverApiFetch } from '@/lib/server-api-fetch'
 
 async function getDeals(
-  opts: { needsAttention?: boolean } = {},
+  opts: { needsAttention?: boolean; brandName?: string } = {},
 ): Promise<{ deals: Deal[]; loadError: string | null }> {
   const apiBase = getServerApiBaseUrl()
   const qs = new URLSearchParams({ limit: '100', sortOrder: 'desc' })
   if (opts.needsAttention) qs.set('needsAttention', 'true')
+  if (opts.brandName !== undefined && opts.brandName.trim().length > 0) {
+    qs.set('brandName', opts.brandName.trim())
+  }
   try {
     const res = await serverApiFetch(`/api/v1/deals?${qs.toString()}`)
     if (!res.ok) {
@@ -46,6 +52,8 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const sp = await searchParams
   const needsAttention = isDealsNeedsAttentionFilter(sp)
   const statusFilter = getDealStatusFilter(sp)
+  const brandFilter = getDealBrandFilter(sp)
+  if (brandFilter) return { title: `${brandFilter} — Deals` }
   if (needsAttention) return { title: 'Needs attention' }
   if (statusFilter) return { title: `${statusFilter.charAt(0) + statusFilter.slice(1).toLowerCase()} deals` }
   return { title: 'Deals' }
@@ -58,6 +66,8 @@ export default async function DealsPage({ searchParams }: Props) {
   const sp = await searchParams
   const needsAttention = isDealsNeedsAttentionFilter(sp)
   const statusFilter = getDealStatusFilter(sp)
+  const brandFilter = getDealBrandFilter(sp)
+  const brandQueryOpt = brandFilter ?? undefined
 
   let allDeals: Deal[]
   let displayDeals: Deal[]
@@ -66,13 +76,13 @@ export default async function DealsPage({ searchParams }: Props) {
 
   if (needsAttention) {
     // Needs-attention mode: API does the join-based filtering; no pipeline strip
-    const result = await getDeals({ needsAttention: true })
+    const result = await getDeals({ needsAttention: true, brandName: brandQueryOpt })
     allDeals = result.deals
     displayDeals = result.deals
     loadError = result.loadError
   } else {
     // Pipeline mode: fetch all deals, compute counts, filter in component
-    const result = await getDeals()
+    const result = await getDeals({ brandName: brandQueryOpt })
     allDeals = result.deals
     loadError = result.loadError
     statusCounts = computeStatusCounts(allDeals)
@@ -104,7 +114,7 @@ export default async function DealsPage({ searchParams }: Props) {
       )}
       <nav className="flex flex-wrap items-center gap-2 text-sm mb-5" aria-label="Deal view mode">
         <Link
-          href="/deals"
+          href={dealsListSearchHref({ status: null, brandName: brandFilter }) as Route}
           className={`${filterPillBase} ${
             !needsAttention
               ? 'bg-brand-900 text-white shadow-sm border border-brand-800'
@@ -115,7 +125,11 @@ export default async function DealsPage({ searchParams }: Props) {
           Pipeline
         </Link>
         <Link
-          href="/deals?needsAttention=true"
+          href={
+            (brandFilter
+              ? `/deals?needsAttention=true&brandName=${encodeURIComponent(brandFilter)}`
+              : '/deals?needsAttention=true') as Route
+          }
           className={`${filterPillBase} ${
             needsAttention
               ? 'bg-amber-900 text-white shadow-sm border border-amber-950/30'
@@ -125,10 +139,32 @@ export default async function DealsPage({ searchParams }: Props) {
         >
           Needs attention
         </Link>
+        <Link
+          href="/deals/brands"
+          className={`${filterPillBase} bg-surface-raised text-stone-700 border border-line/90 hover:bg-surface shadow-sm`}
+        >
+          Brands
+        </Link>
       </nav>
 
+      {brandFilter && (
+        <p className="mb-4 text-sm text-stone-600" role="status">
+          Brand filter:{' '}
+          <span className="font-semibold text-stone-900">{brandFilter}</span>
+          {' · '}
+          <Link
+            href={
+              dealsPageHrefWithoutBrandFilter({ needsAttention, statusFilter }) as Route
+            }
+            className="font-semibold text-brand-800 hover:text-brand-900 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+          >
+            Clear brand filter
+          </Link>
+        </p>
+      )}
+
       {statusCounts !== null && (
-        <DealPipelineStrip counts={statusCounts} activeStatus={statusFilter} />
+        <DealPipelineStrip counts={statusCounts} activeStatus={statusFilter} brandName={brandFilter} />
       )}
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-6">

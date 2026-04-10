@@ -186,18 +186,39 @@ export async function listDealBrands(request: FastifyRequest, reply: FastifyRepl
   }
 
   const rows = await prisma.deal.groupBy({
-    by: ['brandName'],
+    by: ['brandName', 'currency'],
     where: { userId },
     _count: { id: true },
-    orderBy: { brandName: 'asc' },
+    _sum: { value: true },
+    orderBy: [{ brandName: 'asc' }, { currency: 'asc' }],
   })
 
-  void reply.status(200).send({
-    data: rows.map((r) => ({
-      brandName: r.brandName,
-      dealCount: r._count.id,
-    })),
-  })
+  const byBrand = new Map<
+    string,
+    { brandName: string; dealCount: number; segments: Map<string, number> }
+  >()
+
+  for (const r of rows) {
+    let entry = byBrand.get(r.brandName)
+    if (!entry) {
+      entry = { brandName: r.brandName, dealCount: 0, segments: new Map() }
+      byBrand.set(r.brandName, entry)
+    }
+    entry.dealCount += r._count.id
+    const amt = Number(r._sum.value ?? 0)
+    const cur = r.currency
+    entry.segments.set(cur, (entry.segments.get(cur) ?? 0) + amt)
+  }
+
+  const data = [...byBrand.values()].map((e) => ({
+    brandName: e.brandName,
+    dealCount: e.dealCount,
+    contractedTotals: [...e.segments.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([currency, amount]) => ({ currency, amount })),
+  }))
+
+  void reply.status(200).send({ data })
 }
 
 export async function getDeal(

@@ -19,6 +19,7 @@ describe('isMainNavCurrent', () => {
   it('marks deals on /deals and nested deal routes', () => {
     expect(isMainNavCurrent('/deals', 'deals')).toBe(true)
     expect(isMainNavCurrent('/deals/new', 'deals')).toBe(true)
+    expect(isMainNavCurrent('/deals/brands', 'deals')).toBe(true)
     expect(isMainNavCurrent('/deals/abc-123', 'deals')).toBe(true)
     expect(isMainNavCurrent('/attention', 'deals')).toBe(false)
   })

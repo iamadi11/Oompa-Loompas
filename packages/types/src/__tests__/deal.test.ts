@@ -28,15 +28,44 @@ const fullDeal = {
 }
 
 describe('DealBrandSummarySchema', () => {
-  it('parses valid brand summary', () => {
-    expect(DealBrandSummarySchema.parse({ brandName: 'Acme', dealCount: 3 })).toEqual({
+  it('parses valid brand summary with contracted totals', () => {
+    expect(
+      DealBrandSummarySchema.parse({
+        brandName: 'Acme',
+        dealCount: 3,
+        contractedTotals: [
+          { currency: 'INR', amount: 10000 },
+          { currency: 'USD', amount: 200 },
+        ],
+      }),
+    ).toEqual({
       brandName: 'Acme',
       dealCount: 3,
+      contractedTotals: [
+        { currency: 'INR', amount: 10000 },
+        { currency: 'USD', amount: 200 },
+      ],
     })
   })
 
   it('rejects negative dealCount', () => {
-    expect(() => DealBrandSummarySchema.parse({ brandName: 'X', dealCount: -1 })).toThrow()
+    expect(() =>
+      DealBrandSummarySchema.parse({
+        brandName: 'X',
+        dealCount: -1,
+        contractedTotals: [],
+      }),
+    ).toThrow()
+  })
+
+  it('rejects invalid currency in contractedTotals', () => {
+    expect(() =>
+      DealBrandSummarySchema.parse({
+        brandName: 'X',
+        dealCount: 1,
+        contractedTotals: [{ currency: 'XYZ', amount: 1 }],
+      }),
+    ).toThrow()
   })
 })
 
