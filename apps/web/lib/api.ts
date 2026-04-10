@@ -13,6 +13,7 @@ import type {
   AttentionQueue,
   ApiResponse,
   LoginBody,
+  RegisterBody,
   MeResponse,
 } from '@oompa/types'
 
@@ -188,6 +189,13 @@ class ApiClient {
 
   async login(body: LoginBody): Promise<MeResponse> {
     return this.request<MeResponse>('/api/v1/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    })
+  }
+
+  async register(body: RegisterBody): Promise<MeResponse> {
+    return this.request<MeResponse>('/api/v1/auth/register', {
       method: 'POST',
       body: JSON.stringify(body),
     })

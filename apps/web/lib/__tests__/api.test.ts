@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { api, getBrowserApiBase, paymentInvoiceHref } from '@/lib/api'
+import { api, getBrowserApiBase, paymentInvoiceHref, paymentInvoiceAbsoluteUrl } from '@/lib/api'
 
 function jsonResponse(body: unknown, init: { ok?: boolean; status?: number } = {}): Response {
   const ok = init.ok ?? true
@@ -222,6 +222,42 @@ describe('ApiClient', () => {
     })
   })
 
+  it('register POSTs credentials to /auth/register', async () => {
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse({ data: { id: 'u2', email: 'new@b.co', roles: ['MEMBER'] } }, { status: 201 }),
+    )
+    await api.register({ email: 'new@b.co', password: 'secret123' })
+    expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/auth/register', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'new@b.co', password: 'secret123' }),
+    })
+  })
+
+  it('shareProposal POSTs to deal share endpoint', async () => {
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse({ data: { shareToken: 'tok', shareUrl: 'http://x/p/tok' } }),
+    )
+    await api.shareProposal('d1')
+    expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/deals/d1/share', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    })
+  })
+
+  it('revokeShare DELETEs deal share', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ data: { shareToken: null } }))
+    await api.revokeShare('d1')
+    expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/deals/d1/share', {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+    })
+  })
+
   it('login POSTs credentials', async () => {
     fetchMock.mockResolvedValueOnce(
       jsonResponse({ data: { id: 'u1', email: 'a@b.co', roles: ['ADMIN'] } }),
@@ -309,6 +345,19 @@ describe('getBrowserApiBase and paymentInvoiceHref', () => {
     vi.stubGlobal('window', {})
     expect(getBrowserApiBase()).toBe('')
     expect(paymentInvoiceHref('d1', 'p1')).toBe('/api/v1/deals/d1/payments/p1/invoice')
+    vi.unstubAllGlobals()
+  })
+
+  it('paymentInvoiceAbsoluteUrl returns relative path outside browser', () => {
+    vi.unstubAllEnvs()
+    expect(paymentInvoiceAbsoluteUrl('d1', 'p1')).toBe('/api/v1/deals/d1/payments/p1/invoice')
+  })
+
+  it('paymentInvoiceAbsoluteUrl returns absolute URL in browser', () => {
+    vi.stubGlobal('window', { location: { origin: 'https://app.example.com' } })
+    expect(paymentInvoiceAbsoluteUrl('d1', 'p1')).toBe(
+      'https://app.example.com/api/v1/deals/d1/payments/p1/invoice',
+    )
     vi.unstubAllGlobals()
   })
 })

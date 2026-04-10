@@ -17,6 +17,12 @@ export const LoginBodySchema = z.object({
 })
 export type LoginBody = z.infer<typeof LoginBodySchema>
 
+export const RegisterBodySchema = z.object({
+  email: z.string().email('Invalid email address').max(320),
+  password: z.string().min(8, 'Password must be at least 8 characters').max(128),
+})
+export type RegisterBody = z.infer<typeof RegisterBodySchema>
+
 export interface MeResponse {
   data: AuthUser
 }

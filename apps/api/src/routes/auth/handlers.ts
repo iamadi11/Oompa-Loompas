@@ -1,10 +1,10 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import bcrypt from 'bcryptjs'
 import { prisma } from '@oompa/db'
-import { LoginBodySchema, type MeResponse } from '@oompa/types'
+import { LoginBodySchema, RegisterBodySchema, type MeResponse } from '@oompa/types'
 import { validate } from '@oompa/utils'
 import { getSessionCookieName, getSessionSecret, getSessionTtlMs } from '../../lib/auth-env.js'
-import { UnauthorizedError, ValidationError, sendError } from '../../lib/errors.js'
+import { ConflictError, UnauthorizedError, ValidationError, sendError } from '../../lib/errors.js'
 import { hashSessionToken, newSessionToken } from '../../lib/session-token.js'
 
 /**
@@ -89,6 +89,49 @@ export async function postLogin(
         roles: user.roles,
       },
     })
+}
+
+export async function postRegister(
+  request: FastifyRequest<{ Body: unknown }>,
+  reply: FastifyReply,
+): Promise<void> {
+  const parsed = validate(RegisterBodySchema, request.body)
+  if (!parsed.success) {
+    sendError(reply, new ValidationError(parsed.errors.map((e) => e.message).join(', ')))
+    return
+  }
+
+  const { email, password } = parsed.data
+  const normalized = email.trim().toLowerCase()
+
+  const existing = await prisma.user.findUnique({ where: { email: normalized } })
+  if (existing) {
+    sendError(reply, new ConflictError('An account with this email already exists'))
+    return
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10)
+  const user = await prisma.user.create({
+    data: { email: normalized, passwordHash, roles: ['MEMBER'] },
+  })
+
+  const rawToken = newSessionToken()
+  const secret = getSessionSecret()
+  const tokenHash = hashSessionToken(rawToken, secret)
+  const expiresAt = new Date(Date.now() + getSessionTtlMs())
+
+  await prisma.session.create({ data: { userId: user.id, tokenHash, expiresAt } })
+
+  const cookieName = getSessionCookieName()
+  const maxAgeSeconds = Math.floor(getSessionTtlMs() / 1000)
+
+  void reply
+    .setCookie(cookieName, rawToken, {
+      ...sessionCookieBaseOptions(),
+      maxAge: maxAgeSeconds,
+    })
+    .status(201)
+    .send({ data: { id: user.id, email: user.email, roles: user.roles } })
 }
 
 export async function postLogout(request: FastifyRequest, reply: FastifyReply): Promise<void> {

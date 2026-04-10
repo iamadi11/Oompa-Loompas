@@ -141,7 +141,7 @@ export async function getPaymentInvoice(
 
   const nowIso = new Date().toISOString()
 
-  const assigned = await prisma.$transaction(async (tx) => {
+  const assigned = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const locked = await tx.$queryRaw<Array<{ ok: number }>>(
       Prisma.sql`
         SELECT 1 AS ok FROM payments p

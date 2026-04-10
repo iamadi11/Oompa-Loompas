@@ -7,7 +7,10 @@ import { mockSessionFindUnique, testAuthCookieHeader, TEST_USER_ID } from './aut
 const auth = testAuthCookieHeader()
 
 const mockPrisma = prisma as typeof prisma & {
-  user: { findUnique: ReturnType<typeof vi.fn> }
+  user: {
+    findUnique: ReturnType<typeof vi.fn>
+    create: ReturnType<typeof vi.fn>
+  }
   session: {
     findUnique: ReturnType<typeof vi.fn>
     create: ReturnType<typeof vi.fn>
@@ -148,6 +151,122 @@ describe('POST /api/v1/auth/login', () => {
       url: '/api/v1/auth/login',
       payload: { email: 'not-an-email', password: 'x' },
     })
+    expect(response.statusCode).toBe(400)
+    await fastify.close()
+  })
+})
+
+describe('POST /api/v1/auth/register', () => {
+  const NEW_USER_ID = 'new-user-uuid'
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('returns 201, sets session cookie, and auto-logs in the new user', async () => {
+    mockPrisma.user.findUnique.mockResolvedValue(null)
+    mockPrisma.user.create.mockResolvedValue({
+      id: NEW_USER_ID,
+      email: 'creator@test.dev',
+      roles: ['MEMBER'],
+    })
+    mockPrisma.session.create.mockResolvedValue({})
+
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/api/v1/auth/register',
+      payload: { email: 'creator@test.dev', password: 'securepass123' },
+    })
+
+    expect(response.statusCode).toBe(201)
+    const body = response.json()
+    expect(body.data.email).toBe('creator@test.dev')
+    expect(body.data.roles).toEqual(['MEMBER'])
+    const setCookie = response.headers['set-cookie']
+    const cookieHeader = Array.isArray(setCookie) ? setCookie.join(';') : String(setCookie ?? '')
+    expect(cookieHeader).toMatch(/oompa_session=/)
+    expect(mockPrisma.user.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ email: 'creator@test.dev', roles: ['MEMBER'] }) }),
+    )
+    expect(mockPrisma.session.create).toHaveBeenCalled()
+    await fastify.close()
+  })
+
+  it('normalises email to lowercase before storing', async () => {
+    mockPrisma.user.findUnique.mockResolvedValue(null)
+    mockPrisma.user.create.mockResolvedValue({
+      id: NEW_USER_ID,
+      email: 'creator@test.dev',
+      roles: ['MEMBER'],
+    })
+    mockPrisma.session.create.mockResolvedValue({})
+
+    const fastify = await buildServer()
+    await fastify.inject({
+      method: 'POST',
+      url: '/api/v1/auth/register',
+      payload: { email: 'Creator@TEST.dev', password: 'securepass123' },
+    })
+
+    expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({ where: { email: 'creator@test.dev' } })
+    expect(mockPrisma.user.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ email: 'creator@test.dev' }) }),
+    )
+    await fastify.close()
+  })
+
+  it('returns 409 when email is already registered', async () => {
+    mockPrisma.user.findUnique.mockResolvedValue({
+      id: TEST_USER_ID,
+      email: 'existing@test.dev',
+      roles: ['MEMBER'],
+    })
+
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/api/v1/auth/register',
+      payload: { email: 'existing@test.dev', password: 'securepass123' },
+    })
+
+    expect(response.statusCode).toBe(409)
+    expect(mockPrisma.user.create).not.toHaveBeenCalled()
+    await fastify.close()
+  })
+
+  it('returns 400 when password is shorter than 8 characters', async () => {
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/api/v1/auth/register',
+      payload: { email: 'creator@test.dev', password: 'short' },
+    })
+
+    expect(response.statusCode).toBe(400)
+    await fastify.close()
+  })
+
+  it('returns 400 for invalid email format', async () => {
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/api/v1/auth/register',
+      payload: { email: 'not-an-email', password: 'securepass123' },
+    })
+
+    expect(response.statusCode).toBe(400)
+    await fastify.close()
+  })
+
+  it('returns 400 when body is missing required fields', async () => {
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/api/v1/auth/register',
+      payload: { email: 'creator@test.dev' },
+    })
+
     expect(response.statusCode).toBe(400)
     await fastify.close()
   })
