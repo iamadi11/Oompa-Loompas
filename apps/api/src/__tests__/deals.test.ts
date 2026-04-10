@@ -15,6 +15,7 @@ const mockPrisma = prisma as typeof prisma & {
     update: ReturnType<typeof vi.fn>
     delete: ReturnType<typeof vi.fn>
     count: ReturnType<typeof vi.fn>
+    groupBy: ReturnType<typeof vi.fn>
   }
   payment: {
     findMany: ReturnType<typeof vi.fn>
@@ -125,6 +126,67 @@ describe('GET /api/v1/deals', () => {
         expect.objectContaining({ deliverables: expect.any(Object) }),
       ]),
     })
+    await fastify.close()
+  })
+})
+
+describe('GET /api/v1/deals/brands', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
+  })
+
+  it('returns 200 with distinct brands ordered ascending', async () => {
+    mockPrisma.deal.groupBy.mockResolvedValue([
+      { brandName: 'Acme', _count: { id: 2 } },
+      { brandName: 'Nike', _count: { id: 1 } },
+    ])
+
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'GET',
+      url: '/api/v1/deals/brands',
+      headers: auth,
+    })
+
+    expect(response.statusCode).toBe(200)
+    const body = response.json()
+    expect(body.data).toEqual([
+      { brandName: 'Acme', dealCount: 2 },
+      { brandName: 'Nike', dealCount: 1 },
+    ])
+    expect(mockPrisma.deal.groupBy).toHaveBeenCalledWith({
+      by: ['brandName'],
+      where: { userId: TEST_USER_ID },
+      _count: { id: true },
+      orderBy: { brandName: 'asc' },
+    })
+    await fastify.close()
+  })
+
+  it('returns 200 with empty data when user has no deals', async () => {
+    mockPrisma.deal.groupBy.mockResolvedValue([])
+
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'GET',
+      url: '/api/v1/deals/brands',
+      headers: auth,
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(response.json()).toEqual({ data: [] })
+    await fastify.close()
+  })
+
+  it('returns 401 when not authenticated', async () => {
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'GET',
+      url: '/api/v1/deals/brands',
+    })
+
+    expect(response.statusCode).toBe(401)
     await fastify.close()
   })
 })

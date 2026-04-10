@@ -3,6 +3,7 @@ import {
   exportDeliverablesCsv,
   exportPaymentsCsv,
   exportDealsCsv,
+  listDealBrands,
   listDeals,
   getDeal,
   createDeal,
@@ -17,6 +18,7 @@ export async function dealRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get('/export/deliverables', exportDeliverablesCsv)
   fastify.get('/export/payments', exportPaymentsCsv)
   fastify.get('/export', exportDealsCsv)
+  fastify.get('/brands', listDealBrands)
   fastify.get('/', listDeals)
   fastify.get('/:id', getDeal)
   fastify.post('/', createDeal)

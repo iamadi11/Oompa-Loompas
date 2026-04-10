@@ -2,6 +2,24 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.4.4] - 2026-04-11
+
+### `@oompa/types` **0.2.5**
+
+- **`DealBrandSummarySchema` / `DealBrandSummary`:** `{ brandName, dealCount }` for distinct-brand API responses.
+
+### `@oompa/api` **0.4.4**
+
+- **`GET /api/v1/deals/brands`:** session-scoped distinct `brandName` values with deal counts, ascending by name (Prisma `groupBy`). Registered before `/:id`.
+
+### `@oompa/web` **0.4.4**
+
+- **`api.listDealBrands()`** and **`<datalist>`** on **Brand name** in **`DealForm`** (suggestions load on mount; failures are silent so the form still works offline).
+
+### Documentation
+
+- [Decision](./docs/decisions/2026-04-11-deal-brand-suggestions.md) · [Architecture](./docs/architecture/deal-brand-suggestions.md) · [UX](./docs/ux/deal-brand-suggestions.md) · [Testing](./docs/testing/deal-brand-suggestions.md) · [Instrumentation](./docs/instrumentation/deal-brand-suggestions.md) · [Release](./docs/releases/RELEASE-0.4.4.md) · [Retro](./docs/retros/2026-04-11-deal-brand-suggestions.md)
+
 ## [0.4.3] - 2026-04-13
 
 ### `@oompa/utils` **0.2.2**

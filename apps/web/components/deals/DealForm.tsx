@@ -1,8 +1,8 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import type { Deal, CreateDeal, DealStatus, UpdateDeal } from '@oompa/types'
+import type { Deal, DealBrandSummary, CreateDeal, DealStatus, UpdateDeal } from '@oompa/types'
 import { CreateDealSchema, DEAL_STATUS_TRANSITIONS, UpdateDealSchema } from '@oompa/types'
 import { validate } from '@oompa/utils'
 import { api } from '@/lib/api'
@@ -47,6 +47,7 @@ export function DealForm({ deal, mode }: DealFormProps) {
   const [deleting, setDeleting] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [brandSuggestions, setBrandSuggestions] = useState<DealBrandSummary[]>([])
 
   const [form, setForm] = useState({
     title: deal?.title ?? '',
@@ -61,6 +62,23 @@ export function DealForm({ deal, mode }: DealFormProps) {
     () => statusSelectOptions(mode, form.status),
     [mode, form.status],
   )
+
+  useEffect(() => {
+    let cancelled = false
+    void (async () => {
+      try {
+        const res = await api.listDealBrands()
+        if (!cancelled && res.data) {
+          setBrandSuggestions(res.data)
+        }
+      } catch {
+        // Form stays usable without suggestions (network/offline).
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   function setField(name: string, value: string) {
     setForm((prev) => ({ ...prev, [name]: value }))
@@ -161,6 +179,12 @@ export function DealForm({ deal, mode }: DealFormProps) {
         </div>
       )}
 
+      <datalist id="deal-brand-suggestions">
+        {brandSuggestions.map((b) => (
+          <option key={b.brandName} value={b.brandName} />
+        ))}
+      </datalist>
+
       <div className="grid gap-5 sm:grid-cols-2">
         <Input
           label="Deal title"
@@ -177,6 +201,13 @@ export function DealForm({ deal, mode }: DealFormProps) {
           value={form.brandName}
           onChange={(e) => setField('brandName', e.target.value)}
           placeholder="e.g. Nike"
+          list="deal-brand-suggestions"
+          autoComplete="off"
+          hint={
+            brandSuggestions.length > 0
+              ? 'Pick a brand you used before or type a new one.'
+              : undefined
+          }
           required
           error={fieldErrors['brandName']}
         />

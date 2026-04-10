@@ -104,6 +104,13 @@ export const DealListFiltersSchema = z.object({
 })
 export type DealListFilters = z.infer<typeof DealListFiltersSchema>
 
+/** Distinct brand string from the creator's deals, with deal count (for autocomplete / reuse hints). */
+export const DealBrandSummarySchema = z.object({
+  brandName: z.string(),
+  dealCount: z.number().int().nonnegative(),
+})
+export type DealBrandSummary = z.infer<typeof DealBrandSummarySchema>
+
 export function isValidStatusTransition(from: DealStatus, to: DealStatus): boolean {
   return DEAL_STATUS_TRANSITIONS[from].includes(to)
 }

@@ -63,6 +63,18 @@ describe('ApiClient', () => {
     expect(url).toContain('needsAttention=true')
   })
 
+  it('listDealBrands GETs /api/v1/deals/brands', async () => {
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse({ data: [{ brandName: 'Nike', dealCount: 1 }] }),
+    )
+    const res = await api.listDealBrands()
+    expect(res.data).toEqual([{ brandName: 'Nike', dealCount: 1 }])
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3001/api/v1/deals/brands',
+      expect.objectContaining(defaultFetchInit),
+    )
+  })
+
   it('getDeal requests by id', async () => {
     fetchMock.mockResolvedValueOnce(jsonResponse({ data: { id: '1' } }))
     await api.getDeal('abc')

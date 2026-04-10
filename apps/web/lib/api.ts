@@ -1,5 +1,6 @@
 import type {
   Deal,
+  DealBrandSummary,
   CreateDeal,
   UpdateDeal,
   DealListFilters,
@@ -126,6 +127,10 @@ class ApiClient {
     })
     const qs = params.toString()
     return this.request<ApiResponse<Deal[]>>(`/api/v1/deals${qs ? `?${qs}` : ''}`)
+  }
+
+  async listDealBrands(): Promise<ApiResponse<DealBrandSummary[]>> {
+    return this.request<ApiResponse<DealBrandSummary[]>>('/api/v1/deals/brands')
   }
 
   async getDeal(id: string): Promise<ApiResponse<Deal>> {

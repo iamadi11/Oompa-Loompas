@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   CreateDealSchema,
+  DealBrandSummarySchema,
   DealListFiltersSchema,
   DealSchema,
   DealStatusSchema,
@@ -25,6 +26,19 @@ const fullDeal = {
   createdAt: iso,
   updatedAt: iso,
 }
+
+describe('DealBrandSummarySchema', () => {
+  it('parses valid brand summary', () => {
+    expect(DealBrandSummarySchema.parse({ brandName: 'Acme', dealCount: 3 })).toEqual({
+      brandName: 'Acme',
+      dealCount: 3,
+    })
+  })
+
+  it('rejects negative dealCount', () => {
+    expect(() => DealBrandSummarySchema.parse({ brandName: 'X', dealCount: -1 })).toThrow()
+  })
+})
 
 describe('DealSchema', () => {
   it('parses a complete deal', () => {

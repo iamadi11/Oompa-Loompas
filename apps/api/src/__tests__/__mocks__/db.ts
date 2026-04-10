@@ -18,6 +18,7 @@ export const prisma = {
     update: vi.fn(),
     delete: vi.fn(),
     count: vi.fn(),
+    groupBy: vi.fn(),
   },
   payment: {
     findMany: vi.fn(),

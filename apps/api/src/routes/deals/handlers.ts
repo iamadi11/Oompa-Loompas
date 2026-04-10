@@ -179,6 +179,27 @@ export async function listDeals(
   })
 }
 
+export async function listDealBrands(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
+  const rows = await prisma.deal.groupBy({
+    by: ['brandName'],
+    where: { userId },
+    _count: { id: true },
+    orderBy: { brandName: 'asc' },
+  })
+
+  void reply.status(200).send({
+    data: rows.map((r) => ({
+      brandName: r.brandName,
+      dealCount: r._count.id,
+    })),
+  })
+}
+
 export async function getDeal(
   request: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
