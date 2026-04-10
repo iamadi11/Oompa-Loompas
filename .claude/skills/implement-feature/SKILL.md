@@ -54,6 +54,7 @@ No step may be skipped. No human input unless blocked after retries.
 3. Fix all failures before proceeding
 4. Verify coverage ≥90% on changed code
 5. `detect_changes` — review risk-scored change analysis
+6. **Invoke `simplify` skill** — review implementation for reuse, quality, efficiency; fix issues found
 
 ### Step 6 — Validate
 

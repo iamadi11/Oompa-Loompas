@@ -8,7 +8,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Library/Frameworks/Python.framework/Versions/3.12/bin/code-review-graph update --quiet",
+            "command": "/Library/Frameworks/Python.framework/Versions/3.12/bin/code-review-graph update",
             "timeout": 8000
           }
         ]
