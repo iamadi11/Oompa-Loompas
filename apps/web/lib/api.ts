@@ -88,6 +88,37 @@ class ApiClient {
     return res.json() as Promise<T>
   }
 
+  /** Same-origin GET; CSV or other non-JSON body. Reuses JSON API error parsing for failures. */
+  private async fetchBinary(path: string): Promise<Blob> {
+    const base = getBrowserApiBase()
+    const res = await fetch(`${base}${path}`, {
+      credentials: 'include',
+    })
+
+    if (!res.ok) {
+      const raw = await res.text()
+      let message: string
+      try {
+        const parsed = JSON.parse(raw) as { message?: string; error?: string }
+        message = parsed.message ?? parsed.error ?? `HTTP ${res.status}`
+      } catch {
+        const snippet = raw.trim().slice(0, 200)
+        const likelyUnreachable =
+          [502, 503, 504].includes(res.status) ||
+          (res.status >= 500 &&
+            /\b(internal server error|bad gateway|service unavailable|gateway timeout)\b/i.test(
+              snippet,
+            ))
+        message = likelyUnreachable
+          ? 'Could not reach the API. If you are developing locally, start the API (pnpm --filter @oompa/api dev) and ensure Next.js can reach it (see API_URL in next.config).'
+          : `Request failed (${res.status})`
+      }
+      throw new Error(message)
+    }
+
+    return res.blob()
+  }
+
   async listDeals(filters: Partial<DealListFilters> = {}): Promise<ApiResponse<Deal[]>> {
     const params = new URLSearchParams()
     Object.entries(filters).forEach(([k, v]) => {
@@ -181,35 +212,12 @@ class ApiClient {
     })
   }
 
-  /** Same-origin GET; returns CSV bytes (not JSON). */
   async downloadDealsPortfolioCsv(): Promise<Blob> {
-    const base = getBrowserApiBase()
-    const res = await fetch(`${base}/api/v1/deals/export`, {
-      credentials: 'include',
-    })
+    return this.fetchBinary('/api/v1/deals/export')
+  }
 
-    if (!res.ok) {
-      const raw = await res.text()
-      let message: string
-      try {
-        const parsed = JSON.parse(raw) as { message?: string; error?: string }
-        message = parsed.message ?? parsed.error ?? `HTTP ${res.status}`
-      } catch {
-        const snippet = raw.trim().slice(0, 200)
-        const likelyUnreachable =
-          [502, 503, 504].includes(res.status) ||
-          (res.status >= 500 &&
-            /\b(internal server error|bad gateway|service unavailable|gateway timeout)\b/i.test(
-              snippet,
-            ))
-        message = likelyUnreachable
-          ? 'Could not reach the API. If you are developing locally, start the API (pnpm --filter @oompa/api dev) and ensure Next.js can reach it (see API_URL in next.config).'
-          : `Request failed (${res.status})`
-      }
-      throw new Error(message)
-    }
-
-    return res.blob()
+  async downloadPaymentsPortfolioCsv(): Promise<Blob> {
+    return this.fetchBinary('/api/v1/deals/export/payments')
   }
 
   async shareProposal(dealId: string): Promise<{ data: { shareToken: string; shareUrl: string } }> {

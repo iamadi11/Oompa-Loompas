@@ -299,6 +299,27 @@ describe('ApiClient', () => {
     await expect(api.downloadDealsPortfolioCsv()).rejects.toThrow(/Could not reach the API/)
   })
 
+  it('downloadPaymentsPortfolioCsv GETs export/payments and returns blob', async () => {
+    const csv = 'payment_id\n'
+    fetchMock.mockResolvedValueOnce(
+      new Response(new Blob([csv], { type: 'text/csv' }), {
+        status: 200,
+        headers: { 'Content-Type': 'text/csv; charset=utf-8' },
+      }),
+    )
+    const blob = await api.downloadPaymentsPortfolioCsv()
+    expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/deals/export/payments', {
+      credentials: 'include',
+    })
+    expect(blob.type).toMatch(/^text\/csv/)
+    expect(await blob.text()).toBe(csv)
+  })
+
+  it('downloadPaymentsPortfolioCsv throws with server JSON message when not ok', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ message: 'No' }, { ok: false, status: 403 }))
+    await expect(api.downloadPaymentsPortfolioCsv()).rejects.toThrow('No')
+  })
+
   it('login POSTs credentials', async () => {
     fetchMock.mockResolvedValueOnce(
       jsonResponse({ data: { id: 'u1', email: 'a@b.co', roles: ['ADMIN'] } }),

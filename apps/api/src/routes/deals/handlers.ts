@@ -6,7 +6,14 @@ import {
   type DealListFilters,
   isValidStatusTransition,
 } from '@oompa/types'
-import { buildDealsPortfolioCsv, dealsPortfolioExportFilename, validate } from '@oompa/utils'
+import {
+  buildDealsPortfolioCsv,
+  buildPaymentsPortfolioCsv,
+  dealsPortfolioExportFilename,
+  paymentsPortfolioExportFilename,
+  validate,
+  type PaymentPortfolioCsvRow,
+} from '@oompa/utils'
 import { CreateDealSchema, UpdateDealSchema, DealListFiltersSchema } from './schema.js'
 import { buildDealWhere, serializeDeal, toCreateDealData, toUpdateDealData } from './service.js'
 import {
@@ -20,6 +27,46 @@ import { generateShareToken } from '../../lib/share-token.js'
 
 /** Hard cap so export stays bounded under pathological portfolios. */
 const DEALS_EXPORT_MAX = 5000
+const PAYMENTS_EXPORT_MAX = 10_000
+
+export async function exportPaymentsCsv(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
+  const payments = await prisma.payment.findMany({
+    where: { deal: { userId } },
+    include: { deal: { select: { id: true, title: true, brandName: true } } },
+    orderBy: [{ dealId: 'asc' }, { createdAt: 'asc' }],
+    take: PAYMENTS_EXPORT_MAX,
+  })
+
+  const csvRows: PaymentPortfolioCsvRow[] = payments.map((p) => ({
+    paymentId: p.id,
+    dealId: p.deal.id,
+    dealTitle: p.deal.title,
+    brandName: p.deal.brandName,
+    amount: Number(p.amount),
+    currency: p.currency,
+    status: p.status,
+    dueDate: p.dueDate?.toISOString() ?? null,
+    receivedAt: p.receivedAt?.toISOString() ?? null,
+    invoiceNumber: p.invoiceNumber,
+    notes: p.notes,
+    createdAt: p.createdAt.toISOString(),
+    updatedAt: p.updatedAt.toISOString(),
+  }))
+
+  const body = `\uFEFF${buildPaymentsPortfolioCsv(csvRows)}`
+  const filename = paymentsPortfolioExportFilename(new Date())
+
+  void reply
+    .header('Content-Type', 'text/csv; charset=utf-8')
+    .header('Content-Disposition', `attachment; filename="${filename}"`)
+    .status(200)
+    .send(body)
+}
 
 export async function exportDealsCsv(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   const userId = request.authUser?.id

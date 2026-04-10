@@ -2,6 +2,25 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.4.2] - 2026-04-12
+
+### `@oompa/utils` **0.2.1**
+
+- **`buildPaymentsPortfolioCsv` / `paymentsPortfolioExportFilename`:** CSV rows for payment milestones with parent deal id, title, brand, amounts, status, due/received dates, invoice number, notes.
+
+### `@oompa/api` **0.4.2**
+
+- **`GET /api/v1/deals/export/payments`:** authenticated CSV of all payments for deals owned by the user. Joins deal title/brand; ordered by `dealId` then payment `createdAt`; capped at 10,000 rows. UTF-8 BOM + attachment filename `oompa-payments-portfolio-YYYY-MM-DD.csv`.
+
+### `@oompa/web` **0.4.2**
+
+- **`ExportPaymentsCsvButton`:** deals page action next to deal export.
+- **`api.downloadPaymentsPortfolioCsv()`** and shared private **`fetchBinary`** for CSV GET error handling.
+
+### Documentation
+
+- [Decision](./docs/decisions/2026-04-12-payment-milestones-csv-export.md) · [Architecture](./docs/architecture/payment-milestones-csv-export.md) · [UX](./docs/ux/payment-milestones-csv-export.md) · [Testing](./docs/testing/payment-milestones-csv-export.md) · [Instrumentation](./docs/instrumentation/payment-milestones-csv-export.md) · [Release](./docs/releases/RELEASE-0.4.2.md) · [Retro](./docs/retros/2026-04-12-payment-milestones-csv-export.md)
+
 ## [0.4.1] - 2026-04-11
 
 ### `@oompa/utils` **0.2.0**

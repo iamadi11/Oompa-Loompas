@@ -4,6 +4,7 @@ import type { Deal, DealStatus } from '@oompa/types'
 import { DealList } from '@/components/deals/DealList'
 import { DealPipelineStrip } from '@/components/deals/DealPipelineStrip'
 import { ExportDealsCsvButton } from '@/components/deals/ExportDealsCsvButton'
+import { ExportPaymentsCsvButton } from '@/components/deals/ExportPaymentsCsvButton'
 import {
   isDealsNeedsAttentionFilter,
   getDealStatusFilter,
@@ -142,6 +143,7 @@ export default async function DealsPage({ searchParams }: Props) {
         {!loadError && (
           <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end sm:gap-3 w-full sm:w-auto">
             <ExportDealsCsvButton />
+            <ExportPaymentsCsvButton />
             {(needsAttention || allDeals.length > 0) && (
               <Link
                 href="/deals/new"

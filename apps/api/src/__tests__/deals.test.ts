@@ -16,6 +16,9 @@ const mockPrisma = prisma as typeof prisma & {
     delete: ReturnType<typeof vi.fn>
     count: ReturnType<typeof vi.fn>
   }
+  payment: {
+    findMany: ReturnType<typeof vi.fn>
+  }
 }
 
 const mockDeal = {
@@ -158,6 +161,63 @@ describe('GET /api/v1/deals/export', () => {
     const response = await fastify.inject({
       method: 'GET',
       url: '/api/v1/deals/export',
+    })
+
+    expect(response.statusCode).toBe(401)
+    await fastify.close()
+  })
+})
+
+describe('GET /api/v1/deals/export/payments', () => {
+  const mockPaymentRow = {
+    id: '660e8400-e29b-41d4-a716-446655440001',
+    dealId: mockDeal.id,
+    deal: { id: mockDeal.id, title: mockDeal.title, brandName: mockDeal.brandName },
+    amount: { toNumber: () => 40000 },
+    currency: 'INR',
+    status: 'PENDING',
+    dueDate: null,
+    receivedAt: null,
+    notes: 'Advance',
+    invoiceNumber: 'INV-00000001',
+    createdAt: new Date('2026-04-04T00:00:00.000Z'),
+    updatedAt: new Date('2026-04-04T00:00:00.000Z'),
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
+  })
+
+  it('returns 200 CSV with BOM and scoped payment query', async () => {
+    mockPrisma.payment.findMany.mockResolvedValue([mockPaymentRow])
+
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'GET',
+      url: '/api/v1/deals/export/payments',
+      headers: auth,
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(String(response.headers['content-type'])).toContain('text/csv')
+    expect(response.body.startsWith('\uFEFF')).toBe(true)
+    expect(response.body).toContain('payment_id')
+    expect(response.body).toContain(mockPaymentRow.id)
+    expect(mockPrisma.payment.findMany).toHaveBeenCalledWith({
+      where: { deal: { userId: TEST_USER_ID } },
+      include: { deal: { select: { id: true, title: true, brandName: true } } },
+      orderBy: [{ dealId: 'asc' }, { createdAt: 'asc' }],
+      take: 10_000,
+    })
+    await fastify.close()
+  })
+
+  it('returns 401 when not authenticated', async () => {
+    const fastify = await buildServer()
+    const response = await fastify.inject({
+      method: 'GET',
+      url: '/api/v1/deals/export/payments',
     })
 
     expect(response.statusCode).toBe(401)
