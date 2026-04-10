@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import type { AttentionQueue } from '@oompa/types'
+import { ExportAttentionCsvButton } from '@/components/attention/ExportAttentionCsvButton'
 import { PriorityActionList } from '@/components/dashboard/PriorityActionList'
 import { serverApiFetch } from '@/lib/server-api-fetch'
 
@@ -80,9 +81,12 @@ export default async function AttentionPage() {
             overdue first.
           </p>
         </div>
-        <Link href="/dashboard" className={`${linkClass} sm:shrink-0 w-fit`}>
-          ← Overview
-        </Link>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
+          <ExportAttentionCsvButton />
+          <Link href="/dashboard" className={`${linkClass} sm:shrink-0 w-fit`}>
+            ← Overview
+          </Link>
+        </div>
       </div>
 
       <section

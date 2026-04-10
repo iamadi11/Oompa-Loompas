@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify'
-import { getAttention } from './handlers.js'
+import { exportAttentionCsv, getAttention } from './handlers.js'
 
 export async function attentionRoutes(fastify: FastifyInstance): Promise<void> {
+  fastify.get('/attention/export', exportAttentionCsv)
   fastify.get('/attention', getAttention)
 }

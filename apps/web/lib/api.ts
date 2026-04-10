@@ -229,6 +229,10 @@ class ApiClient {
     return this.fetchBinary('/api/v1/deals/export/deliverables')
   }
 
+  async downloadAttentionQueueCsv(): Promise<Blob> {
+    return this.fetchBinary('/api/v1/attention/export')
+  }
+
   async shareProposal(dealId: string): Promise<{ data: { shareToken: string; shareUrl: string } }> {
     return this.request<{ data: { shareToken: string; shareUrl: string } }>(
       `/api/v1/deals/${dealId}/share`,

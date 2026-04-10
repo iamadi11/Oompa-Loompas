@@ -353,6 +353,22 @@ describe('ApiClient', () => {
     await expect(api.downloadDeliverablesPortfolioCsv()).rejects.toThrow('Nope')
   })
 
+  it('downloadAttentionQueueCsv GETs attention/export and returns blob', async () => {
+    const csv = 'priority_kind\n'
+    fetchMock.mockResolvedValueOnce(
+      new Response(new Blob([csv], { type: 'text/csv' }), {
+        status: 200,
+        headers: { 'Content-Type': 'text/csv; charset=utf-8' },
+      }),
+    )
+    const blob = await api.downloadAttentionQueueCsv()
+    expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/attention/export', {
+      credentials: 'include',
+    })
+    expect(blob.type).toMatch(/^text\/csv/)
+    expect(await blob.text()).toBe(csv)
+  })
+
   it('login POSTs credentials', async () => {
     fetchMock.mockResolvedValueOnce(
       jsonResponse({ data: { id: 'u1', email: 'a@b.co', roles: ['ADMIN'] } }),

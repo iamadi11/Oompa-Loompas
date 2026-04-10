@@ -2,6 +2,24 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.4.5] - 2026-04-11
+
+### `@oompa/utils` **0.2.3**
+
+- **`buildAttentionQueueCsv` / `attentionQueueExportFilename` / `AttentionQueueCsvRow`:** CSV for overdue payments and deliverables (same sort as GET /attention).
+
+### `@oompa/api` **0.4.5**
+
+- **`GET /api/v1/attention/export`:** authenticated CSV of the full attention queue (BOM + attachment `oompa-attention-queue-YYYY-MM-DD.csv`). Rows capped at 5,000; `brand_name` filled for deliverable rows from the parent deal.
+
+### `@oompa/web` **0.4.5**
+
+- **`ExportAttentionCsvButton`** on the attention queue page when items exist; **`api.downloadAttentionQueueCsv()`**.
+
+### Documentation
+
+- [Decision](./docs/decisions/2026-04-11-attention-queue-csv-export.md) · [Architecture](./docs/architecture/attention-queue-csv-export.md) · [UX](./docs/ux/attention-queue-csv-export.md) · [Testing](./docs/testing/attention-queue-csv-export.md) · [Instrumentation](./docs/instrumentation/attention-queue-csv-export.md) · [Release](./docs/releases/RELEASE-0.4.5.md) · [Retro](./docs/retros/2026-04-11-attention-queue-csv-export.md)
+
 ## [0.4.4] - 2026-04-11
 
 ### `@oompa/types` **0.2.5**
