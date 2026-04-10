@@ -1,6 +1,8 @@
 import { WorkspacePageMotion } from '@/components/motion/WorkspacePageMotion'
 import { AppShellHeader } from '@/components/shell/MainNav'
 import { BottomNav } from '@/components/shell/BottomNav'
+import { OfflineBanner } from '@/components/pwa/OfflineBanner'
+import { InstallPrompt } from '@/components/pwa/InstallPrompt'
 
 export default function WorkspaceLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -10,6 +12,7 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <AppShellHeader />
         </div>
+        <OfflineBanner />
       </header>
 
       {/* Content — bottom padding accommodates mobile bottom nav */}
@@ -23,6 +26,9 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
 
       {/* Mobile bottom navigation — hidden md+ */}
       <BottomNav />
+
+      {/* PWA install prompt card — fires after 30s, suppressed 30d after dismiss */}
+      <InstallPrompt />
     </div>
   )
 }
