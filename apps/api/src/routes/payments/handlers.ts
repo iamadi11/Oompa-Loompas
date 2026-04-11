@@ -128,30 +128,40 @@ export async function deletePayment(
  * Printable HTML invoice for a single payment milestone (deal-scoped).
  * Returns 404 when the payment is missing or does not belong to the deal.
  */
+/**
+ * Printable HTML invoice for a single payment milestone (deal-scoped).
+ * Allowed for the creator (session) OR anyone with a valid deal shareToken.
+ */
 export async function getPaymentInvoice(
-  request: FastifyRequest<{ Params: { dealId: string; paymentId: string } }>,
+  request: FastifyRequest<{
+    Params: { dealId: string; paymentId: string }
+    Querystring: { token?: string }
+  }>,
   reply: FastifyReply,
 ): Promise<void> {
   const userId = request.authUser?.id
-  if (!userId) {
+  const { token } = request.query
+
+  // Must either be logged in OR provide a token
+  if (!userId && !token) {
     return sendError(reply, new UnauthorizedError())
   }
 
   const { dealId, paymentId } = request.params
-
   const nowIso = new Date().toISOString()
 
   const assigned = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    const locked = await tx.$queryRaw<Array<{ ok: number }>>(
-      Prisma.sql`
-        SELECT 1 AS ok FROM payments p
-        INNER JOIN deals d ON d.id = p.deal_id AND d.user_id = ${userId}
-        WHERE p.id = ${paymentId} AND p.deal_id = ${dealId}
-        FOR UPDATE
-      `,
-    )
-    if (locked.length === 0) {
-      return null
+    // If authenticated, we verify ownership
+    if (userId) {
+      const locked = await tx.$queryRaw<Array<{ ok: number }>>(
+        Prisma.sql`
+          SELECT 1 AS ok FROM payments p
+          INNER JOIN deals d ON d.id = p.deal_id AND d.user_id = ${userId}
+          WHERE p.id = ${paymentId} AND p.deal_id = ${dealId}
+          FOR UPDATE
+        `,
+      )
+      if (locked.length === 0) return null
     }
 
     const row = await tx.payment.findUnique({
@@ -163,13 +173,20 @@ export async function getPaymentInvoice(
             brandName: true,
             currency: true,
             notes: true,
+            shareToken: true,
+            userId: true,
           },
         },
       },
     })
 
-    if (!row || row.dealId !== dealId) {
-      return null
+    if (!row || row.dealId !== dealId) return null
+
+    // If NOT authenticated, we MUST have a matching shareToken
+    if (!userId) {
+      if (!row.deal.shareToken || row.deal.shareToken !== token) {
+        return null
+      }
     }
 
     let invoiceNumber = row.invoiceNumber
@@ -219,7 +236,7 @@ export async function getPaymentInvoice(
     },
   })
 
-  void reply
+  return reply
     .header('Content-Type', 'text/html; charset=utf-8')
     .header('Cache-Control', 'no-store')
     .status(200)

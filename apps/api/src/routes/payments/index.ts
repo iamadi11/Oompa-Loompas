@@ -13,7 +13,6 @@ import {
  */
 export async function paymentRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get('/deals/:dealId/payments', listPayments)
-  fastify.get('/deals/:dealId/payments/:paymentId/invoice', getPaymentInvoice)
   fastify.post('/deals/:dealId/payments', createPayment)
   fastify.patch('/payments/:id', updatePayment)
   fastify.delete('/payments/:id', deletePayment)

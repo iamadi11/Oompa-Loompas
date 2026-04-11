@@ -62,15 +62,24 @@ export function getBrowserApiBase(): string {
   return ''
 }
 
-export function paymentInvoiceHref(dealId: string, paymentId: string): string {
+export function paymentInvoiceHref(
+  dealId: string,
+  paymentId: string,
+  shareToken?: string | null,
+): string {
   const base = getBrowserApiBase()
   const path = `/api/v1/deals/${dealId}/payments/${paymentId}/invoice`
-  return base ? `${base}${path}` : path
+  const query = shareToken ? `?token=${shareToken}` : ''
+  return base ? `${base}${path}${query}` : `${path}${query}`
 }
 
 /** Same-origin absolute URL for sharing or pasting (browser only). */
-export function paymentInvoiceAbsoluteUrl(dealId: string, paymentId: string): string {
-  const href = paymentInvoiceHref(dealId, paymentId)
+export function paymentInvoiceAbsoluteUrl(
+  dealId: string,
+  paymentId: string,
+  shareToken?: string | null,
+): string {
+  const href = paymentInvoiceHref(dealId, paymentId, shareToken)
   if (typeof window === 'undefined') return href
   return new URL(href, window.location.origin).href
 }

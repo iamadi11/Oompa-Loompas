@@ -16,6 +16,7 @@ interface PaymentSectionProps {
   dealValue: number
   dealCurrency: Currency
   initialPayments: Payment[]
+  shareToken?: string | null
 }
 
 export function PaymentSection({
@@ -25,6 +26,7 @@ export function PaymentSection({
   dealValue,
   dealCurrency,
   initialPayments,
+  shareToken,
 }: PaymentSectionProps) {
   const router = useRouter()
   const payments = initialPayments
@@ -120,6 +122,7 @@ export function PaymentSection({
               dealTitle={dealTitle}
               brandName={brandName}
               payment={payment}
+              shareToken={shareToken}
               onUpdate={handlePaymentChange}
             />
           ))}

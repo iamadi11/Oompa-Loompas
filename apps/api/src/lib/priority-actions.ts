@@ -21,6 +21,7 @@ export type DbDealWithRelations = {
   startDate: Date | null
   endDate: Date | null
   notes: string | null
+  shareToken: string | null
   createdAt: Date
   updatedAt: Date
   payments: Array<{
@@ -83,6 +84,7 @@ export function collectPriorityActionsFromDeals(
           amount,
           currency: payment.currency as Currency,
           dueDate: payment.dueDate?.toISOString() ?? null,
+          shareToken: deal.shareToken,
         })
       }
     }
@@ -98,6 +100,7 @@ export function collectPriorityActionsFromDeals(
           deliverableId: d.id,
           deliverableTitle: d.title,
           dueDate: d.dueDate?.toISOString() ?? null,
+          shareToken: deal.shareToken,
         })
       }
     }

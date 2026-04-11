@@ -30,20 +30,26 @@ export function ShareDeliverableReminderButton({
         dueDateIso: dueDate,
       })
 
-      if (typeof navigator !== 'undefined' && navigator.share) {
-        await navigator.share({
-          title: 'Deliverable Update',
-          text: text,
-        })
-        return
-      }
-
+      // Always copy to clipboard as primary action/fallback
       await navigator.clipboard.writeText(text)
-      toast.info('Update copied to clipboard')
-    } catch (err) {
-      if (err instanceof Error && err.name !== 'AbortError') {
-        toast.error('Could not share. Try again.')
+      toast.success('Update copied to clipboard')
+
+      // Attempt native share if available (won't block toast)
+      if (typeof navigator !== 'undefined' && navigator.share) {
+        try {
+          await navigator.share({
+            title: 'Deliverable Update',
+            text: text,
+          })
+        } catch (shareErr) {
+          // Ignore AbortError (user cancelled share sheet)
+          if (shareErr instanceof Error && shareErr.name !== 'AbortError') {
+            console.error('Share failed:', shareErr)
+          }
+        }
       }
+    } catch (err) {
+      toast.error('Could not copy update. Try again.')
     } finally {
       setBusy(false)
     }

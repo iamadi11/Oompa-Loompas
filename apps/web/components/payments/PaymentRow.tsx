@@ -13,10 +13,18 @@ interface PaymentRowProps {
   dealTitle: string
   brandName: string
   payment: Payment
+  shareToken?: string | null
   onUpdate: () => void
 }
 
-export function PaymentRow({ dealId, dealTitle, brandName, payment, onUpdate }: PaymentRowProps) {
+export function PaymentRow({
+  dealId,
+  dealTitle,
+  brandName,
+  payment,
+  shareToken,
+  onUpdate,
+}: PaymentRowProps) {
   const [marking, setMarking] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
@@ -85,7 +93,7 @@ export function PaymentRow({ dealId, dealTitle, brandName, payment, onUpdate }: 
 
       <div className="flex flex-wrap items-center gap-2 shrink-0 border-t border-line/50 sm:border-0 pt-2 sm:pt-0">
         <a
-          href={paymentInvoiceHref(dealId, payment.id)}
+          href={paymentInvoiceHref(dealId, payment.id, shareToken)}
           target="_blank"
           rel="noopener noreferrer"
           className="rounded-md text-sm font-semibold text-brand-800 underline underline-offset-2 hover:text-brand-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
@@ -102,6 +110,7 @@ export function PaymentRow({ dealId, dealTitle, brandName, payment, onUpdate }: 
             amount={payment.amount}
             currency={payment.currency as 'INR' | 'USD' | 'EUR' | 'GBP'}
             dueDate={payment.dueDate}
+            shareToken={shareToken}
           />
         ) : null}
         {canMarkReceived && (

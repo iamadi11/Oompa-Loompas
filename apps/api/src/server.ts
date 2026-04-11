@@ -42,6 +42,18 @@ export async function buildServer() {
   await fastify.register(createAuthRoutes(fastify), { prefix: '/api/v1/auth' })
   await fastify.register(shareRoutes, { prefix: '/api/v1/share' })
 
+  /** Invoices: Publicly accessible via shareToken, or privately via session. */
+  fastify.get('/api/v1/deals/:dealId/payments/:paymentId/invoice', async (req, reply) => {
+    // Attempt authentication but DON'T fail if missing (handler checks token)
+    try {
+      await (fastify as any).authenticate(req, reply)
+    } catch {
+      // Ignore auth failure; handler will check for query token
+    }
+    const { getPaymentInvoice } = await import('./routes/payments/handlers.js')
+    return getPaymentInvoice(req as any, reply)
+  })
+
   /** Encapsulated scope so `authenticate` runs only under `/api/v1/*` (not global). */
   await fastify.register(
     async function oompaProtectedV1(instance) {

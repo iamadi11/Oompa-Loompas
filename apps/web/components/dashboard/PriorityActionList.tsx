@@ -72,6 +72,7 @@ export function PriorityActionList({ actions, className }: Props) {
                   amount={action.amount}
                   currency={action.currency}
                   dueDate={action.dueDate}
+                  shareToken={action.shareToken}
                 />
               </div>
             </div>

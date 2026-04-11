@@ -116,6 +116,7 @@ export default async function DealDetailPage({ params }: Props) {
           dealValue={deal.value}
           dealCurrency={deal.currency}
           initialPayments={payments}
+          shareToken={deal.shareToken}
         />
       </div>
 

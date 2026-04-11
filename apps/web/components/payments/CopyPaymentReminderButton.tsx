@@ -15,6 +15,7 @@ export type CopyPaymentReminderButtonProps = {
   amount: number
   currency: Currency
   dueDate: string | null
+  shareToken?: string | null
 }
 
 export function SharePaymentReminderButton({
@@ -25,13 +26,14 @@ export function SharePaymentReminderButton({
   amount,
   currency,
   dueDate,
+  shareToken,
 }: CopyPaymentReminderButtonProps) {
   const [busy, setBusy] = useState(false)
 
   async function shareReminder() {
     setBusy(true)
     try {
-      const invoiceUrl = paymentInvoiceAbsoluteUrl(dealId, paymentId)
+      const invoiceUrl = paymentInvoiceAbsoluteUrl(dealId, paymentId, shareToken)
       const text = buildPaymentReminderMessage({
         dealTitle,
         brandName,
@@ -41,20 +43,26 @@ export function SharePaymentReminderButton({
         invoiceUrl,
       })
 
-      if (typeof navigator !== 'undefined' && navigator.share) {
-        await navigator.share({
-          title: 'Payment Reminder',
-          text: text,
-        })
-        return
-      }
-
+      // Always copy to clipboard as primary action/fallback
       await navigator.clipboard.writeText(text)
-      toast.info('Reminder copied to clipboard')
-    } catch (err) {
-      if (err instanceof Error && err.name !== 'AbortError') {
-        toast.error('Could not share. Try again.')
+      toast.success('Reminder copied to clipboard')
+
+      // Attempt native share if available (won't block toast)
+      if (typeof navigator !== 'undefined' && navigator.share) {
+        try {
+          await navigator.share({
+            title: 'Payment Reminder',
+            text: text,
+          })
+        } catch (shareErr) {
+          // Ignore AbortError (user cancelled share sheet)
+          if (shareErr instanceof Error && shareErr.name !== 'AbortError') {
+            console.error('Share failed:', shareErr)
+          }
+        }
       }
+    } catch (err) {
+      toast.error('Could not copy reminder. Try again.')
     } finally {
       setBusy(false)
     }

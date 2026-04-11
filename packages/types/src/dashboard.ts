@@ -25,6 +25,7 @@ export const DashboardOverduePaymentActionSchema = z.object({
   amount: z.number(),
   currency: CurrencySchema,
   dueDate: z.string().datetime().nullable(),
+  shareToken: z.string().nullable().optional(),
 })
 export type DashboardOverduePaymentAction = z.infer<typeof DashboardOverduePaymentActionSchema>
 
@@ -36,6 +37,7 @@ export const DashboardOverdueDeliverableActionSchema = z.object({
   deliverableId: IdSchema,
   deliverableTitle: z.string(),
   dueDate: z.string().datetime().nullable(),
+  shareToken: z.string().nullable().optional(),
 })
 export type DashboardOverdueDeliverableAction = z.infer<
   typeof DashboardOverdueDeliverableActionSchema
