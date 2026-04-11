@@ -20,7 +20,7 @@ export default function NewDealPage() {
         </p>
       </div>
       <div className={panelClass}>
-        <DealForm mode="create" />
+        <DealForm key="new-deal-form" mode="create" />
       </div>
     </div>
   )

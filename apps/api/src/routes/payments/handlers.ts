@@ -38,7 +38,7 @@ export async function listPayments(
     orderBy: { createdAt: 'asc' },
   })
 
-  void reply.status(200).send({ data: payments.map(serializePayment) })
+  return reply.status(200).send({ data: payments.map(serializePayment) })
 }
 
 export async function createPayment(
@@ -66,7 +66,7 @@ export async function createPayment(
     data: toCreatePaymentData(dealId, parsed.data),
   })
 
-  void reply.status(201).send({ data: serializePayment(payment) })
+  return reply.status(201).send({ data: serializePayment(payment) })
 }
 
 export async function updatePayment(
@@ -99,7 +99,7 @@ export async function updatePayment(
     data: toUpdatePaymentData(updates),
   })
 
-  void reply.status(200).send({ data: serializePayment(payment) })
+  return reply.status(200).send({ data: serializePayment(payment) })
 }
 
 export async function deletePayment(
@@ -121,7 +121,7 @@ export async function deletePayment(
   }
 
   await prisma.payment.delete({ where: { id } })
-  void reply.status(204).send()
+  return reply.status(204).send()
 }
 
 /**

@@ -43,16 +43,27 @@ export async function buildServer() {
   await fastify.register(shareRoutes, { prefix: '/api/v1/share' })
 
   /** Invoices: Publicly accessible via shareToken, or privately via session. */
-  fastify.get('/api/v1/deals/:dealId/payments/:paymentId/invoice', async (req, reply) => {
-    // Attempt authentication but DON'T fail if missing (handler checks token)
-    try {
-      await (fastify as any).authenticate(req, reply)
-    } catch {
-      // Ignore auth failure; handler will check for query token
-    }
-    const { getPaymentInvoice } = await import('./routes/payments/handlers.js')
-    return getPaymentInvoice(req as any, reply)
-  })
+  await fastify.register(
+    async function oompaInvoices(instance) {
+      // We don't use the global auth hook here; the handler checks auth optionally.
+      instance.get('/deals/:dealId/payments/:paymentId/invoice', async (req, reply) => {
+        // Attempt auth if cookies are present, but don't fail yet if missing.
+        // The handler will use req.authUser if available, or check the query token.
+        const name = 'oompa_session' // Hardcoded for simplicity here or get from auth-env
+        if (req.cookies[name]) {
+          try {
+            await (fastify as any).authenticate(req, reply)
+          } catch {
+            // Error already sent by authenticate
+          }
+        }
+        if (reply.sent) return
+        const { getPaymentInvoice } = await import('./routes/payments/handlers.js')
+        return getPaymentInvoice(req as any, reply)
+      })
+    },
+    { prefix: '/api/v1' },
+  )
 
   /** Encapsulated scope so `authenticate` runs only under `/api/v1/*` (not global). */
   await fastify.register(
@@ -71,6 +82,12 @@ export async function buildServer() {
   )
 
   fastify.setErrorHandler((error, _request, reply) => {
+    // If headers already sent (e.g. double reply), just log and abort.
+    if (reply.sent) {
+      fastify.log.error('Headers already sent, suppressing extra error:', error)
+      return
+    }
+    
     fastify.log.error(error)
     void reply.status(500).send({
       error: 'Internal Server Error',

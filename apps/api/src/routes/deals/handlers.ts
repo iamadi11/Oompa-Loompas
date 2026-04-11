@@ -65,7 +65,7 @@ export async function exportDeliverablesCsv(request: FastifyRequest, reply: Fast
   const body = `\uFEFF${buildDeliverablesPortfolioCsv(csvRows)}`
   const filename = deliverablesPortfolioExportFilename(new Date())
 
-  void reply
+  return reply
     .header('Content-Type', 'text/csv; charset=utf-8')
     .header('Content-Disposition', `attachment; filename="${filename}"`)
     .status(200)
@@ -104,7 +104,7 @@ export async function exportPaymentsCsv(request: FastifyRequest, reply: FastifyR
   const body = `\uFEFF${buildPaymentsPortfolioCsv(csvRows)}`
   const filename = paymentsPortfolioExportFilename(new Date())
 
-  void reply
+  return reply
     .header('Content-Type', 'text/csv; charset=utf-8')
     .header('Content-Disposition', `attachment; filename="${filename}"`)
     .status(200)
@@ -127,7 +127,7 @@ export async function exportDealsCsv(request: FastifyRequest, reply: FastifyRepl
   const body = `\uFEFF${buildDealsPortfolioCsv(serialized)}`
   const filename = dealsPortfolioExportFilename(new Date())
 
-  void reply
+  return reply
     .header('Content-Type', 'text/csv; charset=utf-8')
     .header('Content-Disposition', `attachment; filename="${filename}"`)
     .status(200)
@@ -168,7 +168,7 @@ export async function listDeals(
     prisma.deal.count({ where }),
   ])
 
-  void reply.status(200).send({
+  return reply.status(200).send({
     data: deals.map(serializeDeal),
     meta: {
       page,
@@ -218,7 +218,7 @@ export async function listDealBrands(request: FastifyRequest, reply: FastifyRepl
       .map(([currency, amount]) => ({ currency, amount })),
   }))
 
-  void reply.status(200).send({ data })
+  return reply.status(200).send({ data })
 }
 
 export async function getDeal(
@@ -235,7 +235,7 @@ export async function getDeal(
   if (!deal) {
     return sendError(reply, new NotFoundError('Deal', id))
   }
-  void reply.status(200).send({ data: serializeDeal(deal) })
+  return reply.status(200).send({ data: serializeDeal(deal) })
 }
 
 export async function createDeal(
@@ -265,7 +265,7 @@ export async function createDeal(
     }),
   })
 
-  void reply.status(201).send({ data: serializeDeal(deal) })
+  return reply.status(201).send({ data: serializeDeal(deal) })
 }
 
 export async function updateDeal(
@@ -312,7 +312,7 @@ export async function updateDeal(
     data: toUpdateDealData(updates),
   })
 
-  void reply.status(200).send({ data: serializeDeal(deal) })
+  return reply.status(200).send({ data: serializeDeal(deal) })
 }
 
 export async function deleteDeal(
@@ -332,7 +332,7 @@ export async function deleteDeal(
   }
 
   await prisma.deal.delete({ where: { id } })
-  void reply.status(204).send()
+  return reply.status(204).send()
 }
 
 export async function shareProposal(
@@ -357,7 +357,7 @@ export async function shareProposal(
   })
 
   const shareUrl = `${process.env['WEB_URL'] ?? 'http://localhost:3000'}/p/${updated.shareToken ?? ''}`
-  void reply.status(200).send({ data: { shareToken: updated.shareToken, shareUrl } })
+  return reply.status(200).send({ data: { shareToken: updated.shareToken, shareUrl } })
 }
 
 export async function duplicateDeal(
@@ -422,7 +422,7 @@ export async function duplicateDeal(
     },
   })
 
-  void reply.status(201).send({ data: serializeDeal(newDeal) })
+  return reply.status(201).send({ data: serializeDeal(newDeal) })
 }
 
 export async function revokeShare(
@@ -441,5 +441,5 @@ export async function revokeShare(
   }
 
   await prisma.deal.update({ where: { id }, data: { shareToken: null } })
-  void reply.status(200).send({ data: { shareToken: null } })
+  return reply.status(200).send({ data: { shareToken: null } })
 }

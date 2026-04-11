@@ -90,7 +90,7 @@ export async function getDashboard(request: FastifyRequest, reply: FastifyReply)
     }
   })
 
-  void reply.status(200).send({
+  return reply.status(200).send({
     data: {
       totalContractedValue,
       totalReceivedValue,

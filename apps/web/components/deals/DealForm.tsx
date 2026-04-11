@@ -95,10 +95,13 @@ export function DealForm({ deal, mode }: DealFormProps) {
     e.preventDefault()
     setServerError(null)
 
+    const valRaw = form.value.trim()
+    const valueNum = valRaw === '' ? 0 : parseFloat(valRaw)
+
     const payload = {
-      title: form.title,
-      brandName: form.brandName,
-      value: parseFloat(form.value),
+      title: form.title.trim(),
+      brandName: form.brandName.trim(),
+      value: isNaN(valueNum) ? 0 : valueNum,
       currency: form.currency,
       status: form.status,
       notes: form.notes.trim() || null,
