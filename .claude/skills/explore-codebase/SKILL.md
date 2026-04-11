@@ -1,23 +1,22 @@
 ---
 name: explore-codebase
-description: Navigate and understand codebase structure using the knowledge graph
+description: Navigate and understand codebase structure using search tools
 ---
 
 ## Explore Codebase
 
-Use the code-review-graph MCP tools to explore and understand the codebase.
+Use Grep and Glob to explore and understand the codebase.
 
 ### Steps
 
-1. Run `list_graph_stats` to see overall codebase metrics.
-2. Run `get_architecture_overview` for high-level community structure.
-3. Use `list_communities` to find major modules, then `get_community` for details.
-4. Use `semantic_search_nodes` to find specific functions or classes.
-5. Use `query_graph` with patterns like `callers_of`, `callees_of`, `imports_of` to trace relationships.
-6. Use `list_flows` and `get_flow` to understand execution paths.
+1. Read `graphify-out/GRAPH_REPORT.md` for god nodes and community structure overview.
+2. Use `Glob` with patterns like `apps/api/**/*.ts` or `packages/types/**/*.ts` to find files by module.
+3. Use `Grep` to find specific functions, classes, or patterns across the codebase.
+4. Read key files to understand contracts and interfaces.
+5. Use `Grep` with `callers_of`-style patterns (search for function name) to trace relationships.
 
 ### Tips
 
-- Start broad (stats, architecture) then narrow down to specific areas.
-- Use `children_of` on a file to see all its functions and classes.
-- Use `find_large_functions` to identify complex code.
+- Start from `graphify-out/GRAPH_REPORT.md` communities to know which module owns what.
+- Grep for symbol name before reading whole files.
+- Use `output_mode: files_with_matches` first, then read only relevant files.

@@ -1,6 +1,6 @@
 ---
 name: ship
-description: Fully autonomous feature lifecycle. AI acts as PM+BA+architect+dev+QA+devops+critic. Documents everything. Updates code-review-graph wiki. Zero human input unless blocked.
+description: Fully autonomous feature lifecycle. AI acts as PM+BA+architect+dev+QA+devops+critic. Documents everything. Zero human input unless blocked.
 ---
 
 ## Ship
@@ -15,9 +15,8 @@ No role skipped. No step skipped. No assumption unchallenged.
 
 ### 0.1 — Read State
 1. Read `SOURCE_OF_TRUTH.md`
-2. `get_architecture_overview` + `list_communities` (each) + `list_graph_stats`
-3. `generate_wiki_tool` (force=false)
-4. Check `docs/` for in-progress decisions
+2. Check `docs/` for in-progress decisions
+3. Read `CHANGELOG.md` for current version + shipped features
 
 ### 0.2 — PM Decision
 Answer with evidence:
@@ -34,8 +33,6 @@ Answer with evidence:
 Survives challenge → proceed. Doesn't → pick next candidate, repeat 0.2.
 
 ### 0.4 — Decision Record
-`generate_wiki_tool` (force=false)
-
 Write `docs/decisions/[YYYY-MM-DD]-[slug].md`:
 ```
 # Decision: [Feature]
@@ -47,10 +44,8 @@ Date/Phase/Status
 
 ## Phase 1 — Research
 
-### 1.1 — Codebase (Graph First)
-1. `semantic_search_nodes` — existing related code
-2. `query_graph` imports_of · callers_of · tests_for on affected modules
-3. `get_affected_flows` + `get_impact_radius`
+### 1.1 — Codebase Research
+Use Grep/Glob to find existing related code, callers, tests for affected modules.
 
 Document: reusable code · contracts not to break · existing coverage
 
@@ -65,8 +60,6 @@ Document: reusable code · contracts not to break · existing coverage
 - Deploy path · monitoring (metrics/alerts/thresholds) · rollback procedure · RPO/RTO impact
 
 ### 1.4 — Architecture Record
-`build_or_update_graph_tool` (incremental) + `generate_wiki_tool`
-
 Write `docs/architecture/[slug].md`:
 ```
 # Architecture: [Feature]
@@ -102,16 +95,14 @@ Journey / zero·loading·success·error states / Critic feedback / A11y status
 ## Phase 3 — Tests First
 
 ### 3.1 — Test Cases
-`query_graph` tests_for → baseline. For every behavior:
+For every behavior:
 - Happy path · edge cases (empty/null/zero/boundary/max) · failure modes (DB down, timeout, race) · data integrity
 
 ### 3.2 — Write Failing Tests
 Write all specs → run → confirm FAIL (proves intent). No implementation yet.
 Target: ≥90% coverage. Deterministic. No mocks for DB integration tests.
 
-### 3.3 — Graph Sync + Test Record
-`build_or_update_graph_tool` (incremental)
-
+### 3.3 — Test Record
 Write `docs/testing/[slug].md`:
 ```
 # Test Plan: [Feature]
@@ -127,11 +118,7 @@ Coverage baseline / Test cases table / Edge cases / Failure modes / Coverage tar
 - Data flow: Input → Validate → Normalize → Process → Output
 - No cross-module leakage. No circular deps.
 
-After each meaningful unit:
-```
-build_or_update_graph_tool (incremental)
-detect_changes             (HIGH risk → pause + reassess before continuing)
-```
+After each meaningful unit: run tests, confirm no regressions.
 
 ---
 
@@ -141,8 +128,7 @@ detect_changes             (HIGH risk → pause + reassess before continuing)
 2. `pnpm typecheck` + `pnpm lint` → clean
 3. Coverage ≥90% on changed code
 4. Run twice → deterministic (no flaky)
-5. `detect_changes` + `get_affected_flows` → all impacted paths covered
-6. **Invoke `simplify` skill** → review implementation for reuse, quality, efficiency; fix issues found
+5. **Invoke `simplify` skill** → review implementation for reuse, quality, efficiency; fix issues found
 
 If test cannot pass: document, try alternative, mark BLOCKED only after all retries exhausted.
 
@@ -165,11 +151,6 @@ If test cannot pass: document, try alternative, mark BLOCKED only after all retr
 ## Phase 7 — Documentation
 
 Every changed component: purpose · inputs · outputs · edge cases · failure modes
-
-```
-build_or_update_graph_tool (incremental)
-generate_wiki_tool
-```
 
 ---
 
@@ -198,10 +179,9 @@ All 9 must pass:
 3. **Browser** — real browser validation complete
 4. **Performance** — LCP/INP/CLS within budget OR justification recorded
 5. **Security** — no secrets; auth/authz explicit; no broadened data access
-6. **Impact** — `detect_changes` + `get_affected_flows` all paths covered
-7. **Observability** — post-deploy measurement defined + baseline captured
-8. **Versioning** — semantic version bump + CHANGELOG entry
-9. **Deploy path** — standard pipeline/script only; no ad-hoc agent production changes
+6. **Observability** — post-deploy measurement defined + baseline captured
+7. **Versioning** — semantic version bump + CHANGELOG entry
+8. **Deploy path** — standard pipeline/script only; no ad-hoc agent production changes
 
 Use **`caveman-commit`** skill for all git commit messages.
 
@@ -213,7 +193,6 @@ Use **`caveman-commit`** skill for all git commit messages.
 2. Monitor logs + metrics ≥15 min
 3. Error rate or latency breach → **rollback first, speculate later**
 4. Capture post-deploy measurement baseline
-5. `generate_wiki_tool` — final wiki update
 
 ---
 
@@ -227,11 +206,6 @@ What built / Decisions + why / Critic feedback / Post-deploy baseline / What to 
 
 Invoke **`compress`** skill on `docs/` memory files to reduce future context load.
 
-```
-build_or_update_graph_tool (full sync)
-generate_wiki_tool          (force=true)
-```
-
 ---
 
 ## Completion Criteria
@@ -243,9 +217,8 @@ generate_wiki_tool          (force=true)
 - [ ] Tests green ≥90% (Ph 5)
 - [ ] `simplify` review passed (Ph 5)
 - [ ] UX validated in browser (Ph 6)
-- [ ] All 9 release gates passed (Ph 9)
+- [ ] All 8 release gates passed (Ph 9)
 - [ ] Deployed + health confirmed (Ph 10)
-- [ ] Wiki regenerated (Ph 11)
 - [ ] Retro written + `compress` run (Ph 11)
 
 ---

@@ -288,7 +288,7 @@ TypeScript (strict) · Next.js 16 (PWA per §7.8) · React 19 · **Framer Motion
 
 ## 9.3 Efficiency
 
-Shared packages · static analysis · code graph tooling · **code-review-graph MCP** mandatory (reduces token use vs undirected search — see §20.4).
+Shared packages · static analysis · code graph tooling.
 
 ## 9.4 Security & Secrets (Autonomous Execution)
 
@@ -376,7 +376,7 @@ Stable adherence to §7.7 on core routes. Regressions in lab/field performance =
 * Core revenue paths below a11y bar without recorded exception (§7.6)
 * Expanding data collection/retention/cross-border without alignment to §9.5
 * Merging web changes that breach performance budgets without recorded justification (§7.7)
-* Routine exploration via undirected grep/glob/bulk file reads when code-review-graph MCP suffices (§20.4)
+* Routine exploration via undirected bulk file reads when targeted search suffices
 
 ---
 
@@ -450,18 +450,7 @@ If any fail → reject or redesign.
 
 AI must NEVER read the entire codebase. Must read **only the minimal required context.**
 
-Use: structural code graphs · dependency mapping · change-based context selection.
-
-Context must be: minimal · relevant · deterministic. Full-repo reads forbidden unless explicitly required.
-
-## 20.4 Code-review-graph MCP (mandatory)
-
-For all autonomous agents and AI-assisted engineering:
-* MUST be used **before** undirected exploration via bulk search, glob sweeps, or reading entire source files when the goal is to understand structure, callers, impact, tests, or review changes
-* **Rationale:** graph returns **minimal, task-relevant context** — reduces tokens vs pulling large/unrelated files into context
-* **Fall back** to search/file reads only when graph doesn't cover needed symbol/path, or task explicitly requires a file the graph can't satisfy (generated artifacts, config outside graph, human-specified paths)
-
-Violation for routine exploration = non-compliant with §20.1–20.3.
+Context must be: minimal · relevant · deterministic. Use targeted Grep/Glob before bulk file reads.
 
 ---
 

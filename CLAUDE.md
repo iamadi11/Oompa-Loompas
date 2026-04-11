@@ -3,22 +3,6 @@
 
 ---
 
-## 0. GRAPH FIRST (MANDATORY)
-
-| Goal | Tool |
-|------|------|
-| Find symbols / explore | `semantic_search_nodes` / `query_graph` |
-| Change impact | `get_impact_radius` |
-| Review | `detect_changes` + `get_review_context` |
-| Callers / tests | `query_graph` callers_of / tests_for |
-| Architecture | `get_architecture_overview` + `list_communities` |
-| Renames / dead code | `refactor_tool` |
-| After bulk edits | `build_or_update_graph` |
-
-Full-repo grep/glob/read = **FORBIDDEN** when graph suffices.
-
----
-
 ## 1. WORKFLOW (8 steps, no skips)
 
 1. **RESEARCH** → feasibility, alternatives, sources cited
@@ -131,9 +115,8 @@ Deal → shareToken (nullable) ← /p/:token public proposal
 5. Real browser validation complete
 6. Performance budgets within targets or justification recorded
 7. No secrets in source/logs/output
-8. `detect_changes` + `get_affected_flows` confirm impact covered
-9. Post-deploy signal defined (outcome features)
-10. Semantic version bump + CHANGELOG entry
+8. Post-deploy signal defined (outcome features)
+9. Semantic version bump + CHANGELOG entry
 
 ---
 
@@ -145,7 +128,7 @@ Deal → shareToken (nullable) ← /p/:token public proposal
 | Researcher | Feasibility + alternatives, structured artifact |
 | Developer | Small atomic units, tests green before handoff |
 | Tester | Coverage + missing tests + regression protection |
-| Reviewer | `detect_changes` + `get_review_context`, contract audit |
+| Reviewer | Contract audit, regression check |
 | Optimizer | Dead code, perf, safe refactors |
 
 ---
@@ -201,7 +184,7 @@ Priority: **User Outcome > Determinism > Simplicity > Dev Velocity > Extensibili
 
 ## 12. ANTI-PATTERNS (ZERO TOLERANCE)
 
-Build without research · implement before test definition · large untested changes · `any` types · cross-module leakage · circular deps · secrets in source/logs · full-repo grep when graph suffices · outcome features without post-deploy measurement · black-box AI on money/contracts · silent failures · force-push to main · stale financial data offline
+Build without research · implement before test definition · large untested changes · `any` types · cross-module leakage · circular deps · secrets in source/logs · outcome features without post-deploy measurement · black-box AI on money/contracts · silent failures · force-push to main · stale financial data offline
 
 ---
 

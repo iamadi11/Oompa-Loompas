@@ -18,7 +18,7 @@ Autonomous `/ship` verification against **`main`** at release **`@oompa/web@0.1.
 | 2 | **`pnpm typecheck`** | **Pass** | |
 | 3 | **`pnpm lint`** | **Pass** | |
 | 4 | **`pnpm build`** (repo) | **Pass** after **`rm -rf apps/web/.next`** | Without clean, stale `.next` caused **`PageNotFoundError`** during “Collecting page data” for `/deals/[id]`, `/attention`, etc. |
-| 5 | Code graph wiki | **Pass** | `generate_wiki_tool` **force=true** → 65 pages under **`.code-review-graph/wiki/`** (gitignored). |
+| 5 | Code graph wiki | **Pass** | `generate_wiki_tool` **force=true** → 65 pages generated (gitignored). |
 | 6 | Browser MCP | **Skipped** | No guaranteed local dev server in agent environment; use [browser-ux-checklist-home-overview-unavailable-2026-04-06.md](./browser-ux-checklist-home-overview-unavailable-2026-04-06.md). |
 | 7 | Migrations | **N/A** | No schema change in this slice. |
 | 8 | Version + changelog | **Pass** | **`@oompa/web@0.1.6`**, [CHANGELOG.md](../../CHANGELOG.md) **[0.1.6]**. |

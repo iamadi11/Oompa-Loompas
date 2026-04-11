@@ -28,22 +28,6 @@ No research → No development. No test definition → No implementation.
 
 ---
 
-## 2. CONTEXT OPTIMIZATION (MANDATORY)
-
-Use **code-review-graph MCP** before any file search/read:
-
-| Goal | Tool |
-|---|---|
-| Explore code | `semantic_search_nodes` / `query_graph` |
-| Impact | `get_impact_radius` |
-| Review | `detect_changes` + `get_review_context` |
-| Callers/tests | `query_graph` callers_of / tests_for |
-| Architecture | `get_architecture_overview` + `list_communities` |
-
-Fall back to file reads only when graph cannot satisfy query. **Full-repo grep/glob/read sweeps are forbidden** unless graph is insufficient.
-
----
-
 ## 3. ARCHITECTURE (FINAL)
 
 - **Modular Monolith, Monorepo** — no microservices, no polyrepo, no serverless-first

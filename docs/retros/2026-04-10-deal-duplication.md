@@ -36,5 +36,4 @@ navigate — the new deal needs immediate editing and the back button brings the
 - Check at day 7 and day 14
 
 ## What We'd Do Differently
-- The hook configuration uses `code-review-graph update --quiet` which errors (unrecognized flag).
-  Should be fixed: `code-review-graph update` (no `--quiet`). Non-blocking but noisy.
+- Hook configuration cleanup needed; noisy errors from deprecated tooling were non-blocking.
