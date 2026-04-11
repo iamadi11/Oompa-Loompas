@@ -16,7 +16,31 @@ import type {
   LoginBody,
   RegisterBody,
   MeResponse,
+  BrandProfile,
+  UpsertBrandProfile,
 } from '@oompa/types'
+
+export interface BrandRecentDeal {
+  id: string
+  title: string
+  value: number
+  currency: string
+  status: string
+  createdAt: string
+}
+
+export interface BrandProfileStats {
+  totalDeals: number
+  overduePaymentsCount: number
+  contractedTotals: { currency: string; amount: number }[]
+}
+
+export interface BrandProfileView {
+  brandName: string
+  profile: BrandProfile | null
+  stats: BrandProfileStats
+  recentDeals: BrandRecentDeal[]
+}
 
 /**
  * Base URL for browser `fetch` and invoice links.
@@ -242,6 +266,28 @@ class ApiClient {
 
   async revokeShare(dealId: string): Promise<{ data: { shareToken: null } }> {
     return this.request<{ data: { shareToken: null } }>(`/api/v1/deals/${dealId}/share`, {
+      method: 'DELETE',
+    })
+  }
+
+  async getBrandProfile(brandName: string): Promise<ApiResponse<BrandProfileView>> {
+    return this.request<ApiResponse<BrandProfileView>>(
+      `/api/v1/brands/${encodeURIComponent(brandName)}`,
+    )
+  }
+
+  async upsertBrandProfile(
+    brandName: string,
+    data: UpsertBrandProfile,
+  ): Promise<ApiResponse<BrandProfile>> {
+    return this.request<ApiResponse<BrandProfile>>(
+      `/api/v1/brands/${encodeURIComponent(brandName)}`,
+      { method: 'PUT', body: JSON.stringify(data) },
+    )
+  }
+
+  async deleteBrandProfile(brandName: string): Promise<void> {
+    return this.request<void>(`/api/v1/brands/${encodeURIComponent(brandName)}`, {
       method: 'DELETE',
     })
   }

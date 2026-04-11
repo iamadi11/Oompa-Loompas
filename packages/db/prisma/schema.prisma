@@ -14,14 +14,15 @@ enum Role {
 }
 
 model User {
-  id           String    @id @default(uuid())
-  email        String    @unique @db.VarChar(320)
-  passwordHash String    @map("password_hash") @db.VarChar(255)
-  roles        Role[]    @default([MEMBER])
-  sessions     Session[]
-  deals        Deal[]
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
+  id            String         @id @default(uuid())
+  email         String         @unique @db.VarChar(320)
+  passwordHash  String         @map("password_hash") @db.VarChar(255)
+  roles         Role[]         @default([MEMBER])
+  sessions      Session[]
+  deals         Deal[]
+  brandProfiles BrandProfile[]
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
 
   @@map("users")
 }
@@ -142,6 +143,22 @@ model InvoiceCounter {
   lastSeq Int    @default(0) @map("last_seq")
 
   @@map("invoice_counters")
+}
+
+model BrandProfile {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  brandName    String   @map("brand_name") @db.VarChar(255)
+  contactEmail String?  @map("contact_email") @db.VarChar(500)
+  contactPhone String?  @map("contact_phone") @db.VarChar(50)
+  notes        String?  @db.Text
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, brandName])
+  @@index([userId])
+  @@map("brand_profiles")
 }
 
 model Deliverable {

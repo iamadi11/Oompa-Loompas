@@ -14,6 +14,7 @@ import { healthV1Routes } from './routes/health/index.js'
 import { createAuthRoutes } from './routes/auth/index.js'
 import { adminRoutes } from './routes/admin/index.js'
 import { shareRoutes } from './routes/share/index.js'
+import { brandRoutes } from './routes/brands/index.js'
 
 export async function buildServer() {
   getSessionSecret()
@@ -50,6 +51,7 @@ export async function buildServer() {
       await instance.register(deliverableRoutes)
       await instance.register(attentionRoutes)
       await instance.register(adminRoutes)
+      await instance.register(brandRoutes, { prefix: '/brands' })
     },
     { prefix: '/api/v1' },
   )
