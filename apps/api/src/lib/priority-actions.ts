@@ -94,6 +94,7 @@ export function collectPriorityActionsFromDeals(
           kind: 'overdue_deliverable',
           dealId: deal.id,
           dealTitle: deal.title,
+          brandName: deal.brandName,
           deliverableId: d.id,
           deliverableTitle: d.title,
           dueDate: d.dueDate?.toISOString() ?? null,

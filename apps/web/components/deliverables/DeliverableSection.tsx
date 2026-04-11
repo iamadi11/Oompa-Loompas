@@ -9,10 +9,17 @@ import { Button } from '@/components/ui/Button'
 
 interface DeliverableSectionProps {
   dealId: string
+  dealTitle: string
+  brandName: string
   initialDeliverables: Deliverable[]
 }
 
-export function DeliverableSection({ dealId, initialDeliverables }: DeliverableSectionProps) {
+export function DeliverableSection({
+  dealId,
+  dealTitle,
+  brandName,
+  initialDeliverables,
+}: DeliverableSectionProps) {
   const router = useRouter()
   /** From server; must not freeze initial props — router.refresh() supplies new data. */
   const deliverables = initialDeliverables
@@ -102,6 +109,8 @@ export function DeliverableSection({ dealId, initialDeliverables }: DeliverableS
               key={deliverable.id}
               deliverable={deliverable}
               onUpdate={handleChange}
+              dealTitle={dealTitle}
+              brandName={brandName}
             />
           ))}
         </div>

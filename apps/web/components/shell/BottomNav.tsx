@@ -10,7 +10,7 @@ import { usePrefersReducedMotion } from '@/lib/motion/use-prefers-motion'
 interface NavItem {
   href: string
   label: string
-  key: 'overview' | 'attention' | 'deals'
+  key: 'overview' | 'attention' | 'deals' | 'settings'
   icon: React.ReactNode
 }
 
@@ -49,6 +49,17 @@ const NAV_ITEMS: NavItem[] = [
         <polyline points="14 2 14 8 20 8" />
         <line x1="9" y1="13" x2="15" y2="13" />
         <line x1="9" y1="17" x2="12" y2="17" />
+      </svg>
+    ),
+  },
+  {
+    href: '/settings',
+    label: 'Settings',
+    key: 'settings',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+        <circle cx="12" cy="12" r="3" />
       </svg>
     ),
   },

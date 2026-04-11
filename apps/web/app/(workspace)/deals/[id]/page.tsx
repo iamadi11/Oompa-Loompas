@@ -100,7 +100,12 @@ export default async function DealDetailPage({ params }: Props) {
       />
 
       <div className={panelClass}>
-        <DeliverableSection dealId={deal.id} initialDeliverables={deliverables} />
+        <DeliverableSection
+          dealId={deal.id}
+          dealTitle={deal.title}
+          brandName={deal.brandName}
+          initialDeliverables={deliverables}
+        />
       </div>
 
       <div className={panelClass}>

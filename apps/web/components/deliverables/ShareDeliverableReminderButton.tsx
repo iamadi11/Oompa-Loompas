@@ -1,56 +1,45 @@
 'use client'
 
 import { useState } from 'react'
-import type { Currency } from '@oompa/types'
-import { buildPaymentReminderMessage } from '@oompa/utils'
+import { buildDeliverableReminderMessage } from '@oompa/utils'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/Button'
-import { paymentInvoiceAbsoluteUrl } from '@/lib/api'
 
-export type CopyPaymentReminderButtonProps = {
-  dealId: string
-  paymentId: string
+export type ShareDeliverableReminderButtonProps = {
   dealTitle: string
   brandName: string
-  amount: number
-  currency: Currency
+  deliverableTitle: string
   dueDate: string | null
 }
 
-export function SharePaymentReminderButton({
-  dealId,
-  paymentId,
+export function ShareDeliverableReminderButton({
   dealTitle,
   brandName,
-  amount,
-  currency,
+  deliverableTitle,
   dueDate,
-}: CopyPaymentReminderButtonProps) {
+}: ShareDeliverableReminderButtonProps) {
   const [busy, setBusy] = useState(false)
 
   async function shareReminder() {
     setBusy(true)
     try {
-      const invoiceUrl = paymentInvoiceAbsoluteUrl(dealId, paymentId)
-      const text = buildPaymentReminderMessage({
+      const text = buildDeliverableReminderMessage({
         dealTitle,
         brandName,
-        amount,
-        currency,
+        deliverableTitle,
         dueDateIso: dueDate,
-        invoiceUrl,
       })
 
       if (typeof navigator !== 'undefined' && navigator.share) {
         await navigator.share({
-          title: 'Payment Reminder',
+          title: 'Deliverable Update',
           text: text,
         })
         return
       }
 
       await navigator.clipboard.writeText(text)
-      toast.info('Reminder copied to clipboard')
+      toast.info('Update copied to clipboard')
     } catch (err) {
       if (err instanceof Error && err.name !== 'AbortError') {
         toast.error('Could not share. Try again.')
@@ -67,9 +56,9 @@ export function SharePaymentReminderButton({
       size="sm"
       loading={busy}
       onClick={() => void shareReminder()}
-      aria-label="Share payment reminder message"
+      aria-label="Share deliverable reminder message"
     >
-      Share reminder
+      Share update
     </Button>
   )
 }

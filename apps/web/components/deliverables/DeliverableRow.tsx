@@ -5,10 +5,13 @@ import type { Deliverable } from '@oompa/types'
 import { formatDate } from '@oompa/utils'
 import { api } from '@/lib/api'
 import { Button } from '@/components/ui/Button'
+import { ShareDeliverableReminderButton } from './ShareDeliverableReminderButton'
 
 interface DeliverableRowProps {
   deliverable: Deliverable
   onUpdate: () => void
+  dealTitle: string
+  brandName: string
 }
 
 const PLATFORM_LABELS: Record<string, string> = {
@@ -32,7 +35,12 @@ const TYPE_LABELS: Record<string, string> = {
   OTHER: 'Other',
 }
 
-export function DeliverableRow({ deliverable, onUpdate }: DeliverableRowProps) {
+export function DeliverableRow({
+  deliverable,
+  onUpdate,
+  dealTitle,
+  brandName,
+}: DeliverableRowProps) {
   const [updating, setUpdating] = useState(false)
 
   async function toggleComplete() {
@@ -130,6 +138,14 @@ export function DeliverableRow({ deliverable, onUpdate }: DeliverableRowProps) {
           >
             {isCompleted ? 'Undo' : 'Mark complete'}
           </Button>
+        )}
+        {!isCompleted && !isCancelled && (
+          <ShareDeliverableReminderButton
+            dealTitle={dealTitle}
+            brandName={brandName}
+            deliverableTitle={deliverable.title}
+            dueDate={deliverable.dueDate}
+          />
         )}
         <button
           type="button"

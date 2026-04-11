@@ -317,6 +317,24 @@ class ApiClient {
   async getMe(): Promise<MeResponse> {
     return this.request<MeResponse>('/api/v1/auth/me')
   }
+
+  async getPushPublicKey(): Promise<ApiResponse<{ publicKey: string }>> {
+    return this.request<ApiResponse<{ publicKey: string }>>('/api/v1/push/public-key')
+  }
+
+  async subscribePush(subscription: any): Promise<void> {
+    return this.request<void>('/api/v1/push/subscribe', {
+      method: 'POST',
+      body: JSON.stringify(subscription),
+    })
+  }
+
+  async unsubscribePush(endpoint: string): Promise<void> {
+    return this.request<void>('/api/v1/push/unsubscribe', {
+      method: 'DELETE',
+      body: JSON.stringify({ endpoint }),
+    })
+  }
 }
 
 export const api = new ApiClient()

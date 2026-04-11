@@ -32,6 +32,7 @@ export const DashboardOverdueDeliverableActionSchema = z.object({
   kind: z.literal('overdue_deliverable'),
   dealId: IdSchema,
   dealTitle: z.string(),
+  brandName: z.string(),
   deliverableId: IdSchema,
   deliverableTitle: z.string(),
   dueDate: z.string().datetime().nullable(),

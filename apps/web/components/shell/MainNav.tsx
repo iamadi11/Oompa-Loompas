@@ -23,9 +23,23 @@ function NavLinks(props: { className?: string }) {
 
   return (
     <>
-      {(['overview', 'attention', 'deals'] as const).map((key) => {
-        const href = key === 'overview' ? '/dashboard' : key === 'attention' ? '/attention' : '/deals'
-        const label = key === 'overview' ? 'Overview' : key === 'attention' ? 'Attention' : 'Deals'
+      {(['overview', 'attention', 'deals', 'settings'] as const).map((key) => {
+        const href =
+          key === 'overview'
+            ? '/dashboard'
+            : key === 'attention'
+              ? '/attention'
+              : key === 'deals'
+                ? '/deals'
+                : '/settings'
+        const label =
+          key === 'overview'
+            ? 'Overview'
+            : key === 'attention'
+              ? 'Attention'
+              : key === 'deals'
+                ? 'Deals'
+                : 'Settings'
         const current = isMainNavCurrent(pathname, key)
         return (
           <Link

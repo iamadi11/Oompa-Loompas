@@ -29,4 +29,12 @@ describe('isMainNavCurrent', () => {
     expect(isMainNavCurrent('/attention/', 'attention')).toBe(true)
     expect(isMainNavCurrent('/dashboard/', 'overview')).toBe(true)
   })
+
+  it('marks settings on /settings and nested routes', () => {
+    expect(isMainNavCurrent('/settings', 'settings')).toBe(true)
+    expect(isMainNavCurrent('/settings/', 'settings')).toBe(true)
+    expect(isMainNavCurrent('/settings/notifications', 'settings')).toBe(true)
+    expect(isMainNavCurrent('/dashboard', 'settings')).toBe(false)
+    expect(isMainNavCurrent('/deals', 'settings')).toBe(false)
+  })
 })

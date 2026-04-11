@@ -1,7 +1,7 @@
 /**
  * Determines whether a main shell nav item is the current page for `aria-current="page"`.
  */
-export type MainNavTarget = 'overview' | 'attention' | 'deals'
+export type MainNavTarget = 'overview' | 'attention' | 'deals' | 'settings'
 
 export function isMainNavCurrent(pathname: string, target: MainNavTarget): boolean {
   const normalized =
@@ -13,5 +13,7 @@ export function isMainNavCurrent(pathname: string, target: MainNavTarget): boole
       return normalized === '/attention' || normalized.startsWith('/attention/')
     case 'deals':
       return normalized === '/deals' || normalized.startsWith('/deals/')
+    case 'settings':
+      return normalized === '/settings' || normalized.startsWith('/settings/')
   }
 }

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { api } from '@/lib/api'
+import { toast } from 'sonner'
 
 interface Props {
   dealId: string
@@ -24,7 +25,6 @@ export function ShareProposalButton({ dealId, initialShareToken }: Props) {
       : null,
   )
   const [loading, setLoading] = useState(false)
-  const [copied, setCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   async function handleGenerate() {
@@ -55,12 +55,33 @@ export function ShareProposalButton({ dealId, initialShareToken }: Props) {
     }
   }
 
+  async function handleShare() {
+    if (!shareUrl) return
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Project Proposal',
+          text: 'View our project proposal, deliverables, and payment terms here.',
+          url: shareUrl,
+        })
+        return
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') {
+          console.error('Share failed:', err)
+        } else {
+          return // User cancelled - no-op
+        }
+      }
+    }
+    // Fallback to copy
+    await handleCopy()
+    toast.info('Link copied to clipboard')
+  }
+
   async function handleCopy() {
     if (!shareUrl) return
     try {
       await navigator.clipboard.writeText(shareUrl)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
     } catch {
       // Clipboard API not available — user can copy the URL manually
     }
@@ -100,7 +121,13 @@ export function ShareProposalButton({ dealId, initialShareToken }: Props) {
               onClick={() => void handleCopy()}
               className="shrink-0 rounded-lg border border-stone-300 px-3 py-2 text-xs font-medium text-stone-700 hover:bg-stone-100 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-500"
             >
-              {copied ? 'Copied!' : 'Copy'}
+              Copy
+            </button>
+            <button
+              onClick={() => void handleShare()}
+              className="shrink-0 rounded-lg bg-stone-900 px-3 py-2 text-xs font-medium text-white hover:bg-stone-700 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900"
+            >
+              Share
             </button>
           </div>
           <button
