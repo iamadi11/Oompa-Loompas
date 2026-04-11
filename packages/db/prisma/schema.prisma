@@ -21,6 +21,7 @@ model User {
   sessions      Session[]
   deals         Deal[]
   brandProfiles BrandProfile[]
+  pushSubscriptions PushSubscription[]
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
 
@@ -180,4 +181,19 @@ model Deliverable {
   @@index([status])
   @@index([dueDate])
   @@map("deliverables")
+}
+
+model PushSubscription {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @db.Text
+  p256dh    String   @db.Text
+  auth      String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, endpoint])
+  @@index([userId])
+  @@map("push_subscriptions")
 }
