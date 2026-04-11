@@ -2,6 +2,7 @@ import { config as loadEnv } from 'dotenv'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { buildServer } from './server.js'
+import { startPushNotificationCron } from './jobs/push-notifications.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 loadEnv({ path: resolve(__dirname, '../.env') })
@@ -13,6 +14,7 @@ async function main() {
   const fastify = await buildServer()
 
   try {
+    startPushNotificationCron();
     await fastify.listen({ port: PORT, host: HOST })
   } catch (err) {
     fastify.log.error(err)

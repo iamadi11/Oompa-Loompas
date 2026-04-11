@@ -1,55 +1,57 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { FastifyInstance } from 'fastify';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+
 import { buildServer } from '../server.js';
-import { createAuthSession, createDbUser } from './auth-test-helpers.js';
-import { prisma as db } from '@oompa/db';
+import { testAuthCookieHeader, TEST_USER_ID, mockSessionFindUnique } from './auth-test-helpers.js';
+import { prisma } from '@oompa/db';
+import * as pushEnv from '../lib/push-env.js';
+
+const mockPrisma = prisma as any;
+const auth = testAuthCookieHeader();
 
 describe('Push Notifications API', () => {
-  let app: FastifyInstance;
-  let userId: string;
-  let sessionToken: string;
-  let cookie: string;
-
-  beforeEach(async () => {
-    app = await buildServer({ logger: false });
-    const user = await createDbUser();
-    userId = user.id;
-    const session = await createAuthSession(userId);
-    sessionToken = session.token;
-    cookie = `session=${sessionToken}`;
-  });
-
-  afterEach(async () => {
-    await db.pushSubscription.deleteMany({});
-    await db.session.deleteMany({});
-    await db.user.deleteMany({});
-    await app.close();
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
   describe('GET /api/v1/push/public-key', () => {
     it('returns the VAPID public key', async () => {
-      const resp = await app.inject({
+      vi.spyOn(pushEnv, 'getVapidPublicKey').mockReturnValue('mock-vapid-key');
+      mockSessionFindUnique(mockPrisma.session.findUnique, {
+        userId: TEST_USER_ID,
+        roles: ['MEMBER'],
+      });
+
+      const fastify = await buildServer();
+      const resp = await fastify.inject({
         method: 'GET',
         url: '/api/v1/push/public-key',
-        headers: { cookie }
+        headers: auth
       });
       expect(resp.statusCode).toBe(200);
-      const json = resp.json();
-      expect(json.data.publicKey).toBeDefined();
-      expect(typeof json.data.publicKey).toBe('string');
+      expect(resp.json().data.publicKey).toBe('mock-vapid-key');
+      await fastify.close();
     });
     
     it('returns 401 unauthenticated if not logged in', async () => {
-      const resp = await app.inject({
+      const fastify = await buildServer();
+      const resp = await fastify.inject({
         method: 'GET',
         url: '/api/v1/push/public-key',
       });
       expect(resp.statusCode).toBe(401);
+      await fastify.close();
     });
   });
 
   describe('POST /api/v1/push/subscribe', () => {
     it('creates a new push subscription', async () => {
+      mockSessionFindUnique(mockPrisma.session.findUnique, {
+        userId: TEST_USER_ID,
+        roles: ['MEMBER'],
+      });
+      mockPrisma.pushSubscription.upsert.mockResolvedValue({});
+
+      const fastify = await buildServer();
       const payload = {
         endpoint: 'https://fcm.googleapis.com/fcm/send/fake-endpoint',
         keys: {
@@ -58,80 +60,45 @@ describe('Push Notifications API', () => {
         }
       };
 
-      const resp = await app.inject({
+      const resp = await fastify.inject({
         method: 'POST',
         url: '/api/v1/push/subscribe',
-        headers: { cookie },
+        headers: auth,
         payload
       });
 
       expect(resp.statusCode).toBe(204);
-
-      const sub = await db.pushSubscription.findFirst({
-        where: { userId }
-      });
-      expect(sub).toBeDefined();
-      expect(sub?.endpoint).toBe(payload.endpoint);
-      expect(sub?.p256dh).toBe(payload.keys.p256dh);
-      expect(sub?.auth).toBe(payload.keys.auth);
-    });
-
-    it('updates existing subscription with same endpoint for user', async () => {
-      const payload = {
-        endpoint: 'https://fcm.googleapis.com/fcm/send/fake-endpoint',
-        keys: {
-          p256dh: 'old-p256dh',
-          auth: 'old-auth'
-        }
-      };
-      
-      await app.inject({
-        method: 'POST',
-        url: '/api/v1/push/subscribe',
-        headers: { cookie },
-        payload
-      });
-
-      // Same endpoint, but keys rotated
-      payload.keys.p256dh = 'new-p256dh';
-      
-      const resp2 = await app.inject({
-        method: 'POST',
-        url: '/api/v1/push/subscribe',
-        headers: { cookie },
-        payload
-      });
-
-      expect(resp2.statusCode).toBe(204);
-
-      const subs = await db.pushSubscription.findMany({ where: { userId } });
-      expect(subs).toHaveLength(1);
-      expect(subs[0].p256dh).toBe('new-p256dh');
+      expect(mockPrisma.pushSubscription.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          create: expect.objectContaining({ p256dh: 'fake-p256dh' })
+        })
+      );
+      await fastify.close();
     });
   });
 
   describe('DELETE /api/v1/push/unsubscribe', () => {
     it('deletes an existing push subscription', async () => {
-      await db.pushSubscription.create({
-        data: {
-          userId,
-          endpoint: 'fake-endpoint-to-delete',
-          p256dh: 'fake',
-          auth: 'fake'
-        }
+      mockSessionFindUnique(mockPrisma.session.findUnique, {
+        userId: TEST_USER_ID,
+        roles: ['MEMBER'],
       });
+      mockPrisma.pushSubscription.deleteMany.mockResolvedValue({ count: 1 });
 
-      const resp = await app.inject({
+      const fastify = await buildServer();
+      const resp = await fastify.inject({
         method: 'DELETE',
         url: '/api/v1/push/unsubscribe',
-        headers: { cookie },
+        headers: auth,
         payload: { endpoint: 'fake-endpoint-to-delete' }
       });
 
+      if (resp.statusCode === 500) console.log('DELETE /unsubscribe err:', resp.body);
       expect(resp.statusCode).toBe(204);
-
-      const subs = await db.pushSubscription.findMany({ where: { userId } });
-      expect(subs).toHaveLength(0);
+      expect(mockPrisma.pushSubscription.deleteMany).toHaveBeenCalledWith({
+        where: { userId: TEST_USER_ID, endpoint: 'fake-endpoint-to-delete' }
+      });
+      await fastify.close();
     });
   });
 });

@@ -2,6 +2,33 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.4.7] - 2026-04-12
+
+### `@oompa/db` **0.2.1**
+
+- **`PushSubscription` model:** stores browser push subscription endpoint, `p256dh`, and `auth` keys per user. Migration `20260411210633_push_subscriptions` applied.
+
+### `@oompa/api` **0.4.7**
+
+- **`GET /api/v1/push/public-key`:** returns VAPID public key (authenticated).
+- **`POST /api/v1/push/subscribe`:** upserts a push subscription for the current user.
+- **`DELETE /api/v1/push/unsubscribe`:** removes a push subscription by endpoint.
+- **Push cron job** (`apps/api/src/jobs/push-notifications.ts`): daily at 01:30 UTC, sends a single bundled push notification per user for overdue payments + deliverables (SOT §25.2 — no monetary amounts in payload, max 3 notifications/day).
+
+### `@oompa/web` **0.4.7**
+
+- **Service worker** (`app/sw.ts`): `push` and `notificationclick` event handlers added — surfaces OS-level notifications and focuses/opens the app on click.
+- **`/settings`** page: opt-in UI; requests browser permission, subscribes via API.
+
+### Documentation
+
+- `docs/architecture/pwa-push-notifications.md` — architecture spec.
+- `docs/decisions/2026-04-11-pwa-push-notifications.md` — ADR.
+- `docs/testing/pwa-push-notifications.md` — test plan.
+- `docs/instrumentation/pwa-push-notifications.md` — instrumentation plan.
+
+---
+
 ## [0.4.6] - 2026-04-11
 
 ### `@oompa/types` **0.2.6**

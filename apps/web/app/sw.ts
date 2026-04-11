@@ -43,3 +43,43 @@ const serwist = new Serwist({
 })
 
 serwist.addEventListeners()
+
+self.addEventListener('push', (event) => {
+  if (event.data) {
+    let data;
+    try {
+      data = event.data.json();
+    } catch (e) {
+      data = { title: 'Notification', body: event.data.text() };
+    }
+
+    const title = data.title || 'Attention Required';
+    const options = {
+      body: data.body || 'You have new updates related to your deals.',
+      icon: data.icon || '/icon512_maskable.png',
+      badge: data.badge || '/icon512_maskable.png',
+      data: data.url || '/'
+    };
+
+    event.waitUntil(self.registration.showNotification(title, options));
+  }
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const urlToOpen = (event.notification.data as string) || '/';
+  
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      for (const client of windowClients) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          (client as WindowClient).navigate(urlToOpen);
+          return (client as WindowClient).focus();
+        }
+      }
+      if (self.clients.openWindow) {
+        return self.clients.openWindow(urlToOpen);
+      }
+    })
+  );
+});

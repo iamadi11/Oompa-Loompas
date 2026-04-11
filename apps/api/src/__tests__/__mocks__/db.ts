@@ -39,6 +39,15 @@ export const prisma = {
   invoiceCounter: {
     upsert: vi.fn().mockResolvedValue({ id: 'singleton', lastSeq: 1 }),
   },
+  pushSubscription: {
+    findMany: vi.fn(),
+    findFirst: vi.fn(),
+    findUnique: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    upsert: vi.fn(),
+    deleteMany: vi.fn(),
+  },
   $executeRaw: vi.fn().mockResolvedValue(undefined),
   $queryRaw: vi.fn().mockResolvedValue([{ ok: 1 }]),
   $transaction: vi.fn(),
