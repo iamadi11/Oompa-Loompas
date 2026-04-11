@@ -1,7 +1,7 @@
 'use client'
 
 import { Skeleton } from 'boneyard-js/react'
-import { useReducedMotion } from 'motion/react'
+import { usePrefersReducedMotion } from '@/lib/motion/use-prefers-motion'
 
 const fallbackClass =
   'min-h-[40vh] w-full rounded-2xl border border-line/60 bg-surface-raised/40 animate-pulse motion-reduce:animate-none'
@@ -13,7 +13,7 @@ export type WorkspaceSkeletonName =
   | 'workspace-generic'
 
 export function WorkspaceRouteSkeleton({ name }: { name: WorkspaceSkeletonName }) {
-  const reduced = useReducedMotion() === true
+  const reduced = usePrefersReducedMotion()
   return (
     <Skeleton
       name={name}

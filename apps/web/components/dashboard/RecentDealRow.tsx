@@ -1,54 +1,58 @@
 'use client'
 
+import { useRef } from 'react'
 import type { Route } from 'next'
 import Link from 'next/link'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
 import type { DashboardDeal } from '@oompa/types'
 import { formatCurrency } from '@oompa/utils'
-import { motion } from 'motion/react'
 import { usePrefersReducedMotion } from '@/lib/motion/use-prefers-motion'
 import { StatusBadge } from '@/components/ui/Badge'
 
-const MotionLink = motion.create(Link)
-
 interface RecentDealRowProps {
   deal: DashboardDeal
-  motionIndex?: number
 }
 
-export function RecentDealRow({ deal, motionIndex = 0 }: RecentDealRowProps) {
+export function RecentDealRow({ deal }: RecentDealRowProps) {
   const { paymentSummary } = deal
   const prefersReduced = usePrefersReducedMotion()
+  const rowRef = useRef<HTMLAnchorElement>(null)
+
   const receivedPct =
     paymentSummary.totalContracted > 0
       ? Math.round((paymentSummary.totalReceived / paymentSummary.totalContracted) * 100)
       : 0
 
+  const { contextSafe } = useGSAP({ scope: rowRef })
+
+  const onMouseEnter = contextSafe(() => {
+    if (prefersReduced) return
+    gsap.to(rowRef.current, {
+      paddingLeft: '1.25rem', // Slight indent equivalent to x: 5
+      duration: 0.3,
+      ease: 'power2.out',
+    })
+  })
+
+  const onMouseLeave = contextSafe(() => {
+    if (prefersReduced) return
+    gsap.to(rowRef.current, {
+      paddingLeft: '1rem',
+      duration: 0.3,
+      ease: 'power2.inOut',
+    })
+  })
+
   return (
-    <MotionLink
+    <Link
+      ref={rowRef}
       href={`/deals/${deal.id}` as Route}
-      className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 px-4 py-3.5 rounded-xl border border-line/80 bg-surface-raised shadow-sm hover:border-brand-700/50 hover:shadow-card transition-all duration-200 motion-reduce:transition-none group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
-      initial={prefersReduced ? false : { opacity: 0, x: -12 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={
-        prefersReduced
-          ? { duration: 0 }
-          : {
-              type: 'spring',
-              stiffness: 340,
-              damping: 26,
-              delay: motionIndex * 0.06,
-            }
-      }
-      {...(!prefersReduced
-        ? {
-            whileHover: {
-              x: 5,
-              transition: { type: 'spring' as const, stiffness: 300, damping: 22 },
-            },
-          }
-        : {})}
+      className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 px-4 py-3.5 rounded-xl border border-line/80 bg-surface-raised shadow-sm hover:border-brand-700/50 hover:shadow-card transition-shadow duration-200 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 flex-1 text-left">
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-semibold text-sm text-stone-900 truncate group-hover:text-brand-400 transition-colors">
             {deal.title}
@@ -69,6 +73,6 @@ export function RecentDealRow({ deal, motionIndex = 0 }: RecentDealRowProps) {
         </p>
         <p className="text-xs text-stone-500 tabular-nums">{receivedPct}% received</p>
       </div>
-    </MotionLink>
+    </Link>
   )
 }

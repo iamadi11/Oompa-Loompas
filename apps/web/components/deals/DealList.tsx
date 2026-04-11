@@ -1,7 +1,13 @@
+'use client'
+
+import { useRef } from 'react'
 import Link from 'next/link'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
 import type { Deal } from '@oompa/types'
 import { getDealListEmptyContent, type DealListEmptyVariant } from '@/lib/deal-list-empty'
 import { DealCard } from './DealCard'
+import { usePrefersReducedMotion } from '@/lib/motion/use-prefers-motion'
 
 interface DealListProps {
   deals: Deal[]
@@ -10,6 +16,31 @@ interface DealListProps {
 }
 
 export function DealList({ deals, emptyVariant = 'all' }: DealListProps) {
+  const container = useRef<HTMLDivElement>(null)
+  const prefersReduced = usePrefersReducedMotion()
+
+  useGSAP(
+    () => {
+      if (prefersReduced || !container.current) return
+
+      const cards = container.current.querySelectorAll('.deal-card')
+      gsap.fromTo(
+        cards,
+        { opacity: 0, y: 16, scale: 0.99 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          stagger: 0.04,
+          duration: 0.5,
+          ease: 'power2.out',
+          clearProps: 'all',
+        }
+      )
+    },
+    { dependencies: [deals, prefersReduced], scope: container }
+  )
+
   if (deals.length === 0) {
     const copy = getDealListEmptyContent(emptyVariant)
     return (
@@ -35,7 +66,7 @@ export function DealList({ deals, emptyVariant = 'all' }: DealListProps) {
         <div className="mt-8 flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
           <Link
             href={copy.primaryHref}
-            className="inline-flex items-center justify-center w-full sm:w-auto px-5 py-2.5 rounded-xl bg-brand-700 text-white text-sm font-semibold shadow-sm border border-brand-800/20 hover:bg-brand-800 transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+            className="inline-flex items-center justify-center w-full sm:w-auto px-5 py-2.5 rounded-xl bg-brand-700 text-white text-sm font-semibold shadow-sm border border-brand-800/20 hover:bg-brand-800 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
           >
             {copy.primaryLabel}
           </Link>
@@ -51,9 +82,15 @@ export function DealList({ deals, emptyVariant = 'all' }: DealListProps) {
   }
 
   return (
-    <div className="grid gap-3 sm:gap-4">
-      {deals.map((deal, index) => (
-        <DealCard key={deal.id} deal={deal} motionIndex={index} />
+    <div ref={container} className="grid gap-3 sm:gap-4">
+      {deals.map((deal) => (
+        <div
+          key={deal.id}
+          className="deal-card"
+          style={{ opacity: prefersReduced ? 1 : 0 }}
+        >
+          <DealCard deal={deal} />
+        </div>
       ))}
     </div>
   )

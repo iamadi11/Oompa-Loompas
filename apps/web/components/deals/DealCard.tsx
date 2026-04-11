@@ -1,48 +1,68 @@
 'use client'
 
+import { useRef } from 'react'
 import type { Route } from 'next'
 import Link from 'next/link'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
 import type { Deal } from '@oompa/types'
 import { formatCurrency, formatDate } from '@oompa/utils'
-import { motion } from 'motion/react'
 import { usePrefersReducedMotion } from '@/lib/motion/use-prefers-motion'
 import { StatusBadge } from '@/components/ui/Badge'
 
-const MotionLink = motion.create(Link)
-
 interface DealCardProps {
   deal: Deal
-  motionIndex?: number
 }
 
-export function DealCard({ deal, motionIndex = 0 }: DealCardProps) {
+export function DealCard({ deal }: DealCardProps) {
   const prefersReduced = usePrefersReducedMotion()
+  const cardRef = useRef<HTMLAnchorElement>(null)
+
+  const { contextSafe } = useGSAP({ scope: cardRef })
+
+  const onMouseEnter = contextSafe(() => {
+    if (prefersReduced) return
+    gsap.to(cardRef.current, {
+      y: -6,
+      duration: 0.3,
+      ease: 'power2.out',
+    })
+  })
+
+  const onMouseLeave = contextSafe(() => {
+    if (prefersReduced) return
+    gsap.to(cardRef.current, {
+      y: 0,
+      duration: 0.3,
+      ease: 'power2.inOut',
+    })
+  })
+
+  const onMouseDown = contextSafe(() => {
+    if (prefersReduced) return
+    gsap.to(cardRef.current, {
+      scale: 0.97,
+      duration: 0.1,
+    })
+  })
+
+  const onMouseUp = contextSafe(() => {
+    if (prefersReduced) return
+    gsap.to(cardRef.current, {
+      scale: 1,
+      duration: 0.1,
+    })
+  })
 
   return (
-    <MotionLink
+    <Link
+      ref={cardRef}
       href={`/deals/${deal.id}` as Route}
-      className="block rounded-2xl border border-line/90 bg-surface-raised p-4 sm:p-5 shadow-card transition-shadow duration-200 motion-reduce:transition-none hover:border-brand-700/60 hover:shadow-card-hover group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
-      initial={prefersReduced ? false : { opacity: 0, y: 24, scale: 0.97 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={
-        prefersReduced
-          ? { duration: 0 }
-          : {
-              type: 'spring',
-              stiffness: 340,
-              damping: 26,
-              delay: motionIndex * 0.06,
-            }
-      }
-      {...(!prefersReduced
-        ? {
-            whileHover: {
-              y: -6,
-              transition: { type: 'spring' as const, stiffness: 380, damping: 22 },
-            },
-            whileTap: { scale: 0.97 },
-          }
-        : {})}
+      className="block rounded-2xl border border-line/90 bg-surface-raised p-4 sm:p-5 shadow-card transition-shadow duration-200 hover:border-brand-700/60 hover:shadow-card-hover group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      onMouseDown={onMouseDown}
+      onMouseUp={onMouseUp}
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
@@ -65,6 +85,6 @@ export function DealCard({ deal, motionIndex = 0 }: DealCardProps) {
           </span>
         )}
       </div>
-    </MotionLink>
+    </Link>
   )
 }

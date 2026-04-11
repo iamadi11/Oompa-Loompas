@@ -1,9 +1,11 @@
 'use client'
 
+import { useRef, useMemo } from 'react'
 import Link from 'next/link'
 import type { Route } from 'next'
 import { usePathname } from 'next/navigation'
-import { motion } from 'motion/react'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
 import { isMainNavCurrent } from '@/lib/main-nav'
 import { usePrefersReducedMotion } from '@/lib/motion/use-prefers-motion'
 
@@ -68,6 +70,33 @@ const NAV_ITEMS: NavItem[] = [
 export function BottomNav() {
   const pathname = usePathname() ?? ''
   const reduced = usePrefersReducedMotion()
+  const container = useRef<HTMLUListElement>(null)
+  const indicator = useRef<HTMLSpanElement>(null)
+
+  const activeIndex = useMemo(() => {
+    return NAV_ITEMS.findIndex((item) => isMainNavCurrent(pathname, item.key))
+  }, [pathname])
+
+  useGSAP(
+    () => {
+      if (activeIndex === -1 || !indicator.current || !container.current) return
+
+      const items = container.current.querySelectorAll('li')
+      const target = items[activeIndex]
+      if (!target) return
+
+      const { offsetLeft, offsetWidth } = target
+      
+      // Initial state to avoid jump? No, it's better to let it animate.
+      gsap.to(indicator.current, {
+        x: offsetLeft + 12, // inset-x-3 equivalent
+        width: offsetWidth - 24,
+        duration: reduced ? 0 : 0.4,
+        ease: 'power3.out',
+      })
+    },
+    { dependencies: [activeIndex, reduced], scope: container }
+  )
 
   return (
     <nav
@@ -75,7 +104,14 @@ export function BottomNav() {
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       aria-label="Main navigation"
     >
-      <ul className="flex items-stretch h-[60px]" role="list">
+      <ul ref={container} className="relative flex items-stretch h-[60px]" role="list">
+        {/* Animated indicator */}
+        <span
+          ref={indicator}
+          className="absolute top-0 h-[2px] rounded-b-full bg-brand-600 pointer-events-none"
+          style={{ boxShadow: '0 0 12px 2px rgba(225,43,43,0.55)', opacity: activeIndex === -1 ? 0 : 1 }}
+        />
+
         {NAV_ITEMS.map((item) => {
           const active = isMainNavCurrent(pathname, item.key)
           return (
@@ -85,18 +121,6 @@ export function BottomNav() {
                 aria-current={active ? 'page' : undefined}
                 className="relative flex flex-col items-center justify-center gap-1 h-full w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-inset"
               >
-                {active && (
-                  <motion.span
-                    layoutId="bottom-nav-indicator"
-                    className="absolute inset-x-3 top-0 h-[2px] rounded-b-full bg-brand-600"
-                    style={{ boxShadow: '0 0 12px 2px rgba(225,43,43,0.55)' }}
-                    transition={
-                      reduced
-                        ? { duration: 0 }
-                        : { type: 'spring', stiffness: 500, damping: 35 }
-                    }
-                  />
-                )}
                 <span
                   className={`transition-colors duration-150 ${
                     active ? 'text-brand-600' : 'text-stone-500'

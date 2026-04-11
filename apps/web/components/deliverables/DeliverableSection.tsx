@@ -1,11 +1,14 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
 import type { Deliverable } from '@oompa/types'
 import { DeliverableRow } from './DeliverableRow'
 import { AddDeliverableForm } from './AddDeliverableForm'
 import { Button } from '@/components/ui/Button'
+import { usePrefersReducedMotion } from '@/lib/motion/use-prefers-motion'
 
 interface DeliverableSectionProps {
   dealId: string
@@ -21,6 +24,9 @@ export function DeliverableSection({
   initialDeliverables,
 }: DeliverableSectionProps) {
   const router = useRouter()
+  const prefersReduced = usePrefersReducedMotion()
+  const listRef = useRef<HTMLDivElement>(null)
+
   /** From server; must not freeze initial props — router.refresh() supplies new data. */
   const deliverables = initialDeliverables
   const [showAddForm, setShowAddForm] = useState(false)
@@ -29,6 +35,27 @@ export function DeliverableSection({
     router.refresh()
     setShowAddForm(false)
   }, [router])
+
+  useGSAP(
+    () => {
+      if (prefersReduced || !listRef.current) return
+
+      const rows = listRef.current.querySelectorAll('.deliverable-row-item')
+      gsap.fromTo(
+        rows,
+        { opacity: 0, y: 12 },
+        {
+          opacity: 1,
+          y: 0,
+          stagger: 0.05,
+          duration: 0.5,
+          ease: 'power2.out',
+          clearProps: 'all',
+        }
+      )
+    },
+    { dependencies: [deliverables, prefersReduced], scope: listRef }
+  )
 
   const pendingCount = deliverables.filter((d) => d.status === 'PENDING').length
   const overdueCount = deliverables.filter((d) => d.isOverdue).length
@@ -65,7 +92,7 @@ export function DeliverableSection({
         <div className="mb-4">
           <div className="w-full bg-line/60 rounded-full h-1.5 overflow-hidden">
             <div
-              className="bg-brand-600 h-1.5 rounded-full transition-all motion-reduce:transition-none"
+              className="bg-brand-600 h-1.5 rounded-full transition-all"
               style={{
                 width: `${deliverables.length > 0 ? (completedCount / deliverables.length) * 100 : 0}%`,
               }}
@@ -103,15 +130,16 @@ export function DeliverableSection({
 
       {/* Deliverable list */}
       {deliverables.length > 0 && (
-        <div className="flex flex-col gap-2 mb-4">
+        <div ref={listRef} className="flex flex-col gap-2 mb-4">
           {deliverables.map((deliverable) => (
-            <DeliverableRow
-              key={deliverable.id}
-              deliverable={deliverable}
-              onUpdate={handleChange}
-              dealTitle={dealTitle}
-              brandName={brandName}
-            />
+            <div key={deliverable.id} className="deliverable-row-item" style={{ opacity: prefersReduced ? 1 : 0 }}>
+              <DeliverableRow
+                deliverable={deliverable}
+                onUpdate={handleChange}
+                dealTitle={dealTitle}
+                brandName={brandName}
+              />
+            </div>
           ))}
         </div>
       )}

@@ -1,6 +1,8 @@
 'use client'
 
-import { motion } from 'motion/react'
+import { useRef } from 'react'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
 import { usePrefersReducedMotion } from '@/lib/motion/use-prefers-motion'
 
 interface SummaryCardProps {
@@ -8,7 +10,6 @@ interface SummaryCardProps {
   value: string
   accent?: 'default' | 'green' | 'red' | 'yellow' | undefined
   subtext?: string | undefined
-  motionIndex?: number
 }
 
 const ACCENT_STYLES = {
@@ -37,33 +38,37 @@ export function SummaryCard({
   value,
   accent = 'default',
   subtext,
-  motionIndex = 0,
 }: SummaryCardProps) {
   const prefersReduced = usePrefersReducedMotion()
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  const { contextSafe } = useGSAP({ scope: cardRef })
+
+  const onMouseEnter = contextSafe(() => {
+    if (prefersReduced) return
+    gsap.to(cardRef.current, {
+      y: -4,
+      duration: 0.3,
+      ease: 'power2.out',
+    })
+  })
+
+  const onMouseLeave = contextSafe(() => {
+    if (prefersReduced) return
+    gsap.to(cardRef.current, {
+      y: 0,
+      duration: 0.3,
+      ease: 'power2.inOut',
+    })
+  })
 
   return (
-    <motion.div
-      className={`rounded-2xl border p-4 sm:p-5 ${ACCENT_STYLES[accent]}`}
-      initial={prefersReduced ? false : { opacity: 0, y: 20, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={
-        prefersReduced
-          ? { duration: 0 }
-          : {
-              type: 'spring',
-              stiffness: 360,
-              damping: 28,
-              delay: motionIndex * 0.07,
-            }
-      }
-      {...(!prefersReduced
-        ? {
-            whileHover: {
-              y: -4,
-              transition: { type: 'spring', stiffness: 400, damping: 22 },
-            },
-          }
-        : {})}
+    <div
+      ref={cardRef}
+      className={`rounded-2xl border p-4 sm:p-5 summary-card ${ACCENT_STYLES[accent]}`}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      style={{ opacity: prefersReduced ? 1 : 0 }}
     >
       <p className={`text-[0.65rem] font-semibold uppercase tracking-[0.14em] ${LABEL_ACCENT_STYLES[accent]}`}>
         {label}
@@ -74,6 +79,6 @@ export function SummaryCard({
         {value}
       </p>
       {subtext && <p className="mt-1.5 text-xs text-stone-500 leading-snug">{subtext}</p>}
-    </motion.div>
+    </div>
   )
 }

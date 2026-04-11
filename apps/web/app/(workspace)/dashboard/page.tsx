@@ -4,8 +4,9 @@ import type { DashboardSummary } from '@oompa/types'
 import { formatCurrency } from '@oompa/utils'
 import { OverviewFetchError } from '@/components/dashboard/OverviewFetchError'
 import { PriorityActionsSection } from '@/components/dashboard/PriorityActionsSection'
-import { RecentDealRow } from '@/components/dashboard/RecentDealRow'
 import { SummaryCard } from '@/components/dashboard/SummaryCard'
+import { SummaryGrid } from '@/components/dashboard/SummaryGrid'
+import { RecentDealsList } from '@/components/dashboard/RecentDealsList'
 import { resolveHomeOverviewState } from '@/lib/home-page'
 import { serverApiFetch } from '@/lib/server-api-fetch'
 
@@ -88,27 +89,23 @@ export default async function HomePage() {
         <h2 id="summary-heading" className="sr-only">
           Financial summary
         </h2>
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <SummaryGrid>
           <SummaryCard
-            motionIndex={0}
             label="Contracted"
             value={formatCurrency(dashboard.totalContractedValue, currency)}
             subtext={`${dashboard.totalDealsCount} deal${dashboard.totalDealsCount !== 1 ? 's' : ''}`}
           />
           <SummaryCard
-            motionIndex={1}
             label="Received"
             value={formatCurrency(dashboard.totalReceivedValue, currency)}
             accent="green"
           />
           <SummaryCard
-            motionIndex={2}
             label="Outstanding"
             value={formatCurrency(dashboard.totalOutstandingValue, currency)}
             accent={dashboard.overduePaymentsCount > 0 ? 'red' : 'default'}
           />
           <SummaryCard
-            motionIndex={3}
             label={dashboard.overduePaymentsCount > 0 ? 'Overdue' : 'Active deals'}
             value={
               dashboard.overduePaymentsCount > 0
@@ -122,7 +119,7 @@ export default async function HomePage() {
                 : undefined
             }
           />
-        </div>
+        </SummaryGrid>
       </section>
 
       <section aria-labelledby="recent-deals-heading">
@@ -140,11 +137,7 @@ export default async function HomePage() {
             View all
           </Link>
         </div>
-        <div className="flex flex-col gap-2">
-          {dashboard.recentDeals.map((deal, index) => (
-            <RecentDealRow key={deal.id} deal={deal} motionIndex={index} />
-          ))}
-        </div>
+        <RecentDealsList deals={dashboard.recentDeals} />
       </section>
     </div>
   )
