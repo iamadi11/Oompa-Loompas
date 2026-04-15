@@ -331,7 +331,7 @@ class ApiClient {
     return this.request<ApiResponse<{ publicKey: string }>>('/api/v1/push/public-key')
   }
 
-  async subscribePush(subscription: any): Promise<void> {
+  async subscribePush(subscription: { endpoint?: string; keys?: Record<string, string> }): Promise<void> {
     return this.request<void>('/api/v1/push/subscribe', {
       method: 'POST',
       body: JSON.stringify(subscription),

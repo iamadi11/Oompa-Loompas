@@ -5,7 +5,14 @@ import { testAuthCookieHeader, TEST_USER_ID, mockSessionFindUnique } from './aut
 import { prisma } from '@oompa/db';
 import * as pushEnv from '../lib/push-env.js';
 
-const mockPrisma = prisma as any;
+const mockPrisma = prisma as typeof prisma & {
+  session: { findUnique: ReturnType<typeof vi.fn> }
+  pushSubscription: {
+    upsert: ReturnType<typeof vi.fn>
+    deleteMany: ReturnType<typeof vi.fn>
+  }
+}
+
 const auth = testAuthCookieHeader();
 
 describe('Push Notifications API', () => {
@@ -28,10 +35,10 @@ describe('Push Notifications API', () => {
         headers: auth
       });
       expect(resp.statusCode).toBe(200);
-      expect(resp.json().data.publicKey).toBe('mock-vapid-key');
+      expect(resp.json<{ data: { publicKey: string } }>().data.publicKey).toBe('mock-vapid-key');
       await fastify.close();
     });
-    
+
     it('returns 401 unauthenticated if not logged in', async () => {
       const fastify = await buildServer();
       const resp = await fastify.inject({
@@ -93,7 +100,6 @@ describe('Push Notifications API', () => {
         payload: { endpoint: 'fake-endpoint-to-delete' }
       });
 
-      if (resp.statusCode === 500) console.log('DELETE /unsubscribe err:', resp.body);
       expect(resp.statusCode).toBe(204);
       expect(mockPrisma.pushSubscription.deleteMany).toHaveBeenCalledWith({
         where: { userId: TEST_USER_ID, endpoint: 'fake-endpoint-to-delete' }

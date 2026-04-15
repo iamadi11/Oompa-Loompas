@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyPluginAsync } from 'fastify';
+import type { FastifyInstance, FastifyPluginAsync } from 'fastify';
 import { prisma as db } from '@oompa/db';
 import { getVapidPublicKey, initWebPush } from '../../lib/push-env.js';
 

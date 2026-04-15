@@ -1,4 +1,4 @@
-import Fastify from 'fastify'
+import Fastify, { type FastifyRequest } from 'fastify'
 import compress from '@fastify/compress'
 import sensible from '@fastify/sensible'
 import cookie from '@fastify/cookie'
@@ -52,14 +52,14 @@ export async function buildServer() {
         const name = 'oompa_session' // Hardcoded for simplicity here or get from auth-env
         if (req.cookies[name]) {
           try {
-            await (fastify as any).authenticate(req, reply)
+            await fastify.authenticate(req, reply)
           } catch {
             // Error already sent by authenticate
           }
         }
         if (reply.sent) return
         const { getPaymentInvoice } = await import('./routes/payments/handlers.js')
-        return getPaymentInvoice(req as any, reply)
+        return getPaymentInvoice(req as FastifyRequest<{ Params: { dealId: string; paymentId: string }; Querystring: { token?: string } }>, reply)
       })
     },
     { prefix: '/api/v1' },
@@ -84,7 +84,7 @@ export async function buildServer() {
   fastify.setErrorHandler((error, _request, reply) => {
     // If headers already sent (e.g. double reply), just log and abort.
     if (reply.sent) {
-      fastify.log.error('Headers already sent, suppressing extra error:', error)
+      fastify.log.error({ err: error }, 'Headers already sent, suppressing extra error')
       return
     }
     

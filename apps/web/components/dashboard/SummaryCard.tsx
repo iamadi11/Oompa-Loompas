@@ -1,8 +1,7 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useCallback } from 'react'
 import gsap from 'gsap'
-import { useGSAP } from '@gsap/react'
 import { usePrefersReducedMotion } from '@/lib/motion/use-prefers-motion'
 
 interface SummaryCardProps {
@@ -42,25 +41,23 @@ export function SummaryCard({
   const prefersReduced = usePrefersReducedMotion()
   const cardRef = useRef<HTMLDivElement>(null)
 
-  const { contextSafe } = useGSAP({ scope: cardRef })
-
-  const onMouseEnter = contextSafe(() => {
+  const onMouseEnter = useCallback(() => {
     if (prefersReduced) return
     gsap.to(cardRef.current, {
       y: -4,
       duration: 0.3,
       ease: 'power2.out',
     })
-  })
+  }, [prefersReduced])
 
-  const onMouseLeave = contextSafe(() => {
+  const onMouseLeave = useCallback(() => {
     if (prefersReduced) return
     gsap.to(cardRef.current, {
       y: 0,
       duration: 0.3,
       ease: 'power2.inOut',
     })
-  })
+  }, [prefersReduced])
 
   return (
     <div

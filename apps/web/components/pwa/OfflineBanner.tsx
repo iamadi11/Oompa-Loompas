@@ -1,6 +1,6 @@
 'use client'
 
-import { useSyncExternalStore, useRef, useState, useEffect } from 'react'
+import { useSyncExternalStore, useRef, useState, useEffect, startTransition } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 
@@ -30,7 +30,7 @@ export function OfflineBanner() {
 
   useEffect(() => {
     if (offline) {
-      setMounted(true)
+      startTransition(() => setMounted(true))
     } else if (bannerRef.current) {
       // Animate out
       gsap.to(bannerRef.current, {
@@ -40,7 +40,7 @@ export function OfflineBanner() {
         onComplete: () => setMounted(false),
       })
     } else {
-      setMounted(false)
+      startTransition(() => setMounted(false))
     }
   }, [offline])
 

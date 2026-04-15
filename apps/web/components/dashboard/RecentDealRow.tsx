@@ -1,10 +1,9 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useCallback } from 'react'
 import type { Route } from 'next'
 import Link from 'next/link'
 import gsap from 'gsap'
-import { useGSAP } from '@gsap/react'
 import type { DashboardDeal } from '@oompa/types'
 import { formatCurrency } from '@oompa/utils'
 import { usePrefersReducedMotion } from '@/lib/motion/use-prefers-motion'
@@ -24,25 +23,23 @@ export function RecentDealRow({ deal }: RecentDealRowProps) {
       ? Math.round((paymentSummary.totalReceived / paymentSummary.totalContracted) * 100)
       : 0
 
-  const { contextSafe } = useGSAP({ scope: rowRef })
-
-  const onMouseEnter = contextSafe(() => {
+  const onMouseEnter = useCallback(() => {
     if (prefersReduced) return
     gsap.to(rowRef.current, {
       paddingLeft: '1.25rem', // Slight indent equivalent to x: 5
       duration: 0.3,
       ease: 'power2.out',
     })
-  })
+  }, [prefersReduced])
 
-  const onMouseLeave = contextSafe(() => {
+  const onMouseLeave = useCallback(() => {
     if (prefersReduced) return
     gsap.to(rowRef.current, {
       paddingLeft: '1rem',
       duration: 0.3,
       ease: 'power2.inOut',
     })
-  })
+  }, [prefersReduced])
 
   return (
     <Link

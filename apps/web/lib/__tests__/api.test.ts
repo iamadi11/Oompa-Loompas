@@ -476,3 +476,53 @@ describe('getBrowserApiBase and paymentInvoiceHref', () => {
     vi.unstubAllGlobals()
   })
 })
+
+describe('Push notification API client methods', () => {
+  const fetchMock = vi.fn()
+
+  beforeEach(() => {
+    vi.stubEnv('NEXT_PUBLIC_API_URL', 'http://localhost:3001')
+    vi.stubGlobal('fetch', fetchMock)
+    fetchMock.mockReset()
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.unstubAllEnvs()
+  })
+
+  it('getPushPublicKey calls correct endpoint', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ data: { publicKey: 'test-key' } }))
+    const result = await api.getPushPublicKey()
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3001/api/v1/push/public-key',
+      expect.objectContaining({ credentials: 'include' }),
+    )
+    expect(result.data.publicKey).toBe('test-key')
+  })
+
+  it('subscribePush calls subscribe endpoint with subscription payload', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(null, { status: 204 }))
+    const sub = { endpoint: 'https://fcm.example.com/ep', keys: { p256dh: 'abc', auth: 'xyz' } }
+    await api.subscribePush(sub)
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3001/api/v1/push/subscribe',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify(sub),
+      }),
+    )
+  })
+
+  it('unsubscribePush calls unsubscribe endpoint with endpoint in body', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(null, { status: 204 }))
+    await api.unsubscribePush('https://fcm.example.com/ep')
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3001/api/v1/push/unsubscribe',
+      expect.objectContaining({
+        method: 'DELETE',
+        body: JSON.stringify({ endpoint: 'https://fcm.example.com/ep' }),
+      }),
+    )
+  })
+})

@@ -13,13 +13,16 @@ export function useAllowEntranceMotion(): boolean {
  * Returns true if the user prefers reduced motion.
  * Uses native media query and handles client-side updates.
  */
+const MQ = '(prefers-reduced-motion: reduce)'
+
 export function usePrefersReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(false)
+  const [reduced, setReduced] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false
+    return window.matchMedia(MQ).matches
+  })
 
   useEffect(() => {
-    const query = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setReduced(query.matches)
-
+    const query = window.matchMedia(MQ)
     const handler = (event: MediaQueryListEvent) => setReduced(event.matches)
     query.addEventListener('change', handler)
     return () => query.removeEventListener('change', handler)

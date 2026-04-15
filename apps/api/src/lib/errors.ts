@@ -42,11 +42,11 @@ export class ForbiddenError extends AppError {
   }
 }
 
-export function sendError(reply: FastifyReply, error: AppError): Promise<void> {
+export function sendError(reply: FastifyReply, error: AppError): void {
   const body: ApiError = {
     error: error.error,
     message: error.message,
     statusCode: error.statusCode,
   }
-  return reply.status(error.statusCode).send(body)
+  void reply.status(error.statusCode).send(body)
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, startTransition } from 'react'
 import Link from 'next/link'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -20,7 +20,7 @@ export function MarketingLandingClient() {
 
   // Use a secondary mount gate to ensure GSAP only runs after hydration is complete
   useEffect(() => {
-    setMounted(true)
+    startTransition(() => setMounted(true))
   }, [])
 
   useGSAP(

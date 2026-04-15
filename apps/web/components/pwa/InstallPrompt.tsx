@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import {
@@ -65,9 +65,7 @@ export function InstallPrompt() {
     { dependencies: [mounted, reduced], scope: dialogRef }
   )
 
-  const { contextSafe } = useGSAP({ scope: dialogRef })
-
-  const handleDismiss = contextSafe(() => {
+  const handleDismiss = useCallback(() => {
     gsap.to(dialogRef.current, {
       opacity: 0,
       y: reduced ? 0 : 12,
@@ -79,7 +77,7 @@ export function InstallPrompt() {
     } catch {
       // Swallow — prompt will show next visit, acceptable.
     }
-  })
+  }, [reduced])
 
   const handleInstall = async () => {
     if (!deferredPrompt.current) return

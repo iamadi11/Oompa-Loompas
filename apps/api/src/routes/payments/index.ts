@@ -4,7 +4,6 @@ import {
   createPayment,
   updatePayment,
   deletePayment,
-  getPaymentInvoice,
 } from './handlers.js'
 
 /**

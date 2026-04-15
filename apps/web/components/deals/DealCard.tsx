@@ -1,10 +1,9 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useCallback } from 'react'
 import type { Route } from 'next'
 import Link from 'next/link'
 import gsap from 'gsap'
-import { useGSAP } from '@gsap/react'
 import type { Deal } from '@oompa/types'
 import { formatCurrency, formatDate } from '@oompa/utils'
 import { usePrefersReducedMotion } from '@/lib/motion/use-prefers-motion'
@@ -18,41 +17,39 @@ export function DealCard({ deal }: DealCardProps) {
   const prefersReduced = usePrefersReducedMotion()
   const cardRef = useRef<HTMLAnchorElement>(null)
 
-  const { contextSafe } = useGSAP({ scope: cardRef })
-
-  const onMouseEnter = contextSafe(() => {
+  const onMouseEnter = useCallback(() => {
     if (prefersReduced) return
     gsap.to(cardRef.current, {
       y: -6,
       duration: 0.3,
       ease: 'power2.out',
     })
-  })
+  }, [prefersReduced])
 
-  const onMouseLeave = contextSafe(() => {
+  const onMouseLeave = useCallback(() => {
     if (prefersReduced) return
     gsap.to(cardRef.current, {
       y: 0,
       duration: 0.3,
       ease: 'power2.inOut',
     })
-  })
+  }, [prefersReduced])
 
-  const onMouseDown = contextSafe(() => {
+  const onMouseDown = useCallback(() => {
     if (prefersReduced) return
     gsap.to(cardRef.current, {
       scale: 0.97,
       duration: 0.1,
     })
-  })
+  }, [prefersReduced])
 
-  const onMouseUp = contextSafe(() => {
+  const onMouseUp = useCallback(() => {
     if (prefersReduced) return
     gsap.to(cardRef.current, {
       scale: 1,
       duration: 0.1,
     })
-  })
+  }, [prefersReduced])
 
   return (
     <Link

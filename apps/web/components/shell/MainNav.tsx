@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useMemo } from 'react'
+import { useRef, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
@@ -102,27 +102,25 @@ export function BrandHomeLink() {
   const prefersReduced = usePrefersReducedMotion()
   const spanRef = useRef<HTMLSpanElement>(null)
 
-  const { contextSafe } = useGSAP({ scope: spanRef })
-
-  const onMouseEnter = contextSafe(() => {
+  const onMouseEnter = useCallback(() => {
     if (prefersReduced) return
     gsap.to(spanRef.current, { scale: 1.02, duration: 0.3, ease: 'power2.out' })
-  })
+  }, [prefersReduced])
 
-  const onMouseLeave = contextSafe(() => {
+  const onMouseLeave = useCallback(() => {
     if (prefersReduced) return
     gsap.to(spanRef.current, { scale: 1, duration: 0.3, ease: 'power2.inOut' })
-  })
+  }, [prefersReduced])
 
-  const onMouseDown = contextSafe(() => {
+  const onMouseDown = useCallback(() => {
     if (prefersReduced) return
     gsap.to(spanRef.current, { scale: 0.97, duration: 0.1 })
-  })
+  }, [prefersReduced])
 
-  const onMouseUp = contextSafe(() => {
+  const onMouseUp = useCallback(() => {
     if (prefersReduced) return
     gsap.to(spanRef.current, { scale: 1.02, duration: 0.1 })
-  })
+  }, [prefersReduced])
 
   return (
     <Link

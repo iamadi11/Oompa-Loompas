@@ -27,6 +27,12 @@ export const prisma = {
     create: vi.fn(),
     update: vi.fn(),
     delete: vi.fn(),
+    count: vi.fn(),
+  },
+  brandProfile: {
+    findUnique: vi.fn(),
+    upsert: vi.fn(),
+    deleteMany: vi.fn(),
   },
   deliverable: {
     findMany: vi.fn(),
