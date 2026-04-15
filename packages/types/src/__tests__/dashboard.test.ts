@@ -22,6 +22,7 @@ const deliverableAction = {
   kind: 'overdue_deliverable' as const,
   dealId: '550e8400-e29b-41d4-a716-446655440012',
   dealTitle: 'D2',
+  brandName: 'B2',
   deliverableId: '550e8400-e29b-41d4-a716-446655440013',
   deliverableTitle: 'X',
   dueDate: null,
