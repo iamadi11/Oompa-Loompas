@@ -15,7 +15,7 @@ function jsonResponse(body: unknown, init: { ok?: boolean; status?: number } = {
 
 const defaultFetchInit = {
   credentials: 'include' as const,
-  headers: { 'Content-Type': 'application/json' },
+  headers: {},
 }
 
 describe('ApiClient', () => {
@@ -37,10 +37,7 @@ describe('ApiClient', () => {
     await api.listDeals()
     expect(fetchMock).toHaveBeenCalledWith(
       'http://localhost:3001/api/v1/deals',
-      expect.objectContaining({
-        credentials: 'include',
-        headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
-      }),
+      expect.objectContaining({ credentials: 'include' }),
     )
   })
 
@@ -129,7 +126,7 @@ describe('ApiClient', () => {
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/deals/d1', {
       method: 'DELETE',
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {},
     })
   })
 
@@ -175,7 +172,7 @@ describe('ApiClient', () => {
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/payments/pid', {
       method: 'DELETE',
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {},
     })
   })
 
@@ -240,7 +237,7 @@ describe('ApiClient', () => {
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/deliverables/del1', {
       method: 'DELETE',
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {},
     })
   })
 
@@ -276,7 +273,7 @@ describe('ApiClient', () => {
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/deals/d1/share', {
       method: 'DELETE',
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {},
     })
   })
 
@@ -604,6 +601,68 @@ describe('Push notification API client methods', () => {
         method: 'DELETE',
         body: JSON.stringify({ endpoint: 'https://fcm.example.com/ep' }),
       }),
+    )
+  })
+
+  it('listTemplates calls templates endpoint', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ data: [] }))
+    const result = await api.listTemplates()
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3001/api/v1/templates',
+      expect.objectContaining({ credentials: 'include' }),
+    )
+    expect(result.data).toEqual([])
+  })
+
+  it('getTemplate calls templates/:id endpoint', async () => {
+    const tpl = { id: 'tpl-1', name: 'My Template' }
+    fetchMock.mockResolvedValueOnce(jsonResponse({ data: tpl }))
+    const result = await api.getTemplate('tpl-1')
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3001/api/v1/templates/tpl-1',
+      expect.objectContaining({ credentials: 'include' }),
+    )
+    expect(result.data.id).toBe('tpl-1')
+  })
+
+  it('createTemplate posts to templates endpoint', async () => {
+    const tpl = { id: 'tpl-1', name: 'New Template' }
+    fetchMock.mockResolvedValueOnce(jsonResponse({ data: tpl }, { status: 201 }))
+    const payload = { name: 'New Template', deliverables: [], payments: [] }
+    await api.createTemplate(payload)
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3001/api/v1/templates',
+      expect.objectContaining({ method: 'POST', body: JSON.stringify(payload) }),
+    )
+  })
+
+  it('updateTemplate puts to templates/:id endpoint', async () => {
+    const tpl = { id: 'tpl-1', name: 'Updated' }
+    fetchMock.mockResolvedValueOnce(jsonResponse({ data: tpl }))
+    const payload = { name: 'Updated', deliverables: [], payments: [] }
+    await api.updateTemplate('tpl-1', payload)
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3001/api/v1/templates/tpl-1',
+      expect.objectContaining({ method: 'PUT', body: JSON.stringify(payload) }),
+    )
+  })
+
+  it('deleteTemplate sends DELETE to templates/:id', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(null, { status: 204 }))
+    await api.deleteTemplate('tpl-1')
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3001/api/v1/templates/tpl-1',
+      expect.objectContaining({ method: 'DELETE' }),
+    )
+  })
+
+  it('saveAsTemplate posts to deals/:id/save-as-template', async () => {
+    const tpl = { id: 'tpl-1', name: 'From Deal' }
+    fetchMock.mockResolvedValueOnce(jsonResponse({ data: tpl }, { status: 201 }))
+    await api.saveAsTemplate('deal-1', 'From Deal')
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3001/api/v1/deals/deal-1/save-as-template',
+      expect.objectContaining({ method: 'POST', body: JSON.stringify({ name: 'From Deal' }) }),
     )
   })
 })

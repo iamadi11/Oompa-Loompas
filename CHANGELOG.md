@@ -2,6 +2,23 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.4.9] - 2026-04-16
+
+### Added
+- **Deal templates** — reusable campaign structures (Phase 1 complete)
+  - `deal_templates`, `deal_template_deliverables`, `deal_template_payments` tables (migration `20260416120000_add_deal_templates`)
+  - Max 20 templates per user (`DEAL_TEMPLATE_MAX_PER_USER`)
+  - `GET/POST/PUT/DELETE /api/v1/templates`, `GET /api/v1/templates/:id` — full CRUD
+  - `POST /api/v1/deals/:id/save-as-template` — save any deal as a reusable template
+  - `/deals/templates` list page, `/deals/templates/new`, `/deals/templates/[id]` edit page
+  - `/deals/new-from-template?templateId=...` — pre-fills deal form from template, creates deal + deliverables + payments in one step
+  - "Save as template" panel on deal detail page
+  - "From template" button on deals list page; "Templates" nav link
+  - 22 new API tests for template endpoints (537 total across all packages)
+
+### Fixed
+- `ApiClient.request()` no longer sends `Content-Type: application/json` on bodyless requests (GET, DELETE without body) — was causing Fastify 400 errors on DELETE calls
+
 ## [0.4.8] - 2026-04-16
 
 ### Added

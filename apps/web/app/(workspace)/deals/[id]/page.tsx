@@ -7,6 +7,7 @@ import { DealForm } from '@/components/deals/DealForm'
 import { DealNotFoundContent } from '@/components/deals/DealNotFoundContent'
 import { ShareProposalButton } from '@/components/deals/ShareProposalButton'
 import { DuplicateDealButton } from '@/components/deals/DuplicateDealButton'
+import { SaveAsTemplateButton } from '@/components/templates/SaveAsTemplateButton'
 import { DealNextActionBanner } from '@/components/deals/DealNextActionBanner'
 import { PaymentSection } from '@/components/payments/PaymentSection'
 import { DeliverableSection } from '@/components/deliverables/DeliverableSection'
@@ -126,6 +127,10 @@ export default async function DealDetailPage({ params }: Props) {
 
       <div className={panelClass}>
         <DuplicateDealButton dealId={deal.id} />
+      </div>
+
+      <div className={panelClass}>
+        <SaveAsTemplateButton dealId={deal.id} dealTitle={deal.title} />
       </div>
 
       <div className={panelClass}>

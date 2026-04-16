@@ -146,6 +146,12 @@ export default async function DealsPage({ searchParams }: Props) {
         >
           Brands
         </Link>
+        <Link
+          href="/deals/templates"
+          className={`${filterPillBase} bg-surface-raised text-stone-700 border border-line/90 hover:bg-surface shadow-sm`}
+        >
+          Templates
+        </Link>
       </nav>
 
       {brandFilter && (
@@ -185,26 +191,34 @@ export default async function DealsPage({ searchParams }: Props) {
             <ExportPaymentsCsvButton />
             <ExportDeliverablesCsvButton />
             {(needsAttention || allDeals.length > 0) && (
-              <Link
-                href="/deals/new"
-                className="inline-flex w-fit items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-700 text-white text-sm font-semibold shadow-sm border border-brand-800/20 hover:bg-brand-800 transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
+              <>
+                <Link
+                  href="/deals/templates"
+                  className="inline-flex w-fit items-center gap-2 px-4 py-2.5 rounded-xl border border-line-strong bg-surface-raised text-stone-700 text-sm font-semibold shadow-sm hover:bg-surface transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-                Add deal
-              </Link>
+                  From template
+                </Link>
+                <Link
+                  href="/deals/new"
+                  className="inline-flex w-fit items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-700 text-white text-sm font-semibold shadow-sm border border-brand-800/20 hover:bg-brand-800 transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                  Add deal
+                </Link>
+              </>
             )}
           </div>
         )}

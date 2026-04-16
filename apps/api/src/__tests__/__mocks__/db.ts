@@ -54,6 +54,21 @@ export const prisma = {
     upsert: vi.fn(),
     deleteMany: vi.fn(),
   },
+  dealTemplate: {
+    findMany: vi.fn(),
+    findFirst: vi.fn(),
+    findUnique: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    count: vi.fn(),
+  },
+  dealTemplateDeliverable: {
+    deleteMany: vi.fn(),
+  },
+  dealTemplatePayment: {
+    deleteMany: vi.fn(),
+  },
   $executeRaw: vi.fn().mockResolvedValue(undefined),
   $queryRaw: vi.fn().mockResolvedValue([{ ok: 1 }]),
   $transaction: vi.fn(),

@@ -22,6 +22,7 @@ model User {
   deals         Deal[]
   brandProfiles BrandProfile[]
   pushSubscriptions PushSubscription[]
+  dealTemplates DealTemplate[]
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
 
@@ -181,6 +182,50 @@ model Deliverable {
   @@index([status])
   @@index([dueDate])
   @@map("deliverables")
+}
+
+model DealTemplate {
+  id           String                    @id @default(uuid())
+  userId       String                    @map("user_id")
+  user         User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String                    @db.VarChar(255)
+  defaultValue Decimal?                  @map("default_value") @db.Decimal(15, 2)
+  currency     Currency                  @default(INR)
+  notes        String?                   @db.Text
+  deliverables DealTemplateDeliverable[]
+  payments     DealTemplatePayment[]
+  createdAt    DateTime                  @default(now()) @map("created_at")
+  updatedAt    DateTime                  @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@map("deal_templates")
+}
+
+model DealTemplateDeliverable {
+  id         String              @id @default(uuid())
+  templateId String              @map("template_id")
+  template   DealTemplate        @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  title      String              @db.VarChar(255)
+  platform   DeliverablePlatform
+  type       DeliverableType
+  notes      String?             @db.Text
+  sortOrder  Int                 @default(0) @map("sort_order")
+
+  @@index([templateId])
+  @@map("deal_template_deliverables")
+}
+
+model DealTemplatePayment {
+  id         String       @id @default(uuid())
+  templateId String       @map("template_id")
+  template   DealTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  label      String       @db.VarChar(255)
+  percentage Decimal      @db.Decimal(5, 2)
+  notes      String?      @db.Text
+  sortOrder  Int          @default(0) @map("sort_order")
+
+  @@index([templateId])
+  @@map("deal_template_payments")
 }
 
 model PushSubscription {

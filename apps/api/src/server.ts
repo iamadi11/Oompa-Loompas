@@ -16,6 +16,8 @@ import { adminRoutes } from './routes/admin/index.js'
 import { shareRoutes } from './routes/share/index.js'
 import { brandRoutes } from './routes/brands/index.js'
 import { pushRoutes } from './routes/push/index.js'
+import { templateRoutes } from './routes/templates/index.js'
+import { saveAsTemplate } from './routes/templates/handlers.js'
 
 export async function buildServer() {
   getSessionSecret()
@@ -83,6 +85,8 @@ export async function buildServer() {
       await instance.register(adminRoutes)
       await instance.register(brandRoutes, { prefix: '/brands' })
       await instance.register(pushRoutes, { prefix: '/push' })
+      await instance.register(templateRoutes, { prefix: '/templates' })
+      instance.post('/deals/:id/save-as-template', saveAsTemplate)
     },
     { prefix: '/api/v1' },
   )

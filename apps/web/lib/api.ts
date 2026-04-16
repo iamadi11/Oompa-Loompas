@@ -20,6 +20,9 @@ import type {
   UpsertBrandProfile,
   Currency,
   DealStatus,
+  DealTemplate,
+  CreateDealTemplate,
+  UpdateDealTemplate,
 } from '@oompa/types'
 
 export interface BrandRecentDeal {
@@ -89,12 +92,11 @@ export function paymentInvoiceAbsoluteUrl(
 class ApiClient {
   private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const base = getBrowserApiBase()
+    const headers: Record<string, string> = { ...options.headers as Record<string, string> }
+    if (options.body != null) headers['Content-Type'] = 'application/json'
     const res = await fetch(`${base}${path}`, {
       credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+      headers,
       ...options,
     })
 
@@ -347,6 +349,39 @@ class ApiClient {
     return this.request<void>('/api/v1/push/unsubscribe', {
       method: 'DELETE',
       body: JSON.stringify({ endpoint }),
+    })
+  }
+
+  async listTemplates(): Promise<ApiResponse<DealTemplate[]>> {
+    return this.request<ApiResponse<DealTemplate[]>>('/api/v1/templates')
+  }
+
+  async getTemplate(id: string): Promise<ApiResponse<DealTemplate>> {
+    return this.request<ApiResponse<DealTemplate>>(`/api/v1/templates/${id}`)
+  }
+
+  async createTemplate(data: CreateDealTemplate): Promise<ApiResponse<DealTemplate>> {
+    return this.request<ApiResponse<DealTemplate>>('/api/v1/templates', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async updateTemplate(id: string, data: UpdateDealTemplate): Promise<ApiResponse<DealTemplate>> {
+    return this.request<ApiResponse<DealTemplate>>(`/api/v1/templates/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async deleteTemplate(id: string): Promise<void> {
+    return this.request<void>(`/api/v1/templates/${id}`, { method: 'DELETE' })
+  }
+
+  async saveAsTemplate(dealId: string, name: string): Promise<ApiResponse<DealTemplate>> {
+    return this.request<ApiResponse<DealTemplate>>(`/api/v1/deals/${dealId}/save-as-template`, {
+      method: 'POST',
+      body: JSON.stringify({ name }),
     })
   }
 }
