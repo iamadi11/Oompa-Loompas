@@ -47,7 +47,7 @@ export function OfflineBanner() {
   useGSAP(
     () => {
       if (!mounted || !bannerRef.current) return
-      
+
       gsap.from(bannerRef.current, {
         opacity: 0,
         height: 0,
@@ -55,7 +55,7 @@ export function OfflineBanner() {
         ease: 'power2.out',
       })
     },
-    { dependencies: [mounted], scope: bannerRef }
+    { dependencies: [mounted], scope: bannerRef },
   )
 
   if (!mounted) return null

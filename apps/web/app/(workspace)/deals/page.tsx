@@ -55,7 +55,8 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const brandFilter = getDealBrandFilter(sp)
   if (brandFilter) return { title: `${brandFilter} — Deals` }
   if (needsAttention) return { title: 'Needs attention' }
-  if (statusFilter) return { title: `${statusFilter.charAt(0) + statusFilter.slice(1).toLowerCase()} deals` }
+  if (statusFilter)
+    return { title: `${statusFilter.charAt(0) + statusFilter.slice(1).toLowerCase()} deals` }
   return { title: 'Deals' }
 }
 
@@ -149,13 +150,10 @@ export default async function DealsPage({ searchParams }: Props) {
 
       {brandFilter && (
         <p className="mb-4 text-sm text-stone-600" role="status">
-          Brand filter:{' '}
-          <span className="font-semibold text-stone-900">{brandFilter}</span>
+          Brand filter: <span className="font-semibold text-stone-900">{brandFilter}</span>
           {' · '}
           <Link
-            href={
-              dealsPageHrefWithoutBrandFilter({ needsAttention, statusFilter }) as Route
-            }
+            href={dealsPageHrefWithoutBrandFilter({ needsAttention, statusFilter }) as Route}
             className="font-semibold text-brand-800 hover:text-brand-900 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
           >
             Clear brand filter
@@ -164,7 +162,11 @@ export default async function DealsPage({ searchParams }: Props) {
       )}
 
       {statusCounts !== null && (
-        <DealPipelineStrip counts={statusCounts} activeStatus={statusFilter} brandName={brandFilter} />
+        <DealPipelineStrip
+          counts={statusCounts}
+          activeStatus={statusFilter}
+          brandName={brandFilter}
+        />
       )}
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-6">
@@ -207,10 +209,7 @@ export default async function DealsPage({ searchParams }: Props) {
           </div>
         )}
       </div>
-      <DealList
-        deals={displayDeals}
-        emptyVariant={needsAttention ? 'needsAttention' : 'all'}
-      />
+      <DealList deals={displayDeals} emptyVariant={needsAttention ? 'needsAttention' : 'all'} />
     </div>
   )
 }

@@ -14,7 +14,7 @@ export default function SettingsPage() {
   useEffect(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
       setPermission(Notification.permission)
-      
+
       // Check if already subscribed to push
       navigator.serviceWorker.ready.then((reg) => {
         reg.pushManager.getSubscription().then((sub) => {
@@ -55,7 +55,7 @@ export default function SettingsPage() {
           endpoint: pushSub.endpoint,
           keys: pushSub.keys,
         })
-        
+
         setIsSubscribed(true)
         toast.success('Notifications enabled!')
       }
@@ -87,13 +87,15 @@ export default function SettingsPage() {
           <div className="space-y-0.5">
             <span className="text-sm font-medium text-stone-900">Push Notifications</span>
             <div className="flex items-center gap-2">
-              <span className={`w-2 h-2 rounded-full ${isSubscribed ? 'bg-green-500' : 'bg-stone-300'}`} />
+              <span
+                className={`w-2 h-2 rounded-full ${isSubscribed ? 'bg-green-500' : 'bg-stone-300'}`}
+              />
               <span className="text-xs text-stone-500">
                 {isBlocked ? 'Blocked by browser' : isSubscribed ? 'Subscribed' : 'Not active'}
               </span>
             </div>
           </div>
-          
+
           <Button
             onClick={() => void handlePushToggle()}
             disabled={loading || isBlocked}
@@ -103,10 +105,11 @@ export default function SettingsPage() {
             {loading ? 'Updating...' : isSubscribed ? 'Disable' : 'Enable'}
           </Button>
         </div>
-        
+
         {isBlocked && (
           <p className="text-xs text-red-600 bg-red-50 p-3 rounded-lg border border-red-100 italic">
-            Your browser has blocked notifications for this site. Please reset the permission in your browser address bar to enable them.
+            Your browser has blocked notifications for this site. Please reset the permission in
+            your browser address bar to enable them.
           </p>
         )}
       </div>
@@ -114,7 +117,9 @@ export default function SettingsPage() {
       <div className="rounded-2xl border border-line/90 bg-surface-raised p-5 sm:p-6 shadow-card space-y-4 opacity-50 pointer-events-none">
         <div>
           <h2 className="font-display text-lg font-semibold text-stone-900">Account</h2>
-          <p className="text-sm text-stone-500 mt-1">Manage your profile and currency preferences.</p>
+          <p className="text-sm text-stone-500 mt-1">
+            Manage your profile and currency preferences.
+          </p>
         </div>
         <p className="text-xs text-stone-400 italic">Account settings coming soon.</p>
       </div>

@@ -24,7 +24,11 @@ export function serializeBrandProfile(profile: DbBrandProfile) {
   }
 }
 
-export function toUpsertBrandProfileData(userId: string, brandName: string, data: UpsertBrandProfile) {
+export function toUpsertBrandProfileData(
+  userId: string,
+  brandName: string,
+  data: UpsertBrandProfile,
+) {
   return {
     userId,
     brandName,

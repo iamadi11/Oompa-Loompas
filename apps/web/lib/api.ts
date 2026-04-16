@@ -18,21 +18,23 @@ import type {
   MeResponse,
   BrandProfile,
   UpsertBrandProfile,
+  Currency,
+  DealStatus,
 } from '@oompa/types'
 
 export interface BrandRecentDeal {
   id: string
   title: string
   value: number
-  currency: string
-  status: string
+  currency: Currency
+  status: DealStatus
   createdAt: string
 }
 
 export interface BrandProfileStats {
   totalDeals: number
   overduePaymentsCount: number
-  contractedTotals: { currency: string; amount: number }[]
+  contractedTotals: { currency: Currency; amount: number }[]
 }
 
 export interface BrandProfileView {
@@ -331,7 +333,10 @@ class ApiClient {
     return this.request<ApiResponse<{ publicKey: string }>>('/api/v1/push/public-key')
   }
 
-  async subscribePush(subscription: { endpoint?: string; keys?: Record<string, string> }): Promise<void> {
+  async subscribePush(subscription: {
+    endpoint?: string
+    keys?: Record<string, string>
+  }): Promise<void> {
     return this.request<void>('/api/v1/push/subscribe', {
       method: 'POST',
       body: JSON.stringify(subscription),

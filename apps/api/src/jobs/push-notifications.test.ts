@@ -50,9 +50,7 @@ describe('buildNotificationPayloads', () => {
   })
 
   it('builds overdue payment notification with correct copy', () => {
-    const payments: OverduePaymentItem[] = [
-      { dealId: 'd1', brandName: 'Acme', daysOverdue: 4 },
-    ]
+    const payments: OverduePaymentItem[] = [{ dealId: 'd1', brandName: 'Acme', daysOverdue: 4 }]
     const payloads = buildNotificationPayloads(payments, [])
     expect(payloads).toHaveLength(1)
     expect(payloads[0]?.title).toBe('Payment overdue')
@@ -61,9 +59,7 @@ describe('buildNotificationPayloads', () => {
   })
 
   it('uses singular "day" when daysOverdue is 1', () => {
-    const payments: OverduePaymentItem[] = [
-      { dealId: 'd1', brandName: 'Brand', daysOverdue: 1 },
-    ]
+    const payments: OverduePaymentItem[] = [{ dealId: 'd1', brandName: 'Brand', daysOverdue: 1 }]
     const payloads = buildNotificationPayloads(payments, [])
     expect(payloads[0]?.body).toBe('Brand payment 1 day overdue')
   })
@@ -103,9 +99,7 @@ describe('buildNotificationPayloads', () => {
   })
 
   it('no payment amounts in body (SOT §25.2 privacy)', () => {
-    const payments: OverduePaymentItem[] = [
-      { dealId: 'd1', brandName: 'Acme', daysOverdue: 4 },
-    ]
+    const payments: OverduePaymentItem[] = [{ dealId: 'd1', brandName: 'Acme', daysOverdue: 4 }]
     const payloads = buildNotificationPayloads(payments, [])
     // Body must not contain currency symbols or numbers that look like amounts
     expect(payloads[0]?.body).not.toMatch(/₹|USD|\d{3,}/)
@@ -142,7 +136,10 @@ describe('runDailyPushJob', () => {
     await runDailyPushJob(NOW)
 
     expect(webpush.sendNotification).toHaveBeenCalledOnce()
-    const call = (webpush.sendNotification as ReturnType<typeof vi.fn>).mock.calls[0] as [unknown, string]
+    const call = (webpush.sendNotification as ReturnType<typeof vi.fn>).mock.calls[0] as [
+      unknown,
+      string,
+    ]
     const [sub, payloadStr] = call
     expect(sub).toMatchObject({ endpoint: SUB_1.endpoint })
     const payload = JSON.parse(payloadStr) as { title: string; body: string; url: string }
@@ -167,7 +164,8 @@ describe('runDailyPushJob', () => {
     await runDailyPushJob(NOW)
 
     expect(webpush.sendNotification).toHaveBeenCalledOnce()
-    const payloadStr = (webpush.sendNotification as ReturnType<typeof vi.fn>).mock.calls[0]?.[1] as string
+    const payloadStr = (webpush.sendNotification as ReturnType<typeof vi.fn>).mock
+      .calls[0]?.[1] as string
     const payload = JSON.parse(payloadStr) as { title: string; body: string }
     expect(payload.title).toBe('Deliverable due today')
     expect(payload.body).toContain('BrandX')
@@ -220,7 +218,13 @@ describe('runDailyPushJob', () => {
   })
 
   it('handles multiple users with separate subscriptions', async () => {
-    const sub2 = { id: 'sub-2', userId: 'user-2', endpoint: 'https://fcm.example.com/2', p256dh: 'p2', auth: 'a2' }
+    const sub2 = {
+      id: 'sub-2',
+      userId: 'user-2',
+      endpoint: 'https://fcm.example.com/2',
+      p256dh: 'p2',
+      auth: 'a2',
+    }
     mockPrisma.pushSubscription.findMany.mockResolvedValue([SUB_1, sub2])
     mockPrisma.payment.findMany.mockResolvedValue([
       {

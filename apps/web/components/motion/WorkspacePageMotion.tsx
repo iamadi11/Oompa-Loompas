@@ -24,10 +24,10 @@ export function WorkspacePageMotion({ children }: { children: React.ReactNode })
           duration: 0.4,
           ease: 'power2.out',
           clearProps: 'all',
-        }
+        },
       )
     },
-    { scope: container, dependencies: [prefersReduced] }
+    { scope: container, dependencies: [prefersReduced] },
   )
 
   return (

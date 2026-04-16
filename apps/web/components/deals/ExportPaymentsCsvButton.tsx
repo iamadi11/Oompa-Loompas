@@ -40,7 +40,13 @@ export function ExportPaymentsCsvButton() {
         disabled={loading}
         className="inline-flex w-fit items-center gap-2 rounded-xl border border-line/90 bg-surface-raised px-4 py-2.5 text-sm font-semibold text-stone-800 shadow-sm hover:bg-surface transition-colors duration-200 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"

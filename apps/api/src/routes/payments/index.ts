@@ -1,10 +1,5 @@
 import type { FastifyInstance } from 'fastify'
-import {
-  listPayments,
-  createPayment,
-  updatePayment,
-  deletePayment,
-} from './handlers.js'
+import { listPayments, createPayment, updatePayment, deletePayment } from './handlers.js'
 
 /**
  * Payment routes nested under deals (for deal-scoped listing/creation)

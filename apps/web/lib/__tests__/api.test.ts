@@ -66,7 +66,13 @@ describe('ApiClient', () => {
   it('listDealBrands GETs /api/v1/deals/brands', async () => {
     fetchMock.mockResolvedValueOnce(
       jsonResponse({
-        data: [{ brandName: 'Nike', dealCount: 1, contractedTotals: [{ currency: 'INR', amount: 5000 }] }],
+        data: [
+          {
+            brandName: 'Nike',
+            dealCount: 1,
+            contractedTotals: [{ currency: 'INR', amount: 5000 }],
+          },
+        ],
       }),
     )
     const res = await api.listDealBrands()
@@ -276,7 +282,10 @@ describe('ApiClient', () => {
 
   it('duplicateDeal POSTs to duplicate endpoint and returns new deal', async () => {
     fetchMock.mockResolvedValueOnce(
-      jsonResponse({ data: { id: 'new-id', title: 'Deal (Copy)', status: 'DRAFT' } }, { status: 201 }),
+      jsonResponse(
+        { data: { id: 'new-id', title: 'Deal (Copy)', status: 'DRAFT' } },
+        { status: 201 },
+      ),
     )
     await api.duplicateDeal('d1')
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/deals/d1/duplicate', {
@@ -304,7 +313,9 @@ describe('ApiClient', () => {
   })
 
   it('downloadDealsPortfolioCsv throws with server JSON message when not ok', async () => {
-    fetchMock.mockResolvedValueOnce(jsonResponse({ message: 'Forbidden' }, { ok: false, status: 403 }))
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse({ message: 'Forbidden' }, { ok: false, status: 403 }),
+    )
     await expect(api.downloadDealsPortfolioCsv()).rejects.toThrow('Forbidden')
   })
 
@@ -345,9 +356,12 @@ describe('ApiClient', () => {
       }),
     )
     const blob = await api.downloadDeliverablesPortfolioCsv()
-    expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/api/v1/deals/export/deliverables', {
-      credentials: 'include',
-    })
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3001/api/v1/deals/export/deliverables',
+      {
+        credentials: 'include',
+      },
+    )
     expect(blob.type).toMatch(/^text\/csv/)
     expect(await blob.text()).toBe(csv)
   })
@@ -474,6 +488,73 @@ describe('getBrowserApiBase and paymentInvoiceHref', () => {
       'https://app.example.com/api/v1/deals/d1/payments/p1/invoice',
     )
     vi.unstubAllGlobals()
+  })
+})
+
+describe('Brand profile API client methods', () => {
+  const fetchMock = vi.fn()
+
+  beforeEach(() => {
+    vi.stubEnv('NEXT_PUBLIC_API_URL', 'http://localhost:3001')
+    vi.stubGlobal('fetch', fetchMock)
+    fetchMock.mockReset()
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.unstubAllEnvs()
+  })
+
+  it('getBrandProfile GETs /api/v1/brands/:brandName with url-encoding', async () => {
+    const view = {
+      brandName: 'Nike & Co',
+      profile: null,
+      stats: {
+        totalDeals: 2,
+        overduePaymentsCount: 1,
+        contractedTotals: [{ currency: 'INR', amount: 5000 }],
+      },
+      recentDeals: [],
+    }
+    fetchMock.mockResolvedValueOnce(jsonResponse({ data: view }))
+    const res = await api.getBrandProfile('Nike & Co')
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3001/api/v1/brands/Nike%20%26%20Co',
+      expect.objectContaining({ credentials: 'include' }),
+    )
+    expect(res.data.brandName).toBe('Nike & Co')
+    expect(res.data.stats.totalDeals).toBe(2)
+    expect(res.data.profile).toBeNull()
+  })
+
+  it('upsertBrandProfile PUTs JSON body', async () => {
+    const profile = {
+      id: 'p1',
+      userId: 'u1',
+      brandName: 'Nike',
+      contactEmail: 'a@b.com',
+      contactPhone: null,
+      notes: null,
+      createdAt: '2024-01-01T00:00:00.000Z',
+      updatedAt: '2024-01-01T00:00:00.000Z',
+    }
+    fetchMock.mockResolvedValueOnce(jsonResponse({ data: profile }))
+    const payload = { contactEmail: 'a@b.com', contactPhone: null, notes: null }
+    const res = await api.upsertBrandProfile('Nike', payload)
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3001/api/v1/brands/Nike',
+      expect.objectContaining({ method: 'PUT', body: JSON.stringify(payload) }),
+    )
+    expect(res.data.contactEmail).toBe('a@b.com')
+  })
+
+  it('deleteBrandProfile DELETEs /api/v1/brands/:brandName', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(null, { status: 204 }))
+    await api.deleteBrandProfile('Nike')
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3001/api/v1/brands/Nike',
+      expect.objectContaining({ method: 'DELETE' }),
+    )
   })
 })
 

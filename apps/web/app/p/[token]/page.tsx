@@ -135,9 +135,7 @@ export default async function ProposalPage({ params }: Props) {
           </p>
         )}
 
-        <p className="mt-8 text-center text-xs text-stone-400">
-          Shared via Oompa · View only
-        </p>
+        <p className="mt-8 text-center text-xs text-stone-400">Shared via Oompa · View only</p>
       </div>
     </div>
   )

@@ -49,9 +49,7 @@ describe('buildAttentionQueueCsv', () => {
   })
 
   it('escapes deal title with comma', () => {
-    const line = buildAttentionQueueCsv([
-      { ...paymentRow, dealTitle: 'A, B' },
-    ]).split('\r\n')[1]
+    const line = buildAttentionQueueCsv([{ ...paymentRow, dealTitle: 'A, B' }]).split('\r\n')[1]
     expect(line).toContain('"A, B"')
   })
 })

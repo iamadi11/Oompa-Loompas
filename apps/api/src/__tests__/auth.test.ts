@@ -187,7 +187,9 @@ describe('POST /api/v1/auth/register', () => {
     const cookieHeader = Array.isArray(setCookie) ? setCookie.join(';') : String(setCookie ?? '')
     expect(cookieHeader).toMatch(/oompa_session=/)
     expect(mockPrisma.user.create).toHaveBeenCalledWith(
-      expect.objectContaining({ data: expect.objectContaining({ email: 'creator@test.dev', roles: ['MEMBER'] }) }),
+      expect.objectContaining({
+        data: expect.objectContaining({ email: 'creator@test.dev', roles: ['MEMBER'] }),
+      }),
     )
     expect(mockPrisma.session.create).toHaveBeenCalled()
     await fastify.close()
@@ -209,7 +211,9 @@ describe('POST /api/v1/auth/register', () => {
       payload: { email: 'Creator@TEST.dev', password: 'securepass123' },
     })
 
-    expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({ where: { email: 'creator@test.dev' } })
+    expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({
+      where: { email: 'creator@test.dev' },
+    })
     expect(mockPrisma.user.create).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ email: 'creator@test.dev' }) }),
     )

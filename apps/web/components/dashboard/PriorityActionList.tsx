@@ -36,10 +36,10 @@ export function PriorityActionList({ actions, className }: Props) {
           duration: 0.5,
           ease: 'power2.out',
           clearProps: 'all',
-        }
+        },
       )
     },
-    { dependencies: [actions, prefersReduced], scope: listRef }
+    { dependencies: [actions, prefersReduced], scope: listRef },
   )
 
   return (

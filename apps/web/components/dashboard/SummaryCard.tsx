@@ -32,12 +32,7 @@ const LABEL_ACCENT_STYLES = {
   yellow: 'text-amber-500',
 }
 
-export function SummaryCard({
-  label,
-  value,
-  accent = 'default',
-  subtext,
-}: SummaryCardProps) {
+export function SummaryCard({ label, value, accent = 'default', subtext }: SummaryCardProps) {
   const prefersReduced = usePrefersReducedMotion()
   const cardRef = useRef<HTMLDivElement>(null)
 
@@ -67,7 +62,9 @@ export function SummaryCard({
       onMouseLeave={onMouseLeave}
       style={{ opacity: prefersReduced ? 1 : 0 }}
     >
-      <p className={`text-[0.65rem] font-semibold uppercase tracking-[0.14em] ${LABEL_ACCENT_STYLES[accent]}`}>
+      <p
+        className={`text-[0.65rem] font-semibold uppercase tracking-[0.14em] ${LABEL_ACCENT_STYLES[accent]}`}
+      >
         {label}
       </p>
       <p

@@ -184,18 +184,20 @@ describe('computeDealNextAction', () => {
   })
 
   it('suggests DELIVERED when ACTIVE and all deliverables COMPLETED', () => {
-    const action = computeDealNextAction('ACTIVE', [], [
-      { status: 'COMPLETED' },
-      { status: 'COMPLETED' },
-    ])
+    const action = computeDealNextAction(
+      'ACTIVE',
+      [],
+      [{ status: 'COMPLETED' }, { status: 'COMPLETED' }],
+    )
     expect(action?.targetStatus).toBe('DELIVERED')
   })
 
   it('suggests DELIVERED when ACTIVE and all deliverables COMPLETED or CANCELLED', () => {
-    const action = computeDealNextAction('ACTIVE', [], [
-      { status: 'COMPLETED' },
-      { status: 'CANCELLED' },
-    ])
+    const action = computeDealNextAction(
+      'ACTIVE',
+      [],
+      [{ status: 'COMPLETED' }, { status: 'CANCELLED' }],
+    )
     expect(action?.targetStatus).toBe('DELIVERED')
   })
 
@@ -205,10 +207,11 @@ describe('computeDealNextAction', () => {
   })
 
   it('returns null when ACTIVE and some deliverables are PENDING', () => {
-    const action = computeDealNextAction('ACTIVE', [], [
-      { status: 'COMPLETED' },
-      { status: 'PENDING' },
-    ])
+    const action = computeDealNextAction(
+      'ACTIVE',
+      [],
+      [{ status: 'COMPLETED' }, { status: 'PENDING' }],
+    )
     expect(action).toBeNull()
   })
 
@@ -224,18 +227,20 @@ describe('computeDealNextAction', () => {
   })
 
   it('suggests PAID when DELIVERED and all payments RECEIVED', () => {
-    const action = computeDealNextAction('DELIVERED', [
-      { status: 'RECEIVED' },
-      { status: 'RECEIVED' },
-    ], [])
+    const action = computeDealNextAction(
+      'DELIVERED',
+      [{ status: 'RECEIVED' }, { status: 'RECEIVED' }],
+      [],
+    )
     expect(action?.targetStatus).toBe('PAID')
   })
 
   it('suggests PAID when DELIVERED and payments are RECEIVED or REFUNDED', () => {
-    const action = computeDealNextAction('DELIVERED', [
-      { status: 'RECEIVED' },
-      { status: 'REFUNDED' },
-    ], [])
+    const action = computeDealNextAction(
+      'DELIVERED',
+      [{ status: 'RECEIVED' }, { status: 'REFUNDED' }],
+      [],
+    )
     expect(action?.targetStatus).toBe('PAID')
   })
 
@@ -245,10 +250,11 @@ describe('computeDealNextAction', () => {
   })
 
   it('returns null when DELIVERED and a payment is PENDING', () => {
-    const action = computeDealNextAction('DELIVERED', [
-      { status: 'RECEIVED' },
-      { status: 'PENDING' },
-    ], [])
+    const action = computeDealNextAction(
+      'DELIVERED',
+      [{ status: 'RECEIVED' }, { status: 'PENDING' }],
+      [],
+    )
     expect(action).toBeNull()
   })
 

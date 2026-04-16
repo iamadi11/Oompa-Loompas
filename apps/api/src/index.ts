@@ -14,7 +14,7 @@ async function main() {
   const fastify = await buildServer()
 
   try {
-    startPushNotificationCron();
+    startPushNotificationCron()
     await fastify.listen({ port: PORT, host: HOST })
   } catch (err) {
     fastify.log.error(err)

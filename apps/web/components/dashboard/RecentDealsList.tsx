@@ -26,10 +26,10 @@ export function RecentDealsList({ deals }: { deals: DashboardDeal[] }) {
           duration: 0.5,
           ease: 'power2.out',
           clearProps: 'all',
-        }
+        },
       )
     },
-    { dependencies: [deals, prefersReduced], scope: container }
+    { dependencies: [deals, prefersReduced], scope: container },
   )
 
   return (

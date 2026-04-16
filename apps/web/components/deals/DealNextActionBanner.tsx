@@ -37,7 +37,7 @@ export function DealNextActionBanner({ dealId, dealStatus, payments, deliverable
         ease: 'power2.out',
       })
     },
-    { dependencies: [!!action, prefersReduced], scope: bannerRef }
+    { dependencies: [!!action, prefersReduced], scope: bannerRef },
   )
 
   const { contextSafe } = useGSAP({ scope: buttonRef })
@@ -94,9 +94,7 @@ export function DealNextActionBanner({ dealId, dealStatus, payments, deliverable
     >
       <div>
         <p
-          className={`text-sm font-semibold ${
-            isHighValue ? 'text-emerald-900' : 'text-brand-900'
-          }`}
+          className={`text-sm font-semibold ${isHighValue ? 'text-emerald-900' : 'text-brand-900'}`}
         >
           {action.description}
         </p>
@@ -122,9 +120,7 @@ export function DealNextActionBanner({ dealId, dealStatus, payments, deliverable
         </button>
       </div>
 
-      {error && (
-        <p className="text-xs text-red-600 sm:col-span-full">{error}</p>
-      )}
+      {error && <p className="text-xs text-red-600 sm:col-span-full">{error}</p>}
     </div>
   )
 }

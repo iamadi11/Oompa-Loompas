@@ -50,7 +50,7 @@ function NavLinks(props: { className?: string }) {
         ease: 'power3.out',
       })
     },
-    { dependencies: [activeIndex, reduced], scope: container }
+    { dependencies: [activeIndex, reduced], scope: container },
   )
 
   return (

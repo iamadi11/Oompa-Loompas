@@ -59,7 +59,13 @@ export async function buildServer() {
         }
         if (reply.sent) return
         const { getPaymentInvoice } = await import('./routes/payments/handlers.js')
-        return getPaymentInvoice(req as FastifyRequest<{ Params: { dealId: string; paymentId: string }; Querystring: { token?: string } }>, reply)
+        return getPaymentInvoice(
+          req as FastifyRequest<{
+            Params: { dealId: string; paymentId: string }
+            Querystring: { token?: string }
+          }>,
+          reply,
+        )
       })
     },
     { prefix: '/api/v1' },
@@ -87,7 +93,7 @@ export async function buildServer() {
       fastify.log.error({ err: error }, 'Headers already sent, suppressing extra error')
       return
     }
-    
+
     fastify.log.error(error)
     void reply.status(500).send({
       error: 'Internal Server Error',

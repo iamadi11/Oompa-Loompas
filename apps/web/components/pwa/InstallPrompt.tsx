@@ -3,10 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
-import {
-  isInstallPromptSuppressed,
-  INSTALL_PROMPT_STORAGE_KEY,
-} from '@/lib/pwa/install-prompt'
+import { isInstallPromptSuppressed, INSTALL_PROMPT_STORAGE_KEY } from '@/lib/pwa/install-prompt'
 import { usePrefersReducedMotion } from '@/lib/motion/use-prefers-motion'
 
 /** Subset of the non-standard BeforeInstallPromptEvent we rely on. */
@@ -62,7 +59,7 @@ export function InstallPrompt() {
         ease: 'power2.out',
       })
     },
-    { dependencies: [mounted, reduced], scope: dialogRef }
+    { dependencies: [mounted, reduced], scope: dialogRef },
   )
 
   const handleDismiss = useCallback(() => {
@@ -129,9 +126,7 @@ export function InstallPrompt() {
 
         {/* Copy */}
         <div className="flex-1 min-w-0 text-left">
-          <p className="text-sm font-semibold text-stone-900 leading-tight">
-            Add to Home Screen
-          </p>
+          <p className="text-sm font-semibold text-stone-900 leading-tight">Add to Home Screen</p>
           <p className="text-xs text-stone-500 mt-0.5 leading-tight">
             Check deals and payments in one tap
           </p>

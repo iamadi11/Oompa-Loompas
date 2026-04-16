@@ -27,10 +27,10 @@ export function MarketingLandingClient() {
     () => {
       if (!mounted || prefersReduced || !container.current) return
 
-      const tl = gsap.timeline({ 
-        defaults: { ease: 'expo.out', duration: 0.8 } 
+      const tl = gsap.timeline({
+        defaults: { ease: 'expo.out', duration: 0.8 },
       })
-      
+
       tl.fromTo('header', { y: -20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 })
         .fromTo('.hero-tagline', { y: 12, opacity: 0 }, { y: 0, opacity: 1 }, '-=0.4')
         .fromTo('.hero-title', { y: 16, opacity: 0 }, { y: 0, opacity: 1 }, '-=0.6')
@@ -38,7 +38,8 @@ export function MarketingLandingClient() {
         .fromTo('.hero-actions', { y: 16, opacity: 0 }, { y: 0, opacity: 1 }, '-=0.5')
 
       // Scroll animations
-      gsap.fromTo('.how-heading', 
+      gsap.fromTo(
+        '.how-heading',
         { y: 20, opacity: 0 },
         {
           scrollTrigger: {
@@ -50,10 +51,11 @@ export function MarketingLandingClient() {
           opacity: 1,
           duration: 0.6,
           ease: 'power2.out',
-        }
+        },
       )
 
-      gsap.fromTo('.feature-card',
+      gsap.fromTo(
+        '.feature-card',
         { y: 24, opacity: 0 },
         {
           scrollTrigger: {
@@ -66,10 +68,10 @@ export function MarketingLandingClient() {
           stagger: 0.1,
           duration: 0.6,
           ease: 'power2.out',
-        }
+        },
       )
     },
-    { dependencies: [mounted, prefersReduced], scope: container }
+    { dependencies: [mounted, prefersReduced], scope: container },
   )
 
   return (

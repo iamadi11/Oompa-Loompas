@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  BrandProfileSchema,
-  UpsertBrandProfileSchema,
-  BrandProfileStatsSchema,
-} from '../brand.js'
+import { BrandProfileSchema, UpsertBrandProfileSchema, BrandProfileStatsSchema } from '../brand.js'
 
 const iso = '2024-01-15T12:00:00.000Z'
 
@@ -51,9 +47,7 @@ describe('UpsertBrandProfileSchema', () => {
   })
 
   it('validates email format', () => {
-    expect(() =>
-      UpsertBrandProfileSchema.parse({ contactEmail: 'notanemail' }),
-    ).toThrow()
+    expect(() => UpsertBrandProfileSchema.parse({ contactEmail: 'notanemail' })).toThrow()
   })
 
   it('accepts valid email', () => {
@@ -67,9 +61,7 @@ describe('UpsertBrandProfileSchema', () => {
   })
 
   it('rejects phone over 50 chars', () => {
-    expect(() =>
-      UpsertBrandProfileSchema.parse({ contactPhone: 'x'.repeat(51) }),
-    ).toThrow()
+    expect(() => UpsertBrandProfileSchema.parse({ contactPhone: 'x'.repeat(51) })).toThrow()
   })
 
   it('accepts valid phone', () => {
@@ -84,9 +76,7 @@ describe('UpsertBrandProfileSchema', () => {
   })
 
   it('rejects notes over 5000 chars', () => {
-    expect(() =>
-      UpsertBrandProfileSchema.parse({ notes: 'x'.repeat(5001) }),
-    ).toThrow()
+    expect(() => UpsertBrandProfileSchema.parse({ notes: 'x'.repeat(5001) })).toThrow()
   })
 })
 

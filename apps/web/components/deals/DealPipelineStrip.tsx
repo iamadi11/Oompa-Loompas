@@ -52,10 +52,7 @@ export function DealPipelineStrip({ counts, activeStatus, brandName = null }: Pr
   const totalActive = Object.values(counts).reduce((sum, n) => sum + n, 0)
 
   return (
-    <nav
-      aria-label="Filter deals by pipeline stage"
-      className="flex flex-wrap gap-1.5 mb-5"
-    >
+    <nav aria-label="Filter deals by pipeline stage" className="flex flex-wrap gap-1.5 mb-5">
       {/* All tab */}
       <Link
         href={dealsListSearchHref({ status: null, brandName }) as Route}

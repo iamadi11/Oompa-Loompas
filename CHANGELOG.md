@@ -2,6 +2,19 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.4.8] - 2026-04-16
+
+### Added
+- Brand profile page at `/deals/brands/[brandName]` — contact info (email, phone, notes), deal stats, overdue payment count, recent deals list
+- "Profile" link in brand directory rows
+- Inline edit form for brand contact info (save/cancel, char counter on notes, server error handling)
+- 3 new API client tests for `getBrandProfile`, `upsertBrandProfile`, `deleteBrandProfile`
+- Tightened `BrandRecentDeal.currency` and `.status` to branded `Currency` / `DealStatus` types
+
+### Fixed
+- `DashboardOverdueDeliverableActionSchema` test fixture missing `brandName` field
+- Prettier formatting drift across 49 workspace files (format:check:workspace now confirmed in local CI loop)
+
 ## [0.4.7] - 2026-04-12
 
 ### `@oompa/db` **0.2.1**

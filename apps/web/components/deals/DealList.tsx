@@ -35,10 +35,10 @@ export function DealList({ deals, emptyVariant = 'all' }: DealListProps) {
           duration: 0.5,
           ease: 'power2.out',
           clearProps: 'all',
-        }
+        },
       )
     },
-    { dependencies: [deals, prefersReduced], scope: container }
+    { dependencies: [deals, prefersReduced], scope: container },
   )
 
   if (deals.length === 0) {
@@ -84,11 +84,7 @@ export function DealList({ deals, emptyVariant = 'all' }: DealListProps) {
   return (
     <div ref={container} className="grid gap-3 sm:gap-4">
       {deals.map((deal) => (
-        <div
-          key={deal.id}
-          className="deal-card"
-          style={{ opacity: prefersReduced ? 1 : 0 }}
-        >
+        <div key={deal.id} className="deal-card" style={{ opacity: prefersReduced ? 1 : 0 }}>
           <DealCard deal={deal} />
         </div>
       ))}

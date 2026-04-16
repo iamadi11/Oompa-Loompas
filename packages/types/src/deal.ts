@@ -154,7 +154,7 @@ export function computeDealNextAction(
       return {
         targetStatus: 'NEGOTIATING',
         label: 'Start negotiating',
-        description: 'This deal is in draft. Move it forward when you\'re ready to negotiate.',
+        description: "This deal is in draft. Move it forward when you're ready to negotiate.",
       }
 
     case 'NEGOTIATING':

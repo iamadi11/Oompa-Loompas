@@ -3,12 +3,7 @@ import { prisma } from '@oompa/db'
 import { validate } from '@oompa/utils'
 import { UpsertBrandProfileSchema } from './schema.js'
 import { serializeBrandProfile, toUpsertBrandProfileData } from './service.js'
-import {
-  NotFoundError,
-  ValidationError,
-  UnauthorizedError,
-  sendError,
-} from '../../lib/errors.js'
+import { NotFoundError, ValidationError, UnauthorizedError, sendError } from '../../lib/errors.js'
 
 export async function getBrandProfile(
   request: FastifyRequest<{ Params: { brandName: string } }>,

@@ -51,10 +51,10 @@ export function DeliverableSection({
           duration: 0.5,
           ease: 'power2.out',
           clearProps: 'all',
-        }
+        },
       )
     },
-    { dependencies: [deliverables, prefersReduced], scope: listRef }
+    { dependencies: [deliverables, prefersReduced], scope: listRef },
   )
 
   const pendingCount = deliverables.filter((d) => d.status === 'PENDING').length
@@ -132,7 +132,11 @@ export function DeliverableSection({
       {deliverables.length > 0 && (
         <div ref={listRef} className="flex flex-col gap-2 mb-4">
           {deliverables.map((deliverable) => (
-            <div key={deliverable.id} className="deliverable-row-item" style={{ opacity: prefersReduced ? 1 : 0 }}>
+            <div
+              key={deliverable.id}
+              className="deliverable-row-item"
+              style={{ opacity: prefersReduced ? 1 : 0 }}
+            >
               <DeliverableRow
                 deliverable={deliverable}
                 onUpdate={handleChange}

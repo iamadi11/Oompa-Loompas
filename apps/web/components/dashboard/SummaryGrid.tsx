@@ -25,10 +25,10 @@ export function SummaryGrid({ children }: { children: React.ReactNode }) {
           duration: 0.6,
           ease: 'power2.out',
           clearProps: 'all',
-        }
+        },
       )
     },
-    { dependencies: [prefersReduced], scope: container }
+    { dependencies: [prefersReduced], scope: container },
   )
 
   return (

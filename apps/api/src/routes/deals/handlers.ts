@@ -33,7 +33,10 @@ const DEALS_EXPORT_MAX = 5000
 const PAYMENTS_EXPORT_MAX = 10_000
 const DELIVERABLES_EXPORT_MAX = 10_000
 
-export async function exportDeliverablesCsv(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+export async function exportDeliverablesCsv(
+  request: FastifyRequest,
+  reply: FastifyReply,
+): Promise<void> {
   const userId = request.authUser?.id
   if (!userId) {
     return sendError(reply, new UnauthorizedError())
@@ -72,7 +75,10 @@ export async function exportDeliverablesCsv(request: FastifyRequest, reply: Fast
     .send(body)
 }
 
-export async function exportPaymentsCsv(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+export async function exportPaymentsCsv(
+  request: FastifyRequest,
+  reply: FastifyReply,
+): Promise<void> {
   const userId = request.authUser?.id
   if (!userId) {
     return sendError(reply, new UnauthorizedError())

@@ -10,11 +10,13 @@ export type BuildDeliverableReminderMessageInput = {
 /**
  * Builds a plain-text follow-up message for an overdue deliverable.
  */
-export function buildDeliverableReminderMessage(input: BuildDeliverableReminderMessageInput): string {
+export function buildDeliverableReminderMessage(
+  input: BuildDeliverableReminderMessageInput,
+): string {
   const brand = input.brandName.trim()
   const title = input.dealTitle.trim()
   const delTitle = input.deliverableTitle.trim()
-  
+
   const greeting = brand.length > 0 ? `Hi ${brand},` : 'Hi,'
   const workLabel = title.length > 0 ? `"${title}"` : 'our engagement'
   const delLabel = delTitle.length > 0 ? `"${delTitle}"` : 'the deliverable'

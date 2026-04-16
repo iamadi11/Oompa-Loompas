@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  isInstallPromptSuppressed,
-  INSTALL_PROMPT_DISMISS_TTL_MS,
-} from '@/lib/pwa/install-prompt'
+import { isInstallPromptSuppressed, INSTALL_PROMPT_DISMISS_TTL_MS } from '@/lib/pwa/install-prompt'
 
 describe('isInstallPromptSuppressed', () => {
   const now = 1_712_000_000_000 // fixed reference timestamp

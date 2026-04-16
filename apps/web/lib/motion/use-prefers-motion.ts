@@ -9,7 +9,7 @@ export function useAllowEntranceMotion(): boolean {
   return false
 }
 
-/** 
+/**
  * Returns true if the user prefers reduced motion.
  * Uses native media query and handles client-side updates.
  */

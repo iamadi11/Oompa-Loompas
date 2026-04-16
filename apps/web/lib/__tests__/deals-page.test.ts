@@ -104,21 +104,21 @@ describe('dealsListSearchHref', () => {
 
 describe('dealsPageHrefWithoutBrandFilter', () => {
   it('preserves needs attention mode', () => {
-    expect(
-      dealsPageHrefWithoutBrandFilter({ needsAttention: true, statusFilter: null }),
-    ).toBe('/deals?needsAttention=true')
+    expect(dealsPageHrefWithoutBrandFilter({ needsAttention: true, statusFilter: null })).toBe(
+      '/deals?needsAttention=true',
+    )
   })
 
   it('preserves status when not in needs-attention mode', () => {
-    expect(
-      dealsPageHrefWithoutBrandFilter({ needsAttention: false, statusFilter: 'ACTIVE' }),
-    ).toBe('/deals?status=ACTIVE')
+    expect(dealsPageHrefWithoutBrandFilter({ needsAttention: false, statusFilter: 'ACTIVE' })).toBe(
+      '/deals?status=ACTIVE',
+    )
   })
 
   it('returns plain deals path when no other filter', () => {
-    expect(
-      dealsPageHrefWithoutBrandFilter({ needsAttention: false, statusFilter: null }),
-    ).toBe('/deals')
+    expect(dealsPageHrefWithoutBrandFilter({ needsAttention: false, statusFilter: null })).toBe(
+      '/deals',
+    )
   })
 })
 

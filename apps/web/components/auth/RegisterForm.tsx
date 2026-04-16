@@ -62,10 +62,13 @@ export function RegisterForm() {
     }
   }, [])
 
-  const handleSubmit = useCallback((e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    void runRegister()
-  }, [runRegister])
+  const handleSubmit = useCallback(
+    (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault()
+      void runRegister()
+    },
+    [runRegister],
+  )
 
   const inputClass =
     'w-full rounded-xl border border-line/90 bg-surface-raised px-3 py-2.5 text-stone-900 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-brand-600 focus:shadow-[0_0_0_3px_rgba(225,43,43,0.18)]'
@@ -85,7 +88,12 @@ export function RegisterForm() {
           aria-invalid={Boolean(formError)}
           defaultValue=""
           onInput={() => setFormError(null)}
-          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); passwordInputRef.current?.focus() } }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              passwordInputRef.current?.focus()
+            }
+          }}
           className={inputClass}
         />
       </div>
@@ -103,7 +111,12 @@ export function RegisterForm() {
           aria-invalid={Boolean(formError)}
           defaultValue=""
           onInput={() => setFormError(null)}
-          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); confirmInputRef.current?.focus() } }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              confirmInputRef.current?.focus()
+            }
+          }}
           className={inputClass}
         />
       </div>
@@ -120,7 +133,12 @@ export function RegisterForm() {
           aria-invalid={Boolean(formError)}
           defaultValue=""
           onInput={() => setFormError(null)}
-          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); void runRegister() } }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              void runRegister()
+            }
+          }}
           className={inputClass}
         />
       </div>

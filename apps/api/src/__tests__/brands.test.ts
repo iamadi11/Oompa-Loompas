@@ -40,7 +40,11 @@ function setupDefaultMocks() {
   mockSessionFindUnique(mockPrisma.session.findUnique, { userId: TEST_USER_ID })
   mockPrisma.deal.count.mockResolvedValue(2) // brand exists
   mockPrisma.deal.groupBy.mockResolvedValue([
-    { currency: 'INR', _count: { id: 2 }, _sum: { value: { toNumber: () => 50000, toString: () => '50000' } } },
+    {
+      currency: 'INR',
+      _count: { id: 2 },
+      _sum: { value: { toNumber: () => 50000, toString: () => '50000' } },
+    },
   ])
   mockPrisma.payment.count.mockResolvedValue(0)
   mockPrisma.deal.findMany.mockResolvedValue([
