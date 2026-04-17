@@ -1,5 +1,10 @@
 {
   "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"],
+      "type": "stdio"
+    },
     "code-review-graph": {
       "command": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12",
       "args": [

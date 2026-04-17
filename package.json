@@ -6,7 +6,10 @@
   "scripts": {
     "build": "pnpm -r build",
     "dev": "pnpm --parallel -r dev",
-    "test": "pnpm -r test",
+    "test": "pnpm -r --filter='!@oompa/e2e' test",
+    "test:e2e": "pnpm -C apps/e2e run test",
+    "test:e2e:ui": "pnpm -C apps/e2e run test:ui",
+    "test:e2e:headed": "pnpm -C apps/e2e run test:headed",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\" --ignore-path .gitignore",
