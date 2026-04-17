@@ -10,7 +10,7 @@
 3. **TEST FIRST** → criteria + failure modes before code
 4. **IMPLEMENT** → small atomic units, each compiles + tests pass
 5. **TEST RUN** → all green, ≥90% coverage; invoke `simplify` skill
-6. **VALIDATE** → real browser, full user flow
+6. **VALIDATE** → update `apps/e2e/tests/` for new/changed routes + run `pnpm test:e2e:ui` (watch tests in browser) or `pnpm test:e2e` (headless); invoke `e2e` skill
 7. **DOCUMENT** → purpose, inputs, outputs, edge cases, failure modes
 8. **INSTRUMENT** → post-deploy signal (outcome work only)
 
@@ -92,7 +92,7 @@ Deal → shareToken (nullable) ← /p/:token public proposal
 - Framer Motion: page transitions, card enters, state changes, celebrations, list reorders
 - `useReducedMotion()` wraps ALL motion · static fallback always present
 - WCAG 2.2 AA · revenue paths keyboard-operable + visible focus
-- Real browser validation mandatory (`preview_*` tools — never skip)
+- E2E validation mandatory: update `apps/e2e/tests/` for changed UI + run `pnpm test:e2e` — no manual browser testing
 - `aria-current="page"` on active nav · document title = active view · mobile-first (375px)
 
 ---
@@ -100,7 +100,10 @@ Deal → shareToken (nullable) ← /p/:token public proposal
 ## 5. TESTING
 
 - ≥90% coverage on all changed packages
-- Unit → Integration → E2E (E2E waiver Phase 1; compensating: API tests + coverage + browser checks)
+- Unit → Integration → E2E
+- **After every feature change:** update `apps/e2e/tests/` specs for new/changed routes, forms, and interactions; verify with `pnpm test:e2e:ui` (watch in browser) — no manual testing, no exceptions
+- Use `pnpm test:e2e` for headless/CI runs; `pnpm test:e2e:ui` for interactive development
+- Use `pnpm -C apps/e2e run test --grep "pattern" --ui` for targeted spec runs during development
 - Every bug: failing test + fix + regression protection
 - Deterministic only — no flaky tests
 
@@ -111,12 +114,13 @@ Deal → shareToken (nullable) ← /p/:token public proposal
 1. `pnpm typecheck` clean
 2. `pnpm lint` clean
 3. `pnpm test` green, ≥90% coverage affected packages
-4. DB migrations forward-compatible or rollback documented
-5. Real browser validation complete
-6. Performance budgets within targets or justification recorded
-7. No secrets in source/logs/output
-8. Post-deploy signal defined (outcome features)
-9. Semantic version bump + CHANGELOG entry
+4. `pnpm test:e2e:ui` green (or `pnpm test:e2e` in CI) — all E2E specs updated for the feature and passing
+5. DB migrations forward-compatible or rollback documented
+6. No manual browser testing — Playwright UI is the validation gate
+7. Performance budgets within targets or justification recorded
+8. No secrets in source/logs/output
+9. Post-deploy signal defined (outcome features)
+10. Semantic version bump + CHANGELOG entry
 
 ---
 
@@ -184,7 +188,7 @@ Priority: **User Outcome > Determinism > Simplicity > Dev Velocity > Extensibili
 
 ## 12. ANTI-PATTERNS (ZERO TOLERANCE)
 
-Build without research · implement before test definition · large untested changes · `any` types · cross-module leakage · circular deps · secrets in source/logs · outcome features without post-deploy measurement · black-box AI on money/contracts · silent failures · force-push to main · stale financial data offline
+Build without research · implement before test definition · large untested changes · `any` types · cross-module leakage · circular deps · secrets in source/logs · outcome features without post-deploy measurement · black-box AI on money/contracts · silent failures · force-push to main · stale financial data offline · shipping UI changes without updating E2E specs · manual browser testing as a substitute for `pnpm test:e2e`
 
 ---
 
@@ -193,6 +197,7 @@ Build without research · implement before test definition · large untested cha
 - **Responses:** terse, no filler, no trailing summaries
 - **Commits:** use `caveman-commit` skill style (compressed, signal-only)
 - **Post-implementation:** invoke `simplify` skill to review code quality
+- **Post-feature UI change:** invoke `e2e` skill — update specs + run `pnpm test:e2e:ui` to watch tests pass in browser; never report done without green E2E
 - **Post-ship docs:** invoke `compress` skill on memory/doc files to reduce future context load
 - **Communication:** caveman full mode by default
 

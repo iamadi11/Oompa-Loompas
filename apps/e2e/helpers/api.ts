@@ -106,15 +106,16 @@ export async function createTemplate(
 ): Promise<string> {
   const res = await req.post(`${API}/api/v1/templates`, {
     data: {
-      title: `E2E Template ${Date.now()}`,
-      brandName: null,
-      value: 50000,
+      name: `E2E Template ${Date.now()}`,
+      defaultValue: 50000,
       currency: 'INR',
       notes: null,
+      deliverables: [],
+      payments: [],
       ...overrides,
     },
   })
-  expect(res.ok(), `createTemplate failed: ${res.status()}`).toBe(true)
+  expect(res.ok(), `createTemplate failed: ${res.status()} ${await res.text()}`).toBe(true)
   const body = (await res.json()) as { data: { id: string } }
   return body.data.id
 }
