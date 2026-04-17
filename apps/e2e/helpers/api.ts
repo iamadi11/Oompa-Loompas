@@ -100,6 +100,14 @@ export async function generateShareToken(req: Req, dealId: string): Promise<stri
 
 // ─── Templates ────────────────────────────────────────────────────────────
 
+export async function deleteAllTemplates(req: Req): Promise<void> {
+  const res = await req.get(`${API}/api/v1/templates`)
+  if (!res.ok()) return
+  const body = (await res.json()) as { data: { id: string }[] }
+  const items = body.data ?? []
+  await Promise.all(items.map((t) => req.delete(`${API}/api/v1/templates/${t.id}`)))
+}
+
 export async function createTemplate(
   req: Req,
   overrides: Record<string, unknown> = {},

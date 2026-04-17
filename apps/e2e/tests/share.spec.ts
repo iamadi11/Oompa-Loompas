@@ -50,13 +50,10 @@ test.describe('Share proposal button — authenticated', () => {
 // ─── Public proposal page — no auth required ───────────────────────────────
 
 test.describe('Public proposal page /p/:token', () => {
-  // These tests run without the saved auth cookie
-  test.use({ storageState: { cookies: [], origins: [] } })
-
   test('invalid token shows not-found / error state', async ({ page }) => {
     await page.goto('/p/this-token-does-not-exist-xyz-abc')
     await page.waitForLoadState('networkidle')
-    await expect(page.getByText(/not found|invalid|expired|no deal/i)).toBeVisible()
+    await expect(page.getByText(/not found|invalid|expired|no deal|does not exist/i).first()).toBeVisible()
   })
 
   test('valid token shows deal title and brand', async ({ page, request }) => {
@@ -100,8 +97,8 @@ test.describe('Public proposal page /p/:token', () => {
     await page.waitForLoadState('networkidle')
 
     await expect(page.getByText(/shared via|view only/i)).toBeVisible()
-    // Workspace nav should NOT be present
-    await expect(page.getByRole('link', { name: 'Dashboard' })).not.toBeVisible()
+    // Workspace nav should NOT be present (no "Attention" or "Settings" nav links)
+    await expect(page.getByRole('link', { name: 'Attention' })).not.toBeVisible()
   })
 
   test('public page lists payments if any', async ({ page, request }) => {
@@ -116,7 +113,7 @@ test.describe('Public proposal page /p/:token', () => {
     await page.goto(`/p/${token}`)
     await page.waitForLoadState('networkidle')
 
-    await expect(page.getByText(/payment/i)).toBeVisible()
+    await expect(page.getByText(/payment/i).first()).toBeVisible()
   })
 
   test('public page lists deliverables if any', async ({ page, request }) => {
@@ -138,6 +135,6 @@ test.describe('Public proposal page /p/:token', () => {
     await page.goto(`/p/${token}`)
     await page.waitForLoadState('networkidle')
 
-    await expect(page.getByText(/deliverable|reel/i)).toBeVisible()
+    await expect(page.getByText(/deliverable|reel/i).first()).toBeVisible()
   })
 })

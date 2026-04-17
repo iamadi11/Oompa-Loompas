@@ -6,9 +6,14 @@
  * Submit: "Create template" (create mode) / "Save changes" (edit mode)
  */
 import { test, expect } from '@playwright/test'
-import { createDeal, createTemplate } from '../helpers/api'
+import { createDeal, createTemplate, deleteAllTemplates } from '../helpers/api'
 
 const API = process.env['E2E_API_URL'] ?? 'http://localhost:3001'
+
+// Clean up templates before each test to avoid hitting the 20-template limit
+test.beforeEach(async ({ request }) => {
+  await deleteAllTemplates(request)
+})
 
 // ─── Templates list ────────────────────────────────────────────────────────
 
@@ -27,11 +32,7 @@ test.describe('Templates list — /deals/templates', () => {
   })
 
   test('has New template button or link', async ({ page }) => {
-    await expect(
-      page.getByRole('link', { name: /new template/i }).or(
-        page.getByRole('button', { name: /new template/i }),
-      ),
-    ).toBeVisible()
+    await expect(page.getByRole('link', { name: 'New template' })).toBeVisible()
   })
 
   test('shows empty state or template list', async ({ page }) => {
@@ -86,7 +87,7 @@ test.describe('Create template — /deals/templates/new', () => {
 
   test('empty submit shows validation error', async ({ page }) => {
     await page.getByRole('button', { name: /create template/i }).click()
-    await expect(page.getByRole('alert').or(page.getByText(/required|enter/i))).toBeVisible()
+    await expect(page.getByRole('alert').or(page.getByText(/required|enter/i)).first()).toBeVisible()
   })
 
   test('can add a deliverable row', async ({ page }) => {
@@ -125,7 +126,7 @@ test.describe('Edit template — /deals/templates/:id', () => {
     const id = await createTemplate(request, { name: 'Edit Me Template' })
     await page.goto(`/deals/templates/${id}`)
     await page.waitForLoadState('networkidle')
-    await expect(page.getByText('Edit Me Template')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Edit Me Template' })).toBeVisible()
   })
 
   test('can update template name', async ({ page, request }) => {
@@ -153,7 +154,7 @@ test.describe('Edit template — /deals/templates/:id', () => {
     })
     await page.goto(`/deals/templates/${id}`)
     await page.waitForLoadState('networkidle')
-    await expect(page.getByDisplayValue('Instagram Reel')).toBeVisible()
+    await expect(page.locator('input[aria-label="Deliverable 1 title"]')).toBeVisible()
   })
 })
 
@@ -232,9 +233,7 @@ test.describe('Save deal as template', () => {
     await page.goto(`/deals/${id}`)
     await page.waitForLoadState('networkidle')
     await expect(
-      page.getByRole('button', { name: /save as template/i }).or(
-        page.getByText(/save as template/i),
-      ),
+      page.getByRole('button', { name: /save as template/i }),
     ).toBeVisible()
   })
 

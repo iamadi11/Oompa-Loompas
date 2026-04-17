@@ -47,9 +47,10 @@ test.describe('Deals list — pipeline strip', () => {
     await page.goto('/deals')
     await page.waitForLoadState('networkidle')
 
+    const strip = page.getByRole('navigation', { name: /filter deals by pipeline stage/i })
     const statuses = ['Draft', 'Negotiating', 'Active', 'Delivered', 'Paid', 'Cancelled']
     for (const s of statuses) {
-      await expect(page.getByRole('link', { name: s, exact: false })).toBeVisible()
+      await expect(strip.getByRole('link', { name: s, exact: false })).toBeVisible()
     }
   })
 
@@ -61,7 +62,8 @@ test.describe('Deals list — pipeline strip', () => {
     await page.goto('/deals')
     await page.waitForLoadState('networkidle')
 
-    const activeTab = page.getByRole('link', { name: /^Active\s*\d*$/ })
+    const strip = page.getByRole('navigation', { name: /filter deals by pipeline stage/i })
+    const activeTab = strip.getByRole('link', { name: /^Active\s*\d*$/ })
     if (await activeTab.isVisible()) {
       await activeTab.click()
       await expect(page).toHaveURL(/status=ACTIVE/)
@@ -130,8 +132,8 @@ test.describe('Deals list — brand filter', () => {
     await createDeal(request, { brandName: 'FilterBrand', title: 'Brand Filter Deal' })
     await page.goto('/deals?brandName=FilterBrand')
     await page.waitForLoadState('networkidle')
-    await expect(page.getByText(/brand filter/i)).toBeVisible()
-    await expect(page.getByText('FilterBrand')).toBeVisible()
+    await expect(page.getByText(/brand filter/i).first()).toBeVisible()
+    await expect(page.getByText('FilterBrand').first()).toBeVisible()
   })
 
   test('Clear brand filter link removes brandName from URL', async ({ page, request }) => {
@@ -146,7 +148,7 @@ test.describe('Deals list — brand filter', () => {
   test('brand filter + needsAttention can coexist', async ({ page }) => {
     await page.goto('/deals?needsAttention=true&brandName=TestBrand')
     await page.waitForLoadState('networkidle')
-    await expect(page.getByText(/brand filter/i)).toBeVisible()
+    await expect(page.getByText(/brand filter/i).first()).toBeVisible()
     await expect(page.getByRole('link', { name: 'Needs attention' })).toHaveAttribute(
       'aria-current',
       'page',
@@ -168,7 +170,7 @@ test.describe('Deals list — Add deal CTA', () => {
     await createDeal(request, { title: 'Ensure CTA Deal 2' })
     await page.goto('/deals')
     await page.waitForLoadState('networkidle')
-    await page.getByRole('link', { name: /from template/i }).click()
+    await page.getByRole('link', { name: /from template/i }).first().click()
     await expect(page).toHaveURL(/\/deals\/templates/)
   })
 })

@@ -18,7 +18,7 @@ test.describe('Deliverables section — structure', () => {
     const id = await createDeal(request, { title: 'Add Del Button Deal' })
     await page.goto(`/deals/${id}`)
     await page.waitForLoadState('networkidle')
-    await expect(page.getByRole('button', { name: /add deliverable/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: /add deliverable/i }).first()).toBeVisible()
   })
 })
 
@@ -30,8 +30,8 @@ test.describe('Add deliverable form', () => {
     await page.goto(`/deals/${id}`)
     await page.waitForLoadState('networkidle')
 
-    await page.getByRole('button', { name: /add deliverable/i }).click()
-    await expect(page.getByLabel(/title/i)).toBeVisible()
+    await page.getByRole('button', { name: /add deliverable/i }).first().click()
+    await expect(page.locator('#deal-deliverable-title')).toBeVisible()
   })
 
   test('form has Platform and Type selects', async ({ page, request }) => {
@@ -39,7 +39,7 @@ test.describe('Add deliverable form', () => {
     await page.goto(`/deals/${id}`)
     await page.waitForLoadState('networkidle')
 
-    await page.getByRole('button', { name: /add deliverable/i }).click()
+    await page.getByRole('button', { name: /add deliverable/i }).first().click()
     await expect(page.getByLabel(/platform/i)).toBeVisible()
     await expect(page.getByLabel(/type/i)).toBeVisible()
   })
@@ -49,15 +49,16 @@ test.describe('Add deliverable form', () => {
     await page.goto(`/deals/${id}`)
     await page.waitForLoadState('networkidle')
 
-    await page.getByRole('button', { name: /add deliverable/i }).click()
+    await page.getByRole('button', { name: /add deliverable/i }).first().click()
 
     const title = `Reel ${Date.now()}`
-    await page.getByLabel(/title/i).fill(title)
+    await page.locator('#deal-deliverable-title').fill(title)
     await page.getByLabel(/platform/i).selectOption('INSTAGRAM')
     await page.getByLabel(/type/i).selectOption('REEL')
     await page.getByLabel(/due date/i).fill('2026-12-31')
 
-    await page.getByRole('button', { name: /save|add|create/i }).click()
+    const delSection = page.locator('section[aria-labelledby="deliverables-heading"]')
+    await delSection.getByRole('button', { name: 'Add deliverable' }).click()
     await page.waitForLoadState('networkidle')
 
     await expect(page.getByText(title)).toBeVisible()
@@ -68,19 +69,20 @@ test.describe('Add deliverable form', () => {
     await page.goto(`/deals/${id}`)
     await page.waitForLoadState('networkidle')
 
-    await page.getByRole('button', { name: /add deliverable/i }).click()
-    await expect(page.getByLabel(/title/i)).toBeVisible()
+    await page.getByRole('button', { name: /add deliverable/i }).first().click()
+    await expect(page.locator('#deal-deliverable-title')).toBeVisible()
 
-    await page.getByRole('button', { name: /cancel/i }).click()
-    await expect(page.getByLabel(/title/i)).not.toBeVisible()
-    await expect(page.getByRole('button', { name: /add deliverable/i })).toBeVisible()
+    const delSection = page.locator('section[aria-labelledby="deliverables-heading"]')
+    await delSection.getByRole('button', { name: 'Cancel' }).click()
+    await expect(page.locator('#deal-deliverable-title')).not.toBeVisible()
+    await expect(page.getByRole('button', { name: /add deliverable/i }).first()).toBeVisible()
   })
 
   test('all platform options are selectable', async ({ page, request }) => {
     const id = await createDeal(request, { title: 'Platform Options Deal' })
     await page.goto(`/deals/${id}`)
     await page.waitForLoadState('networkidle')
-    await page.getByRole('button', { name: /add deliverable/i }).click()
+    await page.getByRole('button', { name: /add deliverable/i }).first().click()
 
     const platformSelect = page.getByLabel(/platform/i)
     const options = await platformSelect.locator('option').allTextContents()
@@ -94,7 +96,7 @@ test.describe('Add deliverable form', () => {
     const id = await createDeal(request, { title: 'Type Options Deal' })
     await page.goto(`/deals/${id}`)
     await page.waitForLoadState('networkidle')
-    await page.getByRole('button', { name: /add deliverable/i }).click()
+    await page.getByRole('button', { name: /add deliverable/i }).first().click()
 
     const typeSelect = page.getByLabel(/type/i)
     const options = await typeSelect.locator('option').allTextContents()
@@ -117,7 +119,8 @@ test.describe('Deliverable row — mark complete', () => {
     await expect(
       page
         .getByRole('button', { name: /complete|mark complete/i })
-        .or(page.getByRole('checkbox', { name: /complete/i })),
+        .or(page.getByRole('checkbox', { name: /complete/i }))
+        .first(),
     ).toBeVisible()
   })
 
@@ -130,6 +133,6 @@ test.describe('Deliverable row — mark complete', () => {
     await page.goto(`/deals/${id}`)
     await page.waitForLoadState('networkidle')
 
-    await expect(page.getByText(/overdue/i)).toBeVisible()
+    await expect(page.getByText(/overdue/i).first()).toBeVisible()
   })
 })

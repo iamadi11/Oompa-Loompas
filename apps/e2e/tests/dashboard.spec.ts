@@ -13,21 +13,21 @@ test.describe('Dashboard — structure', () => {
   })
 
   test('shows Dashboard heading', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: /dashboard/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /overview/i })).toBeVisible()
   })
 
   test('page title is "Dashboard"', async ({ page }) => {
-    await expect(page).toHaveTitle(/dashboard/i)
+    await expect(page).toHaveTitle(/overview/i)
   })
 
   test('nav marks Dashboard as current page', async ({ page }) => {
-    const dashLink = page.locator('a[aria-current="page"]').filter({ hasText: /dashboard/i })
-    await expect(dashLink).toBeVisible()
+    const dashLink = page.locator('a[aria-current="page"]').filter({ hasText: /overview/i })
+    await expect(dashLink.first()).toBeVisible()
   })
 
   test('main navigation has Dashboard and Deals links', async ({ page }) => {
-    const nav = page.getByRole('navigation')
-    await expect(nav.getByRole('link', { name: /dashboard/i })).toBeVisible()
+    const nav = page.getByRole('navigation', { name: 'Main', exact: true })
+    await expect(nav.getByRole('link', { name: /overview/i })).toBeVisible()
     await expect(nav.getByRole('link', { name: /deals/i })).toBeVisible()
   })
 })
@@ -78,7 +78,7 @@ test.describe('Dashboard — priority actions', () => {
     await page.goto('/dashboard')
     await page.waitForLoadState('networkidle')
     // Visual check: list renders (content cap is enforced server-side)
-    await expect(page.getByRole('heading', { name: /dashboard/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /overview/i })).toBeVisible()
   })
 })
 
@@ -95,9 +95,9 @@ test.describe('Dashboard — navigation', () => {
   test('clicking Attention link from priority actions navigates to /attention', async ({ page }) => {
     await page.goto('/dashboard')
     await page.waitForLoadState('networkidle')
-    const attentionLink = page.getByRole('link', { name: /view all|see all|attention/i })
+    const attentionLink = page.getByRole('link', { name: /view all|see all|attention/i }).first()
     if (await attentionLink.isVisible()) {
-      await attentionLink.click()
+      await attentionLink.first().click()
       await expect(page).toHaveURL(/\/attention/)
     }
   })
@@ -116,7 +116,7 @@ test.describe('Dashboard — navigation', () => {
 
     const dealLink = page.getByRole('link', { name: /Click Through Deal/i })
     if (await dealLink.isVisible()) {
-      await dealLink.click()
+      await dealLink.first().click()
       await expect(page).toHaveURL(new RegExp(`/deals/${id}`))
     }
   })

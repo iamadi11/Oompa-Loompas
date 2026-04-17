@@ -9,7 +9,7 @@ import { createDeal, createPayment } from '../helpers/api'
 
 test.describe('Payments section — structure', () => {
   test('Payments heading is visible', async ({ page, request }) => {
-    const id = await createDeal(request, { title: 'Payments Heading Deal' })
+    const id = await createDeal(request, { title: 'Pay Milestones Deal' })
     await page.goto(`/deals/${id}`)
     await page.waitForLoadState('networkidle')
     await expect(page.getByRole('heading', { name: /payments/i })).toBeVisible()
@@ -52,10 +52,10 @@ test.describe('Add payment form', () => {
     await page.getByRole('button', { name: /add payment/i }).click()
     await page.getByLabel(/amount/i).fill('25000')
     await page.getByLabel(/due date/i).fill('2026-12-31')
-    await page.getByRole('button', { name: /save|add|create/i }).click()
+    await page.getByRole('button', { name: 'Add payment' }).click()
 
     await page.waitForLoadState('networkidle')
-    await expect(page.getByText(/25,000|₹/)).toBeVisible()
+    await expect(page.getByText(/25,000|₹/).first()).toBeVisible()
   })
 
   test('cancel hides the add payment form', async ({ page, request }) => {
@@ -66,7 +66,8 @@ test.describe('Add payment form', () => {
     await page.getByRole('button', { name: /add payment/i }).click()
     await expect(page.getByLabel(/amount/i)).toBeVisible()
 
-    await page.getByRole('button', { name: /cancel/i }).click()
+    const paySection = page.locator('section[aria-labelledby="payments-heading"]')
+    await paySection.getByRole('button', { name: 'Cancel' }).click()
     await expect(page.getByLabel(/amount/i)).not.toBeVisible()
     await expect(page.getByRole('button', { name: /add payment/i })).toBeVisible()
   })
@@ -86,7 +87,7 @@ test.describe('Payment row — mark received', () => {
     await expect(
       page.getByRole('button', { name: /received|mark received/i }).or(
         page.getByText(/received/i),
-      ),
+      ).first(),
     ).toBeVisible()
   })
 
@@ -101,7 +102,7 @@ test.describe('Payment row — mark received', () => {
       await receivedBtn.click()
       await page.waitForLoadState('networkidle')
       // Received column should update
-      await expect(page.getByText(/25,000|₹/)).toBeVisible()
+      await expect(page.getByText(/25,000|₹/).first()).toBeVisible()
     }
   })
 })
@@ -141,7 +142,7 @@ test.describe('Payment reminder copy', () => {
     await page.waitForLoadState('networkidle')
 
     await expect(
-      page.getByRole('button', { name: /copy reminder|copy/i }),
+      page.getByRole('button', { name: /share.*reminder|share payment reminder/i }).first(),
     ).toBeVisible()
   })
 })

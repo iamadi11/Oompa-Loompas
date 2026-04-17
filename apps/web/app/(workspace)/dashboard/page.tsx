@@ -1,6 +1,9 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import type { Metadata } from 'next'
 import type { DashboardSummary } from '@oompa/types'
+
+export const metadata: Metadata = { title: 'Overview' }
 import { formatCurrency } from '@oompa/utils'
 import { OverviewFetchError } from '@/components/dashboard/OverviewFetchError'
 import { PriorityActionsSection } from '@/components/dashboard/PriorityActionsSection'

@@ -23,7 +23,7 @@ test.describe('/attention — page structure', () => {
     await page.goto('/attention')
     await page.waitForLoadState('networkidle')
     const current = page.locator('[aria-current="page"]')
-    await expect(current.filter({ hasText: /attention/i })).toBeVisible()
+    await expect(current.filter({ hasText: /attention/i }).first()).toBeVisible()
   })
 })
 
@@ -39,7 +39,7 @@ test.describe('/attention — overdue items', () => {
     await page.goto('/attention')
     await page.waitForLoadState('networkidle')
 
-    await expect(page.getByText(/Overdue Payment Deal/i)).toBeVisible()
+    await expect(page.getByText(/Overdue Payment Deal/i).first()).toBeVisible()
   })
 
   test('overdue deliverable appears in attention queue', async ({ page, request }) => {
@@ -52,7 +52,7 @@ test.describe('/attention — overdue items', () => {
     await page.goto('/attention')
     await page.waitForLoadState('networkidle')
 
-    await expect(page.getByText(/Overdue Del Deal/i)).toBeVisible()
+    await expect(page.getByText(/Overdue Del Deal/i).first()).toBeVisible()
   })
 
   test('attention items are sorted by due date (oldest first)', async ({ page, request }) => {
@@ -107,7 +107,7 @@ test.describe('/deals?needsAttention=true — attention filter', () => {
     await page.goto('/deals?needsAttention=true')
     await page.waitForLoadState('networkidle')
 
-    await expect(page.getByText('Attention Filter Deal')).toBeVisible()
+    await expect(page.getByText('Attention Filter Deal').first()).toBeVisible()
   })
 
   test('each overdue deal card has Copy reminder button', async ({ page, request }) => {

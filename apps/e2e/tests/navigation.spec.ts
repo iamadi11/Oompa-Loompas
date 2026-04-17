@@ -7,7 +7,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Main navigation', () => {
   const routes: Array<{ name: string; url: RegExp }> = [
-    { name: 'Dashboard', url: /\/dashboard/ },
+    { name: 'Overview', url: /\/dashboard/ },
     { name: 'Deals', url: /\/deals/ },
   ]
 
@@ -24,14 +24,14 @@ test.describe('Main navigation', () => {
     for (const { url } of routes) {
       await page.goto(url.toString().replace(/[/\\^$*+?.()|[\]{}]/g, ''))
       // Check that some link has aria-current
-      await expect(page.locator('[aria-current="page"]')).toBeVisible()
+      await expect(page.locator('[aria-current="page"]').first()).toBeVisible()
     }
   })
 
   test('nav links do not return 5xx on GET', async ({ page, request }) => {
     await page.goto('/dashboard')
     await page.waitForLoadState('networkidle')
-    const links = await page.getByRole('navigation').getByRole('link').all()
+    const links = await page.getByRole('navigation').first().getByRole('link').all()
     for (const link of links) {
       const href = await link.getAttribute('href')
       if (!href || href.startsWith('#') || href.startsWith('http')) continue
@@ -49,7 +49,7 @@ test.describe('Offline page — /offline', () => {
   test('renders without auth', async ({ page }) => {
     await page.goto('/offline')
     await page.waitForLoadState('networkidle')
-    await expect(page.getByText(/offline|connection|internet/i)).toBeVisible()
+    await expect(page.getByText(/offline|connection|internet/i).first()).toBeVisible()
   })
 
   test('page does not redirect to login', async ({ page }) => {
@@ -93,7 +93,7 @@ test.describe('Responsive layout — mobile (375px)', () => {
   test('dashboard renders on 375px viewport', async ({ page }) => {
     await page.goto('/dashboard')
     await page.waitForLoadState('networkidle')
-    await expect(page.getByRole('heading', { name: /dashboard/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /overview/i })).toBeVisible()
   })
 
   test('deal detail renders on 375px viewport', async ({ page, request }) => {
@@ -101,9 +101,9 @@ test.describe('Responsive layout — mobile (375px)', () => {
     const id = await createDeal(request, { title: 'Mobile Deal' })
     await page.goto(`/deals/${id}`)
     await page.waitForLoadState('networkidle')
-    await expect(page.getByText('Mobile Deal')).toBeVisible()
-    await expect(page.getByRole('heading', { name: /payments/i })).toBeVisible()
-    await expect(page.getByRole('heading', { name: /deliverables/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Mobile Deal' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /payments/i }).first()).toBeVisible()
+    await expect(page.getByRole('heading', { name: /deliverables/i }).first()).toBeVisible()
   })
 
   test('templates page renders on 375px viewport', async ({ page }) => {

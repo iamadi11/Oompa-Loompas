@@ -67,7 +67,7 @@ export async function getAttention(request: FastifyRequest, reply: FastifyReply)
   const deals = await loadDealsForAttention(userId)
   const actions = collectPriorityActionsFromDeals(deals)
 
-  void reply.status(200).send({
+  return reply.status(200).send({
     data: { actions },
   })
 }
@@ -89,7 +89,7 @@ export async function exportAttentionCsv(
   const body = `\uFEFF${buildAttentionQueueCsv(rows)}`
   const filename = attentionQueueExportFilename(new Date())
 
-  void reply
+  return reply
     .header('Content-Type', 'text/csv; charset=utf-8')
     .header('Content-Disposition', `attachment; filename="${filename}"`)
     .status(200)

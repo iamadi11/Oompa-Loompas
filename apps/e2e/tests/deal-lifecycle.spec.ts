@@ -3,7 +3,7 @@
  * deal duplication.
  */
 import { test, expect } from '@playwright/test'
-import { createDeal, createPayment, createDeliverable, updateDealStatus } from '../helpers/api'
+import { createDeal, createPayment, createDeliverable, updateDealStatus, deleteAllTemplates } from '../helpers/api'
 
 // ─── Next-action banner ────────────────────────────────────────────────────
 
@@ -12,14 +12,14 @@ test.describe('Next-action banner', () => {
     const id = await createDeal(request, { status: 'DRAFT', title: 'Banner DRAFT' })
     await page.goto(`/deals/${id}`)
     await page.waitForLoadState('networkidle')
-    await expect(page.getByText(/negotiating/i)).toBeVisible()
+    await expect(page.getByRole('button', { name: /start negotiating|negotiating/i })).toBeVisible()
   })
 
   test('NEGOTIATING deal shows banner to move to ACTIVE', async ({ page, request }) => {
     const id = await createDeal(request, { status: 'NEGOTIATING', title: 'Banner NEGOTIATING' })
     await page.goto(`/deals/${id}`)
     await page.waitForLoadState('networkidle')
-    await expect(page.getByText(/active/i)).toBeVisible()
+    await expect(page.getByRole('button', { name: /mark as active|active/i })).toBeVisible()
   })
 
   test('PAID deal shows no lifecycle banner', async ({ page, request }) => {
@@ -44,11 +44,11 @@ test.describe('Status advance via banner CTA', () => {
     await page.goto(`/deals/${id}`)
     await page.waitForLoadState('networkidle')
 
-    const advanceBtn = page.getByRole('button', { name: /negotiating|move to negotiating/i })
+    const advanceBtn = page.getByRole('button', { name: /start negotiating|negotiating/i })
     if (await advanceBtn.isVisible()) {
       await advanceBtn.click()
       await page.waitForLoadState('networkidle')
-      await expect(page.getByText(/NEGOTIATING|Negotiating/i)).toBeVisible({ timeout: 10_000 })
+      await expect(page.getByText(/NEGOTIATING|Negotiating/i).first()).toBeVisible({ timeout: 10_000 })
     }
   })
 
@@ -57,11 +57,11 @@ test.describe('Status advance via banner CTA', () => {
     await page.goto(`/deals/${id}`)
     await page.waitForLoadState('networkidle')
 
-    const advanceBtn = page.getByRole('button', { name: /active|move to active/i })
+    const advanceBtn = page.getByRole('button', { name: /mark as active|active/i })
     if (await advanceBtn.isVisible()) {
       await advanceBtn.click()
       await page.waitForLoadState('networkidle')
-      await expect(page.getByText(/ACTIVE|Active/i)).toBeVisible({ timeout: 10_000 })
+      await expect(page.getByText(/ACTIVE|Active/i).first()).toBeVisible({ timeout: 10_000 })
     }
   })
 
@@ -74,11 +74,11 @@ test.describe('Status advance via banner CTA', () => {
     await page.goto(`/deals/${id}`)
     await page.waitForLoadState('networkidle')
 
-    const advanceBtn = page.getByRole('button', { name: /delivered|mark as delivered/i })
+    const advanceBtn = page.getByRole('button', { name: /mark as delivered|delivered/i })
     if (await advanceBtn.isVisible()) {
       await advanceBtn.click()
       await page.waitForLoadState('networkidle')
-      await expect(page.getByText(/DELIVERED|Delivered/i)).toBeVisible({ timeout: 10_000 })
+      await expect(page.getByText(/DELIVERED|Delivered/i).first()).toBeVisible({ timeout: 10_000 })
     }
   })
 
@@ -91,11 +91,11 @@ test.describe('Status advance via banner CTA', () => {
     await page.goto(`/deals/${id}`)
     await page.waitForLoadState('networkidle')
 
-    const advanceBtn = page.getByRole('button', { name: /paid|mark as paid/i })
+    const advanceBtn = page.getByRole('button', { name: /mark as paid|paid/i })
     if (await advanceBtn.isVisible()) {
       await advanceBtn.click()
       await page.waitForLoadState('networkidle')
-      await expect(page.getByText(/PAID|Paid/i)).toBeVisible({ timeout: 10_000 })
+      await expect(page.getByText(/PAID|Paid/i).first()).toBeVisible({ timeout: 10_000 })
     }
   })
 })
@@ -125,9 +125,9 @@ test.describe('Deal duplication', () => {
     )
 
     // New deal is a DRAFT
-    await expect(page.getByText(/DRAFT|Draft/i)).toBeVisible()
+    await expect(page.getByText(/DRAFT|Draft/i).first()).toBeVisible()
     // Title contains "(Copy)" or original title
-    await expect(page.getByText(/Original Deal|Copy/i)).toBeVisible()
+    await expect(page.getByText(/Original Deal|Copy/i).first()).toBeVisible()
   })
 
   test('duplicate has startDate and endDate cleared', async ({ page, request }) => {
@@ -147,34 +147,39 @@ test.describe('Deal duplication', () => {
     )
 
     // Should be DRAFT with cleared dates — just confirm it loaded
-    await expect(page.getByText(/DRAFT|Draft/i)).toBeVisible()
+    await expect(page.getByText(/DRAFT|Draft/i).first()).toBeVisible()
   })
 })
 
 // ─── Save as template ──────────────────────────────────────────────────────
 
 test.describe('Save as template from deal detail', () => {
+  test.beforeEach(async ({ request }) => {
+    await deleteAllTemplates(request)
+  })
+
   test('Save as template button is visible on deal detail', async ({ page, request }) => {
     const id = await createDeal(request, { title: 'Template Source Deal' })
     await page.goto(`/deals/${id}`)
     await page.waitForLoadState('networkidle')
-    await expect(page.getByRole('button', { name: /save as template|template/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: /save as template/i })).toBeVisible()
   })
 
-  test('clicking Save as template shows confirmation or navigates', async ({ page, request }) => {
+  test('clicking Save as template and confirming shows success status', async ({
+    page,
+    request,
+  }) => {
     const id = await createDeal(request, { title: 'Save Template Test' })
     await page.goto(`/deals/${id}`)
     await page.waitForLoadState('networkidle')
 
     const saveBtn = page.getByRole('button', { name: /save as template/i })
     if (await saveBtn.isVisible()) {
+      // SaveAsTemplateButton uses window.prompt — must accept the dialog
+      page.once('dialog', (dialog) => dialog.accept('Saved Template').catch(() => null))
       await saveBtn.click()
-      // Either a success toast, dialog, or navigation to /deals/templates
       await expect(
-        page
-          .getByText(/template saved|saved as template/i)
-          .or(page.getByRole('dialog'))
-          .or(page.getByRole('link', { name: /templates/i })),
+        page.getByRole('status').filter({ hasText: /template saved/i }),
       ).toBeVisible({ timeout: 10_000 })
     }
   })

@@ -23,9 +23,7 @@ test.describe('Settings page — /settings', () => {
 
   test('shows enable or disable notifications button', async ({ page }) => {
     await expect(
-      page
-        .getByRole('button', { name: /enable notifications|disable notifications|notifications/i })
-        .or(page.getByText(/notifications/i)),
+      page.getByRole('button', { name: /enable|disable/i }),
     ).toBeVisible()
   })
 

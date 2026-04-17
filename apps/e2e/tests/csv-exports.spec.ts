@@ -13,7 +13,7 @@ test.describe('Export Deals CSV', () => {
   test('Export deals CSV button is present on /deals', async ({ page }) => {
     await page.goto('/deals')
     await page.waitForLoadState('networkidle')
-    await expect(page.getByRole('button', { name: /export deals|deals csv/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: /^export csv$/i })).toBeVisible()
   })
 
   test('API GET /deals/export returns CSV content-type', async ({ request }) => {
@@ -38,7 +38,7 @@ test.describe('Export Deals CSV', () => {
 
     const [download] = await Promise.all([
       page.waitForEvent('download', { timeout: 10_000 }).catch(() => null),
-      page.getByRole('button', { name: /export deals|deals csv/i }).click(),
+      page.getByRole('button', { name: /^export csv$/i }).click(),
     ])
 
     if (download) {
