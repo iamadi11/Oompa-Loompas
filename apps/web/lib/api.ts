@@ -23,6 +23,7 @@ import type {
   DealTemplate,
   CreateDealTemplate,
   UpdateDealTemplate,
+  DeliverableApprovalView,
 } from '@oompa/types'
 
 export interface BrandRecentDeal {
@@ -280,6 +281,37 @@ class ApiClient {
   async revokeShare(dealId: string): Promise<{ data: { shareToken: null } }> {
     return this.request<{ data: { shareToken: null } }>(`/api/v1/deals/${dealId}/share`, {
       method: 'DELETE',
+    })
+  }
+
+  async generateApprovalToken(
+    dealId: string,
+    deliverableId: string,
+  ): Promise<{ data: { approvalToken: string; approvalUrl: string } }> {
+    return this.request<{ data: { approvalToken: string; approvalUrl: string } }>(
+      `/api/v1/deals/${dealId}/deliverables/${deliverableId}/share-approval`,
+      { method: 'POST', body: JSON.stringify({}) },
+    )
+  }
+
+  async revokeApprovalToken(
+    dealId: string,
+    deliverableId: string,
+  ): Promise<{ data: { approvalToken: null } }> {
+    return this.request<{ data: { approvalToken: null } }>(
+      `/api/v1/deals/${dealId}/deliverables/${deliverableId}/share-approval`,
+      { method: 'DELETE' },
+    )
+  }
+
+  async getApprovalView(token: string): Promise<{ data: DeliverableApprovalView }> {
+    return this.request<{ data: DeliverableApprovalView }>(`/api/v1/approvals/${token}`)
+  }
+
+  async submitApproval(token: string): Promise<{ data: DeliverableApprovalView }> {
+    return this.request<{ data: DeliverableApprovalView }>(`/api/v1/approvals/${token}`, {
+      method: 'POST',
+      body: JSON.stringify({}),
     })
   }
 

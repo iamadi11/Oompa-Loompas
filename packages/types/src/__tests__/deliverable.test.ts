@@ -19,6 +19,8 @@ const baseDeliverable = {
   completedAt: null,
   notes: null,
   isOverdue: false,
+  approvalToken: null,
+  brandApprovedAt: null,
   createdAt: iso,
   updatedAt: iso,
 }

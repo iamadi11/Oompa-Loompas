@@ -2,6 +2,20 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.5.0] - 2026-04-17
+
+### Added
+- **Deliverable approval flow** — token-gated brand approval loop without DMs
+  - `approval_token VARCHAR(64) UNIQUE` and `brand_approved_at TIMESTAMPTZ` columns on `deliverables` (migration `20260417120000_deliverable_approval_token`)
+  - `POST /api/v1/deals/:id/deliverables/:id/share-approval` — generates 64-char hex token (idempotent, auth required)
+  - `DELETE /api/v1/deals/:id/deliverables/:id/share-approval` — revokes token + clears approval (auth required)
+  - `GET /api/v1/approvals/:token` — public read, returns approval view (no auth)
+  - `POST /api/v1/approvals/:token` — brand submits approval, sets `brandApprovedAt` (idempotent, no auth)
+  - `/a/[token]` public Next.js page — brand-facing page outside workspace auth guard
+  - DeliverableRow: "Share approval link" → "Copy link" + "Revoke" state machine, "Brand approved" badge
+  - `DeliverableApprovalView` type in `@oompa/types`
+  - 13 new API unit tests, 10 new E2E tests (550 unit tests total, 217 E2E total)
+
 ## [0.4.9] - 2026-04-16
 
 ### Added

@@ -98,6 +98,21 @@ export async function generateShareToken(req: Req, dealId: string): Promise<stri
   return body.data.shareToken
 }
 
+// ─── Deliverable approval ─────────────────────────────────────────────────
+
+export async function generateApprovalToken(
+  req: Req,
+  dealId: string,
+  deliverableId: string,
+): Promise<string> {
+  const res = await req.post(
+    `${API}/api/v1/deals/${dealId}/deliverables/${deliverableId}/share-approval`,
+  )
+  expect(res.ok(), `generateApprovalToken failed: ${res.status()}`).toBe(true)
+  const body = (await res.json()) as { data: { approvalToken: string } }
+  return body.data.approvalToken
+}
+
 // ─── Templates ────────────────────────────────────────────────────────────
 
 export async function deleteAllTemplates(req: Req): Promise<void> {

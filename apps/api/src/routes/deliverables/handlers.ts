@@ -9,6 +9,7 @@ import { validate } from '@oompa/utils'
 import { CreateDeliverableSchema, UpdateDeliverableSchema } from './schema.js'
 import { findDealIdForUser } from '../../lib/deal-scope.js'
 import { NotFoundError, UnauthorizedError, ValidationError, sendError } from '../../lib/errors.js'
+import { generateShareToken } from '../../lib/share-token.js'
 
 type DbDeliverable = {
   id: string
@@ -20,6 +21,8 @@ type DbDeliverable = {
   status: string
   completedAt: Date | null
   notes: string | null
+  approvalToken: string | null
+  brandApprovedAt: Date | null
   createdAt: Date
   updatedAt: Date
 }
@@ -39,6 +42,8 @@ function serializeDeliverable(deliverable: DbDeliverable) {
     completedAt: deliverable.completedAt?.toISOString() ?? null,
     notes: deliverable.notes,
     isOverdue: computeIsDeliverableOverdue(dueDate, status),
+    approvalToken: deliverable.approvalToken,
+    brandApprovedAt: deliverable.brandApprovedAt?.toISOString() ?? null,
     createdAt: deliverable.createdAt.toISOString(),
     updatedAt: deliverable.updatedAt.toISOString(),
   }
@@ -182,4 +187,62 @@ export async function deleteDeliverable(
 
   await prisma.deliverable.delete({ where: { id } })
   void reply.status(204).send()
+}
+
+export async function generateDeliverableApprovalToken(
+  request: FastifyRequest<{ Params: { dealId: string; id: string } }>,
+  reply: FastifyReply,
+): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
+  const { dealId, id } = request.params
+
+  const existing = await prisma.deliverable.findFirst({
+    where: { id, dealId, deal: { userId } },
+  })
+  if (!existing) {
+    return sendError(reply, new NotFoundError('Deliverable', id))
+  }
+
+  const token = existing.approvalToken ?? generateShareToken()
+  if (!existing.approvalToken) {
+    await prisma.deliverable.update({ where: { id }, data: { approvalToken: token } })
+  }
+
+  const baseUrl = process.env['WEB_URL'] ?? 'http://localhost:3000'
+  return reply.status(200).send({
+    data: {
+      approvalToken: token,
+      approvalUrl: `${baseUrl}/a/${token}`,
+    },
+  })
+}
+
+export async function revokeDeliverableApprovalToken(
+  request: FastifyRequest<{ Params: { dealId: string; id: string } }>,
+  reply: FastifyReply,
+): Promise<void> {
+  const userId = request.authUser?.id
+  if (!userId) {
+    return sendError(reply, new UnauthorizedError())
+  }
+
+  const { dealId, id } = request.params
+
+  const existing = await prisma.deliverable.findFirst({
+    where: { id, dealId, deal: { userId } },
+  })
+  if (!existing) {
+    return sendError(reply, new NotFoundError('Deliverable', id))
+  }
+
+  await prisma.deliverable.update({
+    where: { id },
+    data: { approvalToken: null, brandApprovedAt: null },
+  })
+
+  return reply.status(200).send({ data: { approvalToken: null } })
 }

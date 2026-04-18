@@ -4,6 +4,8 @@ import {
   createDeliverable,
   updateDeliverable,
   deleteDeliverable,
+  generateDeliverableApprovalToken,
+  revokeDeliverableApprovalToken,
 } from './handlers.js'
 
 /**
@@ -15,4 +17,6 @@ export async function deliverableRoutes(fastify: FastifyInstance): Promise<void>
   fastify.post('/deals/:dealId/deliverables', createDeliverable)
   fastify.patch('/deliverables/:id', updateDeliverable)
   fastify.delete('/deliverables/:id', deleteDeliverable)
+  fastify.post('/deals/:dealId/deliverables/:id/share-approval', generateDeliverableApprovalToken)
+  fastify.delete('/deals/:dealId/deliverables/:id/share-approval', revokeDeliverableApprovalToken)
 }

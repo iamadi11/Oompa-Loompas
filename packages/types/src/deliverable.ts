@@ -38,10 +38,25 @@ export const DeliverableSchema = z.object({
   completedAt: z.string().datetime().nullable(),
   notes: z.string().max(2000).nullable(),
   isOverdue: z.boolean(),
+  approvalToken: z.string().length(64).nullable(),
+  brandApprovedAt: z.string().datetime().nullable(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 })
 export type Deliverable = z.infer<typeof DeliverableSchema>
+
+export const DeliverableApprovalViewSchema = z.object({
+  id: IdSchema,
+  title: z.string().min(1).max(255),
+  platform: DeliverablePlatformSchema,
+  type: DeliverableTypeSchema,
+  dueDate: z.string().datetime().nullable(),
+  status: DeliverableStatusSchema,
+  brandApprovedAt: z.string().datetime().nullable(),
+  dealTitle: z.string().min(1).max(255),
+  dealBrandName: z.string().min(1).max(255),
+})
+export type DeliverableApprovalView = z.infer<typeof DeliverableApprovalViewSchema>
 
 export const CreateDeliverableSchema = z.object({
   title: z.string().min(1, 'Title is required').max(255),

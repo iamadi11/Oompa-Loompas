@@ -14,6 +14,7 @@ import { healthV1Routes } from './routes/health/index.js'
 import { createAuthRoutes } from './routes/auth/index.js'
 import { adminRoutes } from './routes/admin/index.js'
 import { shareRoutes } from './routes/share/index.js'
+import { approvalRoutes } from './routes/approvals/index.js'
 import { brandRoutes } from './routes/brands/index.js'
 import { pushRoutes } from './routes/push/index.js'
 import { templateRoutes } from './routes/templates/index.js'
@@ -43,6 +44,7 @@ export async function buildServer() {
   await fastify.register(healthV1Routes, { prefix: '/api/v1' })
   await fastify.register(createAuthRoutes(fastify), { prefix: '/api/v1/auth' })
   await fastify.register(shareRoutes, { prefix: '/api/v1/share' })
+  await fastify.register(approvalRoutes, { prefix: '/api/v1/approvals' })
 
   /** Invoices: Publicly accessible via shareToken, or privately via session. */
   await fastify.register(

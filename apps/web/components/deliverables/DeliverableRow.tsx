@@ -6,10 +6,12 @@ import { formatDate } from '@oompa/utils'
 import { api } from '@/lib/api'
 import { Button } from '@/components/ui/Button'
 import { ShareDeliverableReminderButton } from './ShareDeliverableReminderButton'
+import { toast } from 'sonner'
 
 interface DeliverableRowProps {
   deliverable: Deliverable
   onUpdate: () => void
+  dealId: string
   dealTitle: string
   brandName: string
 }
@@ -38,10 +40,12 @@ const TYPE_LABELS: Record<string, string> = {
 export function DeliverableRow({
   deliverable,
   onUpdate,
+  dealId,
   dealTitle,
   brandName,
 }: DeliverableRowProps) {
   const [updating, setUpdating] = useState(false)
+  const [approvalLoading, setApprovalLoading] = useState(false)
 
   async function toggleComplete() {
     setUpdating(true)
@@ -71,8 +75,50 @@ export function DeliverableRow({
     }
   }
 
+  async function handleShareApproval() {
+    setApprovalLoading(true)
+    try {
+      const res = await api.generateApprovalToken(dealId, deliverable.id)
+      onUpdate()
+      try {
+        await navigator.clipboard.writeText(res.data.approvalUrl)
+        toast.success('Approval link copied')
+      } catch {
+        toast.success('Approval link generated')
+      }
+    } catch {
+      toast.error('Failed to generate approval link')
+    } finally {
+      setApprovalLoading(false)
+    }
+  }
+
+  async function handleRevokeApproval() {
+    setApprovalLoading(true)
+    try {
+      await api.revokeApprovalToken(dealId, deliverable.id)
+      onUpdate()
+    } catch {
+      toast.error('Failed to revoke approval link')
+    } finally {
+      setApprovalLoading(false)
+    }
+  }
+
+  async function handleCopyApprovalLink() {
+    if (!deliverable.approvalToken) return
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/a/${deliverable.approvalToken}`)
+      toast.success('Approval link copied')
+    } catch {
+      toast.error('Failed to copy link')
+    }
+  }
+
   const isCompleted = deliverable.status === 'COMPLETED'
   const isCancelled = deliverable.status === 'CANCELLED'
+  const hasApprovalToken = !!deliverable.approvalToken
+  const isBrandApproved = !!deliverable.brandApprovedAt
 
   return (
     <div
@@ -106,6 +152,11 @@ export function DeliverableRow({
               Overdue
             </span>
           )}
+          {isBrandApproved && (
+            <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+              Brand approved
+            </span>
+          )}
         </div>
         <div className="mt-0.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-stone-500">
           {deliverable.dueDate && (
@@ -117,6 +168,11 @@ export function DeliverableRow({
           {deliverable.completedAt && (
             <span>
               Completed {formatDate(deliverable.completedAt, { day: 'numeric', month: 'short' })}
+            </span>
+          )}
+          {deliverable.brandApprovedAt && (
+            <span className="text-emerald-600">
+              Approved {formatDate(deliverable.brandApprovedAt, { day: 'numeric', month: 'short' })}
             </span>
           )}
           {deliverable.notes && <span className="truncate max-w-xs">{deliverable.notes}</span>}
@@ -146,6 +202,39 @@ export function DeliverableRow({
             deliverableTitle={deliverable.title}
             dueDate={deliverable.dueDate}
           />
+        )}
+        {!isCancelled && !hasApprovalToken && (
+          <Button
+            variant="secondary"
+            size="sm"
+            loading={approvalLoading}
+            onClick={() => void handleShareApproval()}
+            aria-label={`Share approval link for ${deliverable.title}`}
+          >
+            Share approval link
+          </Button>
+        )}
+        {!isCancelled && hasApprovalToken && !isBrandApproved && (
+          <Button
+            variant="secondary"
+            size="sm"
+            loading={approvalLoading}
+            onClick={() => void handleCopyApprovalLink()}
+            aria-label={`Copy approval link for ${deliverable.title}`}
+          >
+            Copy link
+          </Button>
+        )}
+        {!isCancelled && hasApprovalToken && (
+          <button
+            type="button"
+            onClick={() => void handleRevokeApproval()}
+            disabled={approvalLoading}
+            className="text-xs font-medium text-stone-400 hover:text-red-600 transition-colors duration-200 motion-reduce:transition-none disabled:opacity-40 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+            aria-label={`Revoke approval link for ${deliverable.title}`}
+          >
+            Revoke
+          </button>
         )}
         <button
           type="button"

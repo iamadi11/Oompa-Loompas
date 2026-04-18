@@ -140,6 +140,7 @@ export function DeliverableSection({
               <DeliverableRow
                 deliverable={deliverable}
                 onUpdate={handleChange}
+                dealId={dealId}
                 dealTitle={dealTitle}
                 brandName={brandName}
               />
