@@ -2,6 +2,17 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.5.1] - 2026-04-18
+
+### Added
+- **Upcoming payment + deliverable push notifications** — proactive 3-day lead alerts before items are due
+  - `getUpcomingPayments` — pushes for payments due today through 3 days out (status not received/refunded)
+  - `getUpcomingDeliverables` — pushes for deliverables due in 1–3 days (status pending; today already covered)
+  - Priority order within `MAX_NOTIFICATIONS_PER_USER=3` cap: overdue payments → due-today deliverables → upcoming payments → upcoming deliverables
+  - Notification copy: `"Payment due soon"` / `"{brand} payment due in N day(s)"`, `"Deliverable due soon"` / `"{title} due in N day(s) for {brand}"`
+  - No monetary amounts in payload (SOT §25.2)
+  - 12 new unit tests (22 total for push job); all 242 API tests pass
+
 ## [0.5.0] - 2026-04-17
 
 ### Added
