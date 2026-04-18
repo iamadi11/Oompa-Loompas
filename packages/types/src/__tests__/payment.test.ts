@@ -18,6 +18,7 @@ const basePayment = {
   status: 'PENDING' as const,
   dueDate: null,
   receivedAt: null,
+  remindAt: null,
   notes: null,
   isOverdue: false,
   createdAt: iso,

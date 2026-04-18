@@ -2,6 +2,19 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.5.2] - 2026-04-18
+
+### Added
+- **Scheduled payment reminders** — creator picks a date on any pending/partial payment; push notification fires that morning then clears (one-shot)
+  - `remind_at TIMESTAMPTZ NULL` column on `payments` (migration `20260418120000_add_payment_remind_at`); indexed
+  - `getScheduledRemindersToday` — queries payments with `remindAt` in today's UTC window, clears `remindAt = null` immediately before sending (exactly-once)
+  - Notification copy: `"Payment reminder"` / `"{brand} payment — time to send your follow-up"`
+  - Priority order: overdue payments → scheduled reminders → due-today deliverables → upcoming payments → upcoming deliverables
+  - `buildNotificationPayloads` refactored from positional args to `NotificationItems` named object (5 types)
+  - `PaymentRow` — "Remind me" button → date picker → reminder chip with clear (×); hidden on RECEIVED/REFUNDED
+  - No amounts in push payload (SOT §25.2); date stored as midnight UTC to align with cron window
+  - 26 unit tests for push job; 246 total API tests pass; 224 E2E tests pass
+
 ## [0.5.1] - 2026-04-18
 
 ### Added

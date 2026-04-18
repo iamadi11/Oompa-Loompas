@@ -146,3 +146,82 @@ test.describe('Payment reminder copy', () => {
     ).toBeVisible()
   })
 })
+
+// ─── Scheduled payment reminders ──────────────────────────────────────────
+
+test.describe('Scheduled payment reminders', () => {
+  // aria-label is "Schedule a push reminder for this payment" — match by text content
+  const remindMeBtn = (page: import('@playwright/test').Page) =>
+    page.locator('button', { hasText: 'Remind me' })
+
+  test('pending payment shows Remind me button', async ({ page, request }) => {
+    const id = await createDeal(request, { title: 'Remind Me Button Deal' })
+    await createPayment(request, id, {
+      dueDate: new Date(Date.now() + 7 * 86_400_000).toISOString(),
+    })
+    await page.goto(`/deals/${id}`)
+    await page.waitForLoadState('networkidle')
+
+    await expect(remindMeBtn(page)).toBeVisible()
+  })
+
+  test('clicking Remind me reveals date picker', async ({ page, request }) => {
+    const id = await createDeal(request, { title: 'Remind Me Picker Deal' })
+    await createPayment(request, id, {
+      dueDate: new Date(Date.now() + 7 * 86_400_000).toISOString(),
+    })
+    await page.goto(`/deals/${id}`)
+    await page.waitForLoadState('networkidle')
+
+    await remindMeBtn(page).click()
+    await expect(page.locator('input[type="date"]')).toBeVisible()
+  })
+
+  test('selecting a date sets reminder chip and hides Remind me button', async ({ page, request }) => {
+    const id = await createDeal(request, { title: 'Set Reminder Deal' })
+    await createPayment(request, id, {
+      dueDate: new Date(Date.now() + 7 * 86_400_000).toISOString(),
+    })
+    await page.goto(`/deals/${id}`)
+    await page.waitForLoadState('networkidle')
+
+    await remindMeBtn(page).click()
+    await page.locator('input[type="date"]').fill('2026-05-01')
+    await page.waitForLoadState('networkidle')
+
+    await expect(page.getByText(/^Reminder:/)).toBeVisible()
+    await expect(remindMeBtn(page)).not.toBeVisible()
+  })
+
+  test('clearing reminder restores Remind me button', async ({ page, request }) => {
+    const id = await createDeal(request, { title: 'Clear Reminder Deal' })
+    await createPayment(request, id, {
+      dueDate: new Date(Date.now() + 7 * 86_400_000).toISOString(),
+    })
+    await page.goto(`/deals/${id}`)
+    await page.waitForLoadState('networkidle')
+
+    await remindMeBtn(page).click()
+    await page.locator('input[type="date"]').fill('2026-05-01')
+    await page.waitForLoadState('networkidle')
+
+    await page.getByRole('button', { name: /clear.*reminder/i }).click()
+    await page.waitForLoadState('networkidle')
+
+    await expect(remindMeBtn(page)).toBeVisible()
+  })
+
+  test('received payment does not show Remind me button', async ({ page, request }) => {
+    const id = await createDeal(request, { title: 'No Remind Received Deal' })
+    const paymentId = await createPayment(request, id)
+    const res = await request.patch(`${process.env['E2E_API_URL'] ?? 'http://localhost:3001'}/api/v1/payments/${paymentId}`, {
+      data: { status: 'RECEIVED', receivedAt: new Date().toISOString() },
+    })
+    expect(res.ok()).toBe(true)
+
+    await page.goto(`/deals/${id}`)
+    await page.waitForLoadState('networkidle')
+
+    await expect(remindMeBtn(page)).not.toBeVisible()
+  })
+})

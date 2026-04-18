@@ -12,6 +12,7 @@ export const PaymentSchema = z.object({
   status: PaymentStatusSchema.default('PENDING'),
   dueDate: z.string().datetime().nullable(),
   receivedAt: z.string().datetime().nullable(),
+  remindAt: z.string().datetime().nullable(),
   notes: z.string().max(2000).nullable(),
   isOverdue: z.boolean(),
   createdAt: z.string().datetime(),
@@ -34,6 +35,7 @@ export const UpdatePaymentSchema = z.object({
   status: PaymentStatusSchema.optional(),
   dueDate: z.string().datetime().nullable().optional(),
   receivedAt: z.string().datetime().nullable().optional(),
+  remindAt: z.string().datetime().nullable().optional(),
   notes: z.string().max(2000).nullable().optional(),
 })
 export type UpdatePayment = z.infer<typeof UpdatePaymentSchema>

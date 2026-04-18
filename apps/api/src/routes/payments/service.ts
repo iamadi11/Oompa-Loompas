@@ -10,6 +10,7 @@ export type DbPayment = {
   status: string
   dueDate: Date | null
   receivedAt: Date | null
+  remindAt: Date | null
   notes: string | null
   createdAt: Date
   updatedAt: Date
@@ -27,6 +28,7 @@ export function serializePayment(payment: DbPayment) {
     status,
     dueDate: dueDate?.toISOString() ?? null,
     receivedAt: payment.receivedAt?.toISOString() ?? null,
+    remindAt: payment.remindAt?.toISOString() ?? null,
     notes: payment.notes,
     isOverdue: computeIsOverdue(dueDate, status),
     createdAt: payment.createdAt.toISOString(),
@@ -59,6 +61,9 @@ export function toUpdatePaymentData(updates: UpdatePayment): Prisma.PaymentUpdat
     }),
     ...(updates.receivedAt !== undefined && {
       receivedAt: updates.receivedAt ? new Date(updates.receivedAt) : null,
+    }),
+    ...(updates.remindAt !== undefined && {
+      remindAt: updates.remindAt ? new Date(updates.remindAt) : null,
     }),
     ...(updates.notes !== undefined && { notes: updates.notes }),
   }

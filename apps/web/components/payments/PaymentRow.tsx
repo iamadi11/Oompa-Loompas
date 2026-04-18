@@ -27,6 +27,8 @@ export function PaymentRow({
 }: PaymentRowProps) {
   const [marking, setMarking] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [remindLoading, setRemindLoading] = useState(false)
+  const [showDatePicker, setShowDatePicker] = useState(false)
 
   async function markReceived() {
     setMarking(true)
@@ -59,9 +61,27 @@ export function PaymentRow({
     }
   }
 
+  async function updateReminder(remindAt: string | null) {
+    setRemindLoading(true)
+    try {
+      // Store midnight UTC of the chosen date (server cron runs in UTC)
+      await api.updatePayment(payment.id, {
+        remindAt: remindAt ? new Date(remindAt).toISOString() : null,
+      })
+      onUpdate()
+    } catch {
+      // Parent re-fetch will show persisted state
+    } finally {
+      setRemindLoading(false)
+      setShowDatePicker(false)
+    }
+  }
+
   const canMarkReceived =
     payment.status === 'PENDING' || payment.status === 'PARTIAL' || payment.isOverdue
   const canShareReminder = payment.status !== 'RECEIVED' && payment.status !== 'REFUNDED'
+
+  const todayStr = new Date().toISOString().slice(0, 10)
 
   return (
     <div
@@ -85,6 +105,21 @@ export function PaymentRow({
           {payment.receivedAt && (
             <span>
               Received {formatDate(payment.receivedAt, { day: 'numeric', month: 'short' })}
+            </span>
+          )}
+          {payment.remindAt && (
+            <span className="flex items-center gap-1 text-brand-700 font-medium">
+              Reminder:{' '}
+              {formatDate(payment.remindAt, { day: 'numeric', month: 'short' })}
+              <button
+                type="button"
+                onClick={() => void updateReminder(null)}
+                disabled={remindLoading}
+                className="ml-0.5 text-stone-400 hover:text-red-500 transition-colors duration-150 motion-reduce:transition-none disabled:opacity-40 rounded focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-500"
+                aria-label="Clear scheduled reminder"
+              >
+                ×
+              </button>
             </span>
           )}
           {payment.notes && <span className="truncate max-w-xs">{payment.notes}</span>}
@@ -113,6 +148,41 @@ export function PaymentRow({
             shareToken={shareToken}
           />
         ) : null}
+        {canShareReminder && !payment.remindAt && (
+          showDatePicker ? (
+            <div className="flex items-center gap-1.5">
+              <input
+                type="date"
+                min={todayStr}
+                disabled={remindLoading}
+                className="text-xs rounded-md border border-line px-2 py-1 bg-canvas text-stone-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 disabled:opacity-40"
+                aria-label="Select reminder date"
+                onChange={(e) => {
+                  if (e.target.value) void updateReminder(e.target.value)
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowDatePicker(false)}
+                className="text-xs text-stone-400 hover:text-stone-600 transition-colors duration-150 motion-reduce:transition-none rounded focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-stone-400"
+                aria-label="Cancel reminder"
+              >
+                ✕
+              </button>
+            </div>
+          ) : (
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              loading={remindLoading}
+              onClick={() => setShowDatePicker(true)}
+              aria-label="Schedule a push reminder for this payment"
+            >
+              Remind me
+            </Button>
+          )
+        )}
         {canMarkReceived && (
           <Button
             variant="secondary"

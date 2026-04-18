@@ -24,6 +24,12 @@ export interface DueTodayDeliverableItem {
   brandName: string
 }
 
+export interface ScheduledReminderItem {
+  paymentId: string
+  dealId: string
+  brandName: string
+}
+
 export interface UpcomingPaymentItem {
   dealId: string
   brandName: string
@@ -43,6 +49,14 @@ export interface PushNotificationPayload {
   url: string
 }
 
+export interface NotificationItems {
+  overduePayments: OverduePaymentItem[]
+  scheduledReminders: ScheduledReminderItem[]
+  dueTodayDeliverables: DueTodayDeliverableItem[]
+  upcomingPayments: UpcomingPaymentItem[]
+  upcomingDeliverables: UpcomingDeliverableItem[]
+}
+
 function startOfDay(now: Date): Date {
   return new Date(now.getFullYear(), now.getMonth(), now.getDate())
 }
@@ -59,15 +73,17 @@ function daysUntilDueFrom(dueDate: Date, now: Date): number {
 
 /**
  * Pure: build ≤MAX_NOTIFICATIONS_PER_USER payloads from all item types.
- * Priority: overdue payments → due-today deliverables → upcoming payments → upcoming deliverables.
+ * Priority: overdue payments → scheduled reminders → due-today deliverables → upcoming payments → upcoming deliverables.
  * No amounts in payload per SOT §25.2 (privacy rule).
  */
-export function buildNotificationPayloads(
-  overduePayments: OverduePaymentItem[],
-  dueTodayDeliverables: DueTodayDeliverableItem[],
-  upcomingPayments: UpcomingPaymentItem[],
-  upcomingDeliverables: UpcomingDeliverableItem[],
-): PushNotificationPayload[] {
+export function buildNotificationPayloads(items: NotificationItems): PushNotificationPayload[] {
+  const {
+    overduePayments,
+    scheduledReminders,
+    dueTodayDeliverables,
+    upcomingPayments,
+    upcomingDeliverables,
+  } = items
   const payloads: PushNotificationPayload[] = []
 
   for (const p of overduePayments) {
@@ -77,6 +93,15 @@ export function buildNotificationPayloads(
       title: 'Payment overdue',
       body: `${p.brandName} payment ${d} ${pluralDays(d)} overdue`,
       url: `/deals/${p.dealId}`,
+    })
+  }
+
+  for (const r of scheduledReminders) {
+    if (payloads.length >= MAX_NOTIFICATIONS_PER_USER) break
+    payloads.push({
+      title: 'Payment reminder',
+      body: `${r.brandName} payment — time to send your follow-up`,
+      url: `/deals/${r.dealId}`,
     })
   }
 
@@ -132,6 +157,41 @@ async function getOverduePayments(userId: string, now: Date): Promise<OverduePay
     dealId: r.deal.id,
     brandName: r.deal.brandName,
     daysOverdue: Math.floor((now.getTime() - (r.dueDate?.getTime() ?? 0)) / ONE_DAY_MS),
+  }))
+}
+
+/**
+ * I/O: query payments with remindAt today. Clears remindAt immediately (one-shot semantics).
+ * Skips already-received/refunded payments.
+ */
+async function getScheduledRemindersToday(
+  userId: string,
+  now: Date,
+): Promise<ScheduledReminderItem[]> {
+  const todayStart = startOfDay(now)
+  const tomorrowStart = new Date(todayStart.getTime() + ONE_DAY_MS)
+
+  const rows = await prisma.payment.findMany({
+    where: {
+      deal: { userId },
+      remindAt: { gte: todayStart, lt: tomorrowStart },
+      status: { notIn: NON_OVERDUE_PAYMENT_STATUSES },
+    },
+    take: MAX_NOTIFICATIONS_PER_USER,
+    include: { deal: { select: { id: true, brandName: true } } },
+  })
+
+  if (rows.length > 0) {
+    await prisma.payment.updateMany({
+      where: { id: { in: rows.map((r) => r.id) } },
+      data: { remindAt: null },
+    })
+  }
+
+  return rows.map((r) => ({
+    paymentId: r.id,
+    dealId: r.deal.id,
+    brandName: r.deal.brandName,
   }))
 }
 
@@ -263,20 +323,22 @@ export async function runDailyPushJob(now: Date = new Date()): Promise<void> {
   await Promise.all(
     [...subsByUser.entries()].map(async ([userId, subs]) => {
       try {
-        const [overduePayments, dueTodayDeliverables, upcomingPayments, upcomingDeliverables] =
+        const [overduePayments, scheduledReminders, dueTodayDeliverables, upcomingPayments, upcomingDeliverables] =
           await Promise.all([
             getOverduePayments(userId, now),
+            getScheduledRemindersToday(userId, now),
             getDueTodayDeliverables(userId, now),
             getUpcomingPayments(userId, now),
             getUpcomingDeliverables(userId, now),
           ])
 
-        const payloads = buildNotificationPayloads(
+        const payloads = buildNotificationPayloads({
           overduePayments,
+          scheduledReminders,
           dueTodayDeliverables,
           upcomingPayments,
           upcomingDeliverables,
-        )
+        })
         for (const payload of payloads) {
           await sendToUserSubscriptions(subs, payload)
         }

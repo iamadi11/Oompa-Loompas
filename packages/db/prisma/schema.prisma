@@ -128,6 +128,7 @@ model Payment {
   status        PaymentStatus @default(PENDING)
   dueDate       DateTime?     @map("due_date")
   receivedAt    DateTime?     @map("received_at")
+  remindAt      DateTime?     @map("remind_at")
   notes         String?       @db.Text
   invoiceNumber String?       @unique @map("invoice_number") @db.VarChar(32)
 
@@ -137,6 +138,7 @@ model Payment {
   @@index([dealId])
   @@index([status])
   @@index([dueDate])
+  @@index([remindAt])
   @@map("payments")
 }
 
