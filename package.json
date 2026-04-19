@@ -1,6 +1,6 @@
 {
   "name": "oompa-loompas",
-  "version": "0.4.8",
+  "version": "0.5.3",
   "private": true,
   "description": "Oompa Loompas — creator financial outcome engine (monorepo)",
   "scripts": {

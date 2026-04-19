@@ -2,6 +2,16 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.5.3] - 2026-04-19
+
+### Added
+- **Email/text-to-deal capture** — creator pastes a brand email or deal brief on `/deals/new`; heuristic parser pre-fills the form in <1ms (no API call, no LLM)
+  - `parseDealFromText(text): ParsedDeal` — pure function in `@oompa/utils`, zero deps, deterministic, safe in any environment
+  - Extracts: deal value + currency (₹/$/€/£, INR/USD/EUR/GBP, lakh/K shorthands), brand name ("Hi, I'm X from Y", "from Y team", email domain), title (Subject: line or brand+deliverable), deliverable keywords → notes pre-fill
+  - Collapsible "Parse from email or brief" section on create form only; collapses after parse; hint shows what was filled
+  - Pre-fill is non-destructive: only fills empty fields; creator reviews and edits everything before saving; never auto-saves
+  - 25 unit tests, 97.6% coverage on parser; 7 new E2E tests; 231 total E2E pass
+
 ## [0.5.2] - 2026-04-18
 
 ### Added

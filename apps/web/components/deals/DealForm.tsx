@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Deal, DealBrandSummary, CreateDeal, DealStatus, UpdateDeal } from '@oompa/types'
 import { CreateDealSchema, DEAL_STATUS_TRANSITIONS, UpdateDealSchema } from '@oompa/types'
-import { validate } from '@oompa/utils'
+import { validate, parseDealFromText } from '@oompa/utils'
 import { api } from '@/lib/api'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
@@ -48,6 +48,9 @@ export function DealForm({ deal, mode }: DealFormProps) {
   const [serverError, setServerError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [brandSuggestions, setBrandSuggestions] = useState<DealBrandSummary[]>([])
+  const [parseOpen, setParseOpen] = useState(false)
+  const [parseText, setParseText] = useState('')
+  const [parseHint, setParseHint] = useState<string | null>(null)
 
   const [form, setForm] = useState({
     title: deal?.title ?? '',
@@ -89,6 +92,27 @@ export function DealForm({ deal, mode }: DealFormProps) {
         return next
       })
     }
+  }
+
+  function handleParse() {
+    const parsed = parseDealFromText(parseText)
+    const filled: string[] = []
+    setForm((prev) => {
+      const next = { ...prev }
+      if (parsed.title && !prev.title) { next.title = parsed.title; filled.push('title') }
+      if (parsed.brandName && !prev.brandName) { next.brandName = parsed.brandName; filled.push('brand') }
+      if (parsed.value !== undefined && !prev.value) { next.value = String(parsed.value); filled.push('value') }
+      if (parsed.currency && prev.currency === 'INR') { next.currency = parsed.currency; filled.push('currency') }
+      if (parsed.notes && !prev.notes) { next.notes = parsed.notes; filled.push('notes') }
+      return next
+    })
+    if (filled.length > 0) {
+      setParseHint(`Pre-filled: ${filled.join(', ')}. Review and edit before saving.`)
+    } else {
+      setParseHint("Couldn't extract deal details. Try pasting the full email body.")
+    }
+    setParseText('')
+    setParseOpen(false)
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -180,6 +204,51 @@ export function DealForm({ deal, mode }: DealFormProps) {
         >
           {serverError}
         </div>
+      )}
+
+      {mode === 'create' && (
+        <div className="rounded-xl border border-line/70 bg-surface-raised/60">
+          <button
+            type="button"
+            aria-expanded={parseOpen}
+            aria-controls="parse-from-email-panel"
+            onClick={() => { setParseOpen((v) => !v); setParseHint(null) }}
+            className="flex w-full items-center justify-between px-4 py-3 text-sm font-medium text-stone-700 hover:text-stone-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 rounded-xl"
+          >
+            <span>Parse from email or brief</span>
+            <span aria-hidden="true" className={`transition-transform duration-200 ${parseOpen ? 'rotate-180' : ''}`}>▾</span>
+          </button>
+          {parseOpen && (
+            <div id="parse-from-email-panel" className="px-4 pb-4 flex flex-col gap-3">
+              <p className="text-xs text-stone-500 leading-relaxed">
+                Paste a brand email or deal brief. The form will be pre-filled — you can edit everything before saving.
+              </p>
+              <textarea
+                aria-label="Paste email or brief text"
+                rows={6}
+                value={parseText}
+                onChange={(e) => setParseText(e.target.value)}
+                placeholder="Hi, I'm Priya from Nike. We'd love to do a YouTube integration for ₹75,000…"
+                className="block w-full rounded-xl border border-line-strong/80 bg-white px-3 py-2.5 text-sm shadow-sm placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-brand-500 resize-y"
+              />
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                disabled={!parseText.trim()}
+                onClick={handleParse}
+              >
+                Pre-fill form
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {parseHint && (
+        <p role="status" aria-live="polite" className="text-xs text-stone-600 bg-stone-100 rounded-lg px-3 py-2">
+          {parseHint}
+        </p>
       )}
 
       <datalist id="deal-brand-suggestions">

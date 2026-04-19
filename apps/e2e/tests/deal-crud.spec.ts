@@ -47,6 +47,65 @@ test.describe('Create deal — /deals/new', () => {
   })
 })
 
+test.describe('Create deal — parse from email', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/deals/new')
+    await page.waitForLoadState('networkidle')
+  })
+
+  test('"Parse from email or brief" toggle is visible in create mode', async ({ page }) => {
+    await expect(page.getByRole('button', { name: /parse from email/i })).toBeVisible()
+  })
+
+  test('toggle expands and shows textarea', async ({ page }) => {
+    await page.getByRole('button', { name: /parse from email/i }).click()
+    await expect(page.getByLabel(/paste email or brief/i)).toBeVisible()
+    await expect(page.getByRole('button', { name: /pre-fill form/i })).toBeVisible()
+  })
+
+  test('pre-fill button disabled when textarea empty', async ({ page }) => {
+    await page.getByRole('button', { name: /parse from email/i }).click()
+    const preFillBtn = page.getByRole('button', { name: /pre-fill form/i })
+    await expect(preFillBtn).toBeDisabled()
+  })
+
+  test('pasting brand email pre-fills brand, value, and currency', async ({ page }) => {
+    await page.getByRole('button', { name: /parse from email/i }).click()
+    await page.getByLabel(/paste email or brief/i).fill(
+      "Hi, I'm Priya from Nike. We'd love a YouTube integration. Budget ₹75,000.",
+    )
+    await page.getByRole('button', { name: /pre-fill form/i }).click()
+    await expect(page.getByLabel(/brand/i)).toHaveValue(/nike/i)
+    await expect(page.getByLabel(/value|amount/i)).toHaveValue('75000')
+  })
+
+  test('shows pre-filled hint after parsing', async ({ page }) => {
+    await page.getByRole('button', { name: /parse from email/i }).click()
+    await page.getByLabel(/paste email or brief/i).fill(
+      'Hi from Zomato marketing team. Budget ₹50,000 for 2 reels.',
+    )
+    await page.getByRole('button', { name: /pre-fill form/i }).click()
+    await expect(page.getByRole('status')).toBeVisible()
+  })
+
+  test('creator can override pre-filled value before saving', async ({ page }) => {
+    await page.getByRole('button', { name: /parse from email/i }).click()
+    await page.getByLabel(/paste email or brief/i).fill('Budget ₹50,000. Campaign from Nike.')
+    await page.getByRole('button', { name: /pre-fill form/i }).click()
+    // override value
+    const valueField = page.getByLabel(/value|amount/i)
+    await valueField.fill('999999')
+    await expect(valueField).toHaveValue('999999')
+  })
+
+  test('parse panel not shown in edit mode', async ({ page, request }) => {
+    const id = await createDeal(request, { title: 'Edit Mode Deal' })
+    await page.goto(`/deals/${id}`)
+    await page.waitForLoadState('networkidle')
+    await expect(page.getByRole('button', { name: /parse from email/i })).not.toBeVisible()
+  })
+})
+
 test.describe('Edit deal — inline on deal detail', () => {
   test('title field is editable', async ({ page, request }) => {
     const id = await createDeal(request, { title: 'Editable Deal' })
