@@ -416,6 +416,19 @@ class ApiClient {
       body: JSON.stringify({ name }),
     })
   }
+
+  async getNotificationSettings(): Promise<ApiResponse<{ emailDigestEnabled: boolean; pushEnabled: boolean }>> {
+    return this.request<ApiResponse<{ emailDigestEnabled: boolean; pushEnabled: boolean }>>(
+      '/api/v1/settings/notifications',
+    )
+  }
+
+  async updateNotificationSettings(data: { emailDigestEnabled?: boolean }): Promise<void> {
+    return this.request<void>('/api/v1/settings/notifications', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+  }
 }
 
 export const api = new ApiClient()

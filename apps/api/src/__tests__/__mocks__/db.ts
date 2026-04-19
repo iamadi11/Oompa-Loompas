@@ -3,7 +3,10 @@ import { vi } from 'vitest'
 export const prisma = {
   user: {
     findUnique: vi.fn(),
+    findUniqueOrThrow: vi.fn(),
+    findMany: vi.fn(),
     create: vi.fn(),
+    update: vi.fn(),
   },
   session: {
     findUnique: vi.fn(),
@@ -26,6 +29,7 @@ export const prisma = {
     findUnique: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
+    updateMany: vi.fn(),
     delete: vi.fn(),
     count: vi.fn(),
   },

@@ -23,6 +23,7 @@ model User {
   brandProfiles BrandProfile[]
   pushSubscriptions PushSubscription[]
   dealTemplates DealTemplate[]
+  emailDigestEnabled Boolean    @default(true) @map("email_digest_enabled")
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
 

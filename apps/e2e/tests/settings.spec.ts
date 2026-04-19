@@ -23,12 +23,44 @@ test.describe('Settings page — /settings', () => {
 
   test('shows enable or disable notifications button', async ({ page }) => {
     await expect(
-      page.getByRole('button', { name: /enable|disable/i }),
+      page.getByRole('button', { name: /enable|disable/i }).first(),
     ).toBeVisible()
   })
 
   test('page title contains Settings', async ({ page }) => {
     await expect(page).toHaveTitle(/settings/i)
+  })
+})
+
+test.describe('Settings page — email digest toggle', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/settings')
+    await page.waitForLoadState('networkidle')
+  })
+
+  test('daily email digest section is visible', async ({ page }) => {
+    await expect(page.getByText(/daily email digest/i)).toBeVisible()
+  })
+
+  test('digest toggle button shows enable or disable', async ({ page }) => {
+    await expect(
+      page.getByRole('button', { name: /enable daily email digest|disable daily email digest/i }),
+    ).toBeVisible()
+  })
+
+  test('digest toggle button click does not crash page', async ({ page }) => {
+    const btn = page.getByRole('button', { name: /enable daily email digest|disable daily email digest/i })
+    await btn.click()
+    await page.waitForTimeout(500)
+    await expect(page).not.toHaveURL(/error/)
+    // Button still present after click (may have flipped label)
+    await expect(
+      page.getByRole('button', { name: /enable daily email digest|disable daily email digest/i }),
+    ).toBeVisible()
+  })
+
+  test('digest status dot and description text are visible', async ({ page }) => {
+    await expect(page.getByText(/sent at|disabled/i).first()).toBeVisible()
   })
 })
 

@@ -2,6 +2,19 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.5.4] - 2026-04-19
+
+### Added
+- **Daily email digest** — opt-out morning email listing all overdue and due-soon payments + deliverables with deep links and formatted amounts (Phase 2 kick-off)
+  - `emailDigestEnabled BOOLEAN DEFAULT TRUE` on `users` (migration `20260419120000_add_email_digest_enabled`); opt-out model for transactional alerts
+  - `runDailyDigestJob(now)` — queries overdue payments, payments due within 3 days, deliverables due within 3 days per user; skips users with 0 items; graceful per-user error isolation
+  - `buildDigestEmail(items, webUrl)` — pure function: HTML email (brand name, formatted amount, days overdue/until due, deep links to `/deals/:id`) + plain-text fallback; escapes all user-generated strings; opt-out link to `/settings`; 15 unit tests
+  - `startEmailDigestCron()` — `0 6 * * *` (11:30 AM IST); silent no-op if `RESEND_API_KEY` absent
+  - `GET /api/v1/settings/notifications` → `{ emailDigestEnabled, pushEnabled }` · `PATCH` → 204
+  - Settings page: email digest toggle row with status dot, descriptive text, and Enable/Disable button
+  - `RESEND_API_KEY` env var wires up Resend; absent → cron runs but sends nothing (safe local dev)
+  - 22 unit test files (274 tests); 4 new E2E tests; 235 total E2E pass
+
 ## [0.5.3] - 2026-04-19
 
 ### Added

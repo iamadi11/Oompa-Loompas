@@ -10,18 +10,23 @@ export default function SettingsPage() {
   const [permission, setPermission] = useState<NotificationPermission>('default')
   const [loading, setLoading] = useState(false)
   const [isSubscribed, setIsSubscribed] = useState(false)
+  const [emailDigestEnabled, setEmailDigestEnabled] = useState(true)
+  const [digestLoading, setDigestLoading] = useState(false)
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
       setPermission(Notification.permission)
 
-      // Check if already subscribed to push
       navigator.serviceWorker.ready.then((reg) => {
         reg.pushManager.getSubscription().then((sub) => {
           setIsSubscribed(!!sub)
         })
       })
     }
+
+    void api.getNotificationSettings().then((res) => {
+      if (res?.data) setEmailDigestEnabled(res.data.emailDigestEnabled)
+    }).catch(() => {/* form remains usable */})
   }, [])
 
   const handlePushToggle = async () => {
@@ -69,6 +74,20 @@ export default function SettingsPage() {
 
   const isBlocked = permission === 'denied'
 
+  const handleDigestToggle = async () => {
+    setDigestLoading(true)
+    try {
+      const next = !emailDigestEnabled
+      await api.updateNotificationSettings({ emailDigestEnabled: next })
+      setEmailDigestEnabled(next)
+      toast.success(next ? 'Daily digest enabled' : 'Daily digest disabled')
+    } catch {
+      toast.error('Failed to update email preferences')
+    } finally {
+      setDigestLoading(false)
+    }
+  }
+
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-stone-900">
@@ -112,6 +131,29 @@ export default function SettingsPage() {
             your browser address bar to enable them.
           </p>
         )}
+
+        <div className="flex items-center justify-between p-4 rounded-xl bg-canvas border border-line/60">
+          <div className="space-y-0.5">
+            <span className="text-sm font-medium text-stone-900">Daily Email Digest</span>
+            <div className="flex items-center gap-2">
+              <span
+                className={`w-2 h-2 rounded-full ${emailDigestEnabled ? 'bg-green-500' : 'bg-stone-300'}`}
+              />
+              <span className="text-xs text-stone-500">
+                {emailDigestEnabled ? 'Sent at 11:30 AM IST when items are overdue or due soon' : 'Disabled'}
+              </span>
+            </div>
+          </div>
+          <Button
+            onClick={() => void handleDigestToggle()}
+            disabled={digestLoading}
+            variant={emailDigestEnabled ? 'secondary' : 'primary'}
+            size="sm"
+            aria-label={emailDigestEnabled ? 'Disable daily email digest' : 'Enable daily email digest'}
+          >
+            {digestLoading ? 'Updating...' : emailDigestEnabled ? 'Disable' : 'Enable'}
+          </Button>
+        </div>
       </div>
 
       <div className="rounded-2xl border border-line/90 bg-surface-raised p-5 sm:p-6 shadow-card space-y-4 opacity-50 pointer-events-none">
