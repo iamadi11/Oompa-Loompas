@@ -446,13 +446,13 @@ class ApiClient {
     })
   }
 
-  async getNotificationSettings(): Promise<ApiResponse<{ emailDigestEnabled: boolean; pushEnabled: boolean }>> {
-    return this.request<ApiResponse<{ emailDigestEnabled: boolean; pushEnabled: boolean }>>(
+  async getNotificationSettings(): Promise<ApiResponse<{ emailDigestEnabled: boolean; followupEmailsEnabled: boolean; pushEnabled: boolean }>> {
+    return this.request<ApiResponse<{ emailDigestEnabled: boolean; followupEmailsEnabled: boolean; pushEnabled: boolean }>>(
       '/api/v1/settings/notifications',
     )
   }
 
-  async updateNotificationSettings(data: { emailDigestEnabled?: boolean }): Promise<void> {
+  async updateNotificationSettings(data: { emailDigestEnabled?: boolean; followupEmailsEnabled?: boolean }): Promise<void> {
     return this.request<void>('/api/v1/settings/notifications', {
       method: 'PATCH',
       body: JSON.stringify(data),

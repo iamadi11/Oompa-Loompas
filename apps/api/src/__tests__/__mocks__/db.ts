@@ -73,6 +73,9 @@ export const prisma = {
   dealTemplatePayment: {
     deleteMany: vi.fn(),
   },
+  paymentFollowupEmail: {
+    createMany: vi.fn(),
+  },
   $executeRaw: vi.fn().mockResolvedValue(undefined),
   $queryRaw: vi.fn().mockResolvedValue([{ ok: 1 }]),
   $transaction: vi.fn(),

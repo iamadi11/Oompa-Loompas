@@ -12,6 +12,8 @@ export default function SettingsPage() {
   const [isSubscribed, setIsSubscribed] = useState(false)
   const [emailDigestEnabled, setEmailDigestEnabled] = useState(true)
   const [digestLoading, setDigestLoading] = useState(false)
+  const [followupEmailsEnabled, setFollowupEmailsEnabled] = useState(true)
+  const [followupLoading, setFollowupLoading] = useState(false)
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
@@ -25,7 +27,10 @@ export default function SettingsPage() {
     }
 
     void api.getNotificationSettings().then((res) => {
-      if (res?.data) setEmailDigestEnabled(res.data.emailDigestEnabled)
+      if (res?.data) {
+        setEmailDigestEnabled(res.data.emailDigestEnabled)
+        setFollowupEmailsEnabled(res.data.followupEmailsEnabled)
+      }
     }).catch(() => {/* form remains usable */})
   }, [])
 
@@ -85,6 +90,20 @@ export default function SettingsPage() {
       toast.error('Failed to update email preferences')
     } finally {
       setDigestLoading(false)
+    }
+  }
+
+  const handleFollowupToggle = async () => {
+    setFollowupLoading(true)
+    try {
+      const next = !followupEmailsEnabled
+      await api.updateNotificationSettings({ followupEmailsEnabled: next })
+      setFollowupEmailsEnabled(next)
+      toast.success(next ? 'Follow-up emails enabled' : 'Follow-up emails disabled')
+    } catch {
+      toast.error('Failed to update email preferences')
+    } finally {
+      setFollowupLoading(false)
     }
   }
 
@@ -152,6 +171,29 @@ export default function SettingsPage() {
             aria-label={emailDigestEnabled ? 'Disable daily email digest' : 'Enable daily email digest'}
           >
             {digestLoading ? 'Updating...' : emailDigestEnabled ? 'Disable' : 'Enable'}
+          </Button>
+        </div>
+
+        <div className="flex items-center justify-between p-4 rounded-xl bg-canvas border border-line/60">
+          <div className="space-y-0.5">
+            <span className="text-sm font-medium text-stone-900">Overdue Payment Follow-ups</span>
+            <div className="flex items-center gap-2">
+              <span
+                className={`w-2 h-2 rounded-full ${followupEmailsEnabled ? 'bg-green-500' : 'bg-stone-300'}`}
+              />
+              <span className="text-xs text-stone-500">
+                {followupEmailsEnabled ? 'Emails sent at 3d, 7d, and 14d overdue with draft messages' : 'Disabled'}
+              </span>
+            </div>
+          </div>
+          <Button
+            onClick={() => void handleFollowupToggle()}
+            disabled={followupLoading}
+            variant={followupEmailsEnabled ? 'secondary' : 'primary'}
+            size="sm"
+            aria-label={followupEmailsEnabled ? 'Disable overdue payment follow-up emails' : 'Enable overdue payment follow-up emails'}
+          >
+            {followupLoading ? 'Updating...' : followupEmailsEnabled ? 'Disable' : 'Enable'}
           </Button>
         </div>
       </div>

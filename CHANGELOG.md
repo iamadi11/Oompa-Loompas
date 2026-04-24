@@ -2,6 +2,17 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.5.6] - 2026-04-25
+
+### Added
+- **Automated payment follow-up emails** — threshold-triggered emails at 3d, 7d, and 14d overdue; each fires exactly once per payment per threshold; grouped into a single email per user per run
+  - `followupEmailsEnabled BOOLEAN DEFAULT TRUE` on `users` (opt-out model); `payment_followup_emails` dedup table with `UNIQUE(payment_id, day_threshold)` and cascade delete
+  - `runPaymentFollowupJob(now)` — parallel per-user threshold queries; records dedup rows *before* send to prevent duplicate emails on retry; per-user error isolation
+  - `buildFollowupEmail(items, webUrl)` — pure function: HTML email with urgency-escalating subject ("Follow up" / "Urgent" / "Action needed"), severity-sorted rows, inline reminder copy-paste text, attention queue CTA; 13 unit tests
+  - `startPaymentFollowupCron()` — `30 7 * * *` (1:00 PM IST); silent no-op if `RESEND_API_KEY` absent
+  - Settings: `followupEmailsEnabled` field on `GET/PATCH /api/v1/settings/notifications`; "Overdue Payment Follow-ups" toggle row in Settings UI
+  - GET `/notifications` parallelized with `Promise.all` (two independent DB queries)
+
 ## [0.5.5] - 2026-04-25
 
 ### Added

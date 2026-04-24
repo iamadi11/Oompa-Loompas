@@ -665,4 +665,54 @@ describe('Push notification API client methods', () => {
       expect.objectContaining({ method: 'POST', body: JSON.stringify({ name: 'From Deal' }) }),
     )
   })
+
+  it('getNotificationSettings returns all three flags', async () => {
+    const data = { emailDigestEnabled: true, followupEmailsEnabled: false, pushEnabled: true }
+    fetchMock.mockResolvedValueOnce(jsonResponse({ data }))
+    const result = await api.getNotificationSettings()
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3001/api/v1/settings/notifications',
+      expect.objectContaining({ credentials: 'include' }),
+    )
+    expect(result.data).toEqual(data)
+  })
+
+  it('updateNotificationSettings patches emailDigestEnabled', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(null, { status: 204 }))
+    await api.updateNotificationSettings({ emailDigestEnabled: false })
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3001/api/v1/settings/notifications',
+      expect.objectContaining({ method: 'PATCH', body: JSON.stringify({ emailDigestEnabled: false }) }),
+    )
+  })
+
+  it('updateNotificationSettings patches followupEmailsEnabled', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(null, { status: 204 }))
+    await api.updateNotificationSettings({ followupEmailsEnabled: true })
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3001/api/v1/settings/notifications',
+      expect.objectContaining({ method: 'PATCH', body: JSON.stringify({ followupEmailsEnabled: true }) }),
+    )
+  })
+
+  it('reconcileMatch posts transactions and returns matches', async () => {
+    const result = { matches: [], unmatched: [] }
+    fetchMock.mockResolvedValueOnce(jsonResponse({ data: result }))
+    const txns = [{ date: '2026-04-01', amount: 1000 }]
+    await api.reconcileMatch(txns)
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3001/api/v1/reconcile/match',
+      expect.objectContaining({ method: 'POST', body: JSON.stringify({ transactions: txns }) }),
+    )
+  })
+
+  it('reconcileApply posts approvals and returns updated count', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ data: { updated: 2 } }))
+    const approvals = [{ paymentId: 'p-1', receivedAt: '2026-04-01T00:00:00.000Z' }]
+    await api.reconcileApply(approvals)
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3001/api/v1/reconcile/apply',
+      expect.objectContaining({ method: 'POST', body: JSON.stringify({ approvals }) }),
+    )
+  })
 })

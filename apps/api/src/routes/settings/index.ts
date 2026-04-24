@@ -6,30 +6,36 @@ export const settingsRoutes: FastifyPluginAsync = async (fastify: FastifyInstanc
   fastify.get('/notifications', async (request) => {
     const userId = request.authUser!.id
 
-    const user = await prisma.user.findUniqueOrThrow({
-      where: { id: userId },
-      select: { emailDigestEnabled: true },
-    })
+    const [user, pushSub] = await Promise.all([
+      prisma.user.findUniqueOrThrow({
+        where: { id: userId },
+        select: { emailDigestEnabled: true, followupEmailsEnabled: true },
+      }),
+      prisma.pushSubscription.findFirst({ where: { userId }, select: { id: true } }),
+    ])
 
-    const pushEnabled = await prisma.pushSubscription
-      .findFirst({ where: { userId }, select: { id: true } })
-      .then((r) => r !== null)
-
-    return { data: { emailDigestEnabled: user.emailDigestEnabled, pushEnabled } }
+    return {
+      data: {
+        emailDigestEnabled: user.emailDigestEnabled,
+        followupEmailsEnabled: user.followupEmailsEnabled,
+        pushEnabled: pushSub !== null,
+      },
+    }
   })
 
   // PATCH /api/v1/settings/notifications
-  fastify.patch<{ Body: { emailDigestEnabled?: boolean } }>(
+  fastify.patch<{ Body: { emailDigestEnabled?: boolean; followupEmailsEnabled?: boolean } }>(
     '/notifications',
     async (request, reply) => {
       const userId = request.authUser!.id
-      const { emailDigestEnabled } = request.body
+      const { emailDigestEnabled, followupEmailsEnabled } = request.body
 
-      if (typeof emailDigestEnabled === 'boolean') {
-        await prisma.user.update({
-          where: { id: userId },
-          data: { emailDigestEnabled },
-        })
+      const data: { emailDigestEnabled?: boolean; followupEmailsEnabled?: boolean } = {}
+      if (typeof emailDigestEnabled === 'boolean') data.emailDigestEnabled = emailDigestEnabled
+      if (typeof followupEmailsEnabled === 'boolean') data.followupEmailsEnabled = followupEmailsEnabled
+
+      if (Object.keys(data).length > 0) {
+        await prisma.user.update({ where: { id: userId }, data })
       }
 
       return reply.code(204).send()

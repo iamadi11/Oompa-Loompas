@@ -23,7 +23,8 @@ model User {
   brandProfiles BrandProfile[]
   pushSubscriptions PushSubscription[]
   dealTemplates DealTemplate[]
-  emailDigestEnabled Boolean    @default(true) @map("email_digest_enabled")
+  emailDigestEnabled    Boolean @default(true) @map("email_digest_enabled")
+  followupEmailsEnabled Boolean @default(true) @map("followup_emails_enabled")
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
 
@@ -132,6 +133,7 @@ model Payment {
   remindAt      DateTime?     @map("remind_at")
   notes         String?       @db.Text
   invoiceNumber String?       @unique @map("invoice_number") @db.VarChar(32)
+  followupEmails PaymentFollowupEmail[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -141,6 +143,18 @@ model Payment {
   @@index([dueDate])
   @@index([remindAt])
   @@map("payments")
+}
+
+model PaymentFollowupEmail {
+  id           String   @id @default(uuid())
+  paymentId    String   @map("payment_id")
+  payment      Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  dayThreshold Int      @map("day_threshold")
+  sentAt       DateTime @default(now()) @map("sent_at")
+
+  @@unique([paymentId, dayThreshold])
+  @@index([paymentId])
+  @@map("payment_followup_emails")
 }
 
 model InvoiceCounter {
