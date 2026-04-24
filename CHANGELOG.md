@@ -2,6 +2,18 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.5.5] - 2026-04-25
+
+### Added
+- **Payment reconciliation** — upload or paste a bank/UPI CSV → auto-match credit rows to pending payments by amount, brand name, and date → review with confidence badges → bulk-mark RECEIVED in one click
+  - `parseReconcileCsv(text)` — pure parser supporting HDFC, ICICI, SBI, and generic Indian bank CSV formats; extracts credit rows with date, amount, narration
+  - `matchTransactionsToPayments(txs, payments)` — greedy confidence-scored matching: high (exact amount + brand or date match), medium (exact amount only), low (within 5% + date within 7 days); deduplicates: each payment matched at most once
+  - `POST /api/v1/reconcile/match` — returns `{ matches, unmatched }` scoped to auth user's PENDING/PARTIAL payments
+  - `POST /api/v1/reconcile/apply` — concurrent `updateMany` per approval; scoped to auth user (cross-user write prevented); sets `status=RECEIVED` and `receivedAt`
+  - `/reconcile` page — Upload CSV / Paste CSV tabs; review table with per-row checkbox, editable received-date, confidence badge; deselect-all; "Mark N payments received" → redirect to `/attention` with success toast
+  - Entry point: "Reconcile from bank →" link on `/attention` page (visible when overdue payments exist)
+  - 12 E2E tests, 10 unit tests; 250 total E2E pass
+
 ## [0.5.4] - 2026-04-19
 
 ### Added

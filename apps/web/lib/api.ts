@@ -26,6 +26,35 @@ import type {
   DeliverableApprovalView,
 } from '@oompa/types'
 
+export interface BankTransactionInput {
+  date: string
+  amount: number
+  description?: string
+}
+
+export interface ReconcileMatch {
+  transactionIndex: number
+  paymentId: string
+  dealId: string
+  dealTitle: string
+  brandName: string
+  paymentAmount: number
+  transactionAmount: number
+  transactionDate: string
+  suggestedReceivedAt: string
+  confidence: 'high' | 'medium' | 'low'
+}
+
+export interface ReconcileMatchResult {
+  matches: ReconcileMatch[]
+  unmatched: number[]
+}
+
+export interface ReconcileApproval {
+  paymentId: string
+  receivedAt: string
+}
+
 export interface BrandRecentDeal {
   id: string
   title: string
@@ -427,6 +456,20 @@ class ApiClient {
     return this.request<void>('/api/v1/settings/notifications', {
       method: 'PATCH',
       body: JSON.stringify(data),
+    })
+  }
+
+  async reconcileMatch(transactions: BankTransactionInput[]): Promise<ApiResponse<ReconcileMatchResult>> {
+    return this.request<ApiResponse<ReconcileMatchResult>>('/api/v1/reconcile/match', {
+      method: 'POST',
+      body: JSON.stringify({ transactions }),
+    })
+  }
+
+  async reconcileApply(approvals: ReconcileApproval[]): Promise<ApiResponse<{ updated: number }>> {
+    return this.request<ApiResponse<{ updated: number }>>('/api/v1/reconcile/apply', {
+      method: 'POST',
+      body: JSON.stringify({ approvals }),
     })
   }
 }

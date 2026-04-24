@@ -83,6 +83,9 @@ export default async function AttentionPage() {
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
           <ExportAttentionCsvButton />
+          <Link href="/reconcile" className={`${linkClass} sm:shrink-0 w-fit`}>
+            Reconcile from bank →
+          </Link>
           <Link href="/dashboard" className={`${linkClass} sm:shrink-0 w-fit`}>
             ← Overview
           </Link>

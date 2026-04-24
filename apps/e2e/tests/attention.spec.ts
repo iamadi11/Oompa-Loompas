@@ -11,7 +11,8 @@ test.describe('/attention — page structure', () => {
   test('shows Attention heading', async ({ page }) => {
     await page.goto('/attention')
     await page.waitForLoadState('networkidle')
-    await expect(page.getByRole('heading', { name: /attention/i })).toBeVisible()
+    // Page shows "Needs your attention" with data, "You are caught up" when empty
+    await expect(page.getByRole('heading', { name: /attention|caught up/i })).toBeVisible()
   })
 
   test('page title contains Attention', async ({ page }) => {
@@ -89,6 +90,24 @@ test.describe('/attention — caught-up state', () => {
     const hasItems = await page.getByRole('listitem').count().then((c) => c > 0).catch(() => false)
 
     expect(hasCaughtUp || hasItems).toBe(true)
+  })
+})
+
+// ─── Attention page — reconcile link ─────────────────────────────────────
+
+test.describe('/attention — reconcile link', () => {
+  test('shows "Reconcile from bank" link pointing to /reconcile', async ({ page, request }) => {
+    const id = await createDeal(request, { title: 'Reconcile Link Deal', status: 'ACTIVE' })
+    await createPayment(request, id, {
+      dueDate: new Date(Date.now() - 86_400_000).toISOString(),
+    })
+
+    await page.goto('/attention')
+    await page.waitForLoadState('networkidle')
+
+    const link = page.getByRole('link', { name: /reconcile from bank/i })
+    await expect(link).toBeVisible()
+    await expect(link).toHaveAttribute('href', '/reconcile')
   })
 })
 

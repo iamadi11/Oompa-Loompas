@@ -19,6 +19,7 @@ import { brandRoutes } from './routes/brands/index.js'
 import { pushRoutes } from './routes/push/index.js'
 import { templateRoutes } from './routes/templates/index.js'
 import { settingsRoutes } from './routes/settings/index.js'
+import { reconcileRoutes } from './routes/reconcile/index.js'
 import { saveAsTemplate } from './routes/templates/handlers.js'
 
 export async function buildServer() {
@@ -90,6 +91,7 @@ export async function buildServer() {
       await instance.register(pushRoutes, { prefix: '/push' })
       await instance.register(templateRoutes, { prefix: '/templates' })
       await instance.register(settingsRoutes, { prefix: '/settings' })
+      await instance.register(reconcileRoutes, { prefix: '/reconcile' })
       instance.post('/deals/:id/save-as-template', saveAsTemplate)
     },
     { prefix: '/api/v1' },
