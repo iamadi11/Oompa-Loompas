@@ -11,7 +11,7 @@ Daily cron → find threshold-crossing PENDING payments → group by user → bu
 ### `users` table
 New column: `followup_emails_enabled BOOLEAN DEFAULT TRUE`
 Migration: `20260425120000_add_followup_emails_enabled`
-Opt-out model (matches existing `email_digest_enabled` pattern).
+Opt-out model (matches `email_digest_enabled` pattern).
 
 ### New table: `payment_followup_emails`
 ```sql
@@ -25,7 +25,7 @@ CREATE TABLE payment_followup_emails (
 CREATE INDEX idx_followup_emails_payment ON payment_followup_emails(payment_id);
 ```
 
-Purpose: deduplication guard — each (paymentId, dayThreshold) pair is sent exactly once.
+Purpose: dedup guard — each (paymentId, dayThreshold) sent exactly once.
 
 ## Prisma Models
 
@@ -67,7 +67,7 @@ No new routes. Settings endpoint extended additively (backward compatible).
 ## Cron Job: `payment-followup.ts`
 
 Schedule: `30 7 * * *` (07:30 UTC = 1:00 PM IST)
-Why: different window from digest (06:00 UTC) and push (01:30 UTC); runs mid-day when creator is active.
+Why: separate window from digest (06:00 UTC) + push (01:30 UTC); mid-day when creator active.
 
 **Thresholds:** 3 days, 7 days, 14 days
 
@@ -84,11 +84,11 @@ prisma.payment.findMany({
 })
 ```
 
-Three parallel queries (one per threshold) → merge → group by userId → one email per user.
+3 parallel queries (one per threshold) → merge → group by userId → one email per user.
 
-**Email per user:** one email listing all threshold-crossing payments for that user, sorted by dayThreshold DESC (most overdue first).
+**Email per user:** one email, all threshold-crossing payments, sorted dayThreshold DESC (most overdue first).
 
-**After successful send:** `prisma.paymentFollowupEmail.createMany({ data: [...] })`
+**After send:** `prisma.paymentFollowupEmail.createMany({ data: [...] })`
 
 ## Email Templates
 
@@ -98,17 +98,17 @@ Three parallel queries (one per threshold) → merge → group by userId → one
 | 7 days | "Urgent: [Brand] payment is 1 week overdue" | "1 week overdue" |
 | 14 days | "Action needed: payment 2 weeks overdue" | "2 weeks overdue — escalate" |
 
-Subject uses the MOST urgent threshold in the batch (14d > 7d > 3d).
+Subject uses most urgent threshold in batch (14d > 7d > 3d).
 
-Body: HTML (same inline-CSS style as digest) with:
-- Per-payment row: brand, deal title, amount+currency, threshold label, pre-composed reminder text in a quote block
-- "View on Oompa" CTA button → `/attention`
-- "Manage email preferences" footer link → `/settings`
+Body: HTML (inline-CSS, same as digest):
+- Per-payment row: brand, deal title, amount+currency, threshold label, pre-composed reminder in quote block
+- "View on Oompa" CTA → `/attention`
+- "Manage email preferences" footer → `/settings`
 
 ## Scale
-At 10K creators with ~5 overdue payments each, max ~50K rows queried across 3 threshold queries.
+10K creators × ~5 overdue payments = ~50K rows across 3 threshold queries.
 Indexed on `dueDate` + `status` (existing) + `payment_followup_emails.payment_id` (new).
-Acceptable: runs once daily off-peak.
+Once daily off-peak — acceptable.
 
 ## Cron Registration
 In `apps/api/src/server.ts`:
@@ -117,10 +117,10 @@ startPaymentFollowupCron()
 ```
 
 ## Rollback
-- Migration is additive (new column default true, new table)
-- Rollback: drop `payment_followup_emails`, drop `followup_emails_enabled` column
-- No data loss on rollback (no existing data depends on new fields)
+- Migration additive (new col default true, new table)
+- Rollback: drop `payment_followup_emails`, drop `followup_emails_enabled`
+- No data loss (no existing data depends on new fields)
 
 ## Ops
-Monitoring: log `[FOLLOWUP]` prefix; count emails sent per run. Alert if cron stops running.
-Rollout: no feature flag needed (opt-out model, safe default).
+Monitor: log `[FOLLOWUP]` prefix; count emails per run. Alert if cron stops.
+Rollout: no feature flag needed (opt-out, safe default).
