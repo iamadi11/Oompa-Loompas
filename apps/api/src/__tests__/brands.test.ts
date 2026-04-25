@@ -14,6 +14,7 @@ const mockPrisma = prisma as typeof prisma & {
   }
   payment: {
     count: ReturnType<typeof vi.fn>
+    findMany: ReturnType<typeof vi.fn>
   }
   brandProfile: {
     findUnique: ReturnType<typeof vi.fn>
@@ -47,6 +48,7 @@ function setupDefaultMocks() {
     },
   ])
   mockPrisma.payment.count.mockResolvedValue(0)
+  mockPrisma.payment.findMany.mockResolvedValue([]) // no received payments by default
   mockPrisma.deal.findMany.mockResolvedValue([
     {
       id: 'd1',
@@ -243,5 +245,105 @@ describe('DELETE /api/v1/brands/:brandName', () => {
       url: `/api/v1/brands/${BRAND}`,
     })
     expect(res.statusCode).toBe(401)
+  })
+})
+
+describe('GET /api/v1/brands/:brandName — payment track record stats', () => {
+  let app: Awaited<ReturnType<typeof buildServer>>
+
+  beforeEach(async () => {
+    vi.clearAllMocks()
+    setupDefaultMocks()
+    mockPrisma.brandProfile.findUnique.mockResolvedValue(null)
+    app = await buildServer()
+  })
+
+  it('returns receivedPaymentsCount 0 and null behavior stats when no received payments', async () => {
+    mockPrisma.payment.findMany.mockResolvedValue([])
+
+    const res = await app.inject({ method: 'GET', url: `/api/v1/brands/${BRAND}`, headers: auth })
+    expect(res.statusCode).toBe(200)
+    const stats = res.json().data.stats
+    expect(stats.receivedPaymentsCount).toBe(0)
+    expect(stats.avgDaysToPayment).toBeNull()
+    expect(stats.onTimeRate).toBeNull()
+    expect(stats.receivedTotals).toEqual([])
+  })
+
+  it('returns correct avgDaysToPayment and onTimeRate for payments paid late', async () => {
+    const dueDate = new Date('2026-01-10T00:00:00.000Z')
+    const receivedAt = new Date('2026-01-20T00:00:00.000Z') // 10 days late
+    mockPrisma.payment.findMany.mockResolvedValue([
+      { dueDate, receivedAt, amount: { toNumber: () => 10000 }, deal: { currency: 'INR' } },
+    ])
+
+    const res = await app.inject({ method: 'GET', url: `/api/v1/brands/${BRAND}`, headers: auth })
+    const stats = res.json().data.stats
+    expect(stats.receivedPaymentsCount).toBe(1)
+    expect(stats.avgDaysToPayment).toBeCloseTo(10, 1)
+    expect(stats.onTimeRate).toBe(0)
+    expect(stats.receivedTotals).toEqual([{ currency: 'INR', amount: 10000 }])
+  })
+
+  it('returns onTimeRate 1 when all payments received on time', async () => {
+    const dueDate = new Date('2026-02-15T00:00:00.000Z')
+    const receivedAt = new Date('2026-02-10T00:00:00.000Z') // 5 days early
+    mockPrisma.payment.findMany.mockResolvedValue([
+      { dueDate, receivedAt, amount: { toNumber: () => 25000 }, deal: { currency: 'INR' } },
+    ])
+
+    const res = await app.inject({ method: 'GET', url: `/api/v1/brands/${BRAND}`, headers: auth })
+    const stats = res.json().data.stats
+    expect(stats.avgDaysToPayment).toBeCloseTo(-5, 1)
+    expect(stats.onTimeRate).toBe(1)
+  })
+
+  it('computes mixed on-time and late payments correctly', async () => {
+    const base = new Date('2026-01-10T00:00:00.000Z')
+    const onTime = new Date('2026-01-08T00:00:00.000Z') // 2 days early
+    const late = new Date('2026-01-20T00:00:00.000Z')  // 10 days late
+    mockPrisma.payment.findMany.mockResolvedValue([
+      { dueDate: base, receivedAt: onTime, amount: { toNumber: () => 5000 }, deal: { currency: 'INR' } },
+      { dueDate: base, receivedAt: late, amount: { toNumber: () => 15000 }, deal: { currency: 'INR' } },
+    ])
+
+    const res = await app.inject({ method: 'GET', url: `/api/v1/brands/${BRAND}`, headers: auth })
+    const stats = res.json().data.stats
+    expect(stats.receivedPaymentsCount).toBe(2)
+    expect(stats.avgDaysToPayment).toBeCloseTo(4, 1) // mean of (-2, 10) = 4
+    expect(stats.onTimeRate).toBeCloseTo(0.5, 2)
+    expect(stats.receivedTotals).toEqual([{ currency: 'INR', amount: 20000 }])
+  })
+
+  it('ignores payments with null dueDate or null receivedAt for avg/rate computation', async () => {
+    mockPrisma.payment.findMany.mockResolvedValue([
+      { dueDate: null, receivedAt: new Date('2026-01-20T00:00:00.000Z'), amount: { toNumber: () => 8000 }, deal: { currency: 'INR' } },
+      { dueDate: new Date('2026-01-10T00:00:00.000Z'), receivedAt: null, amount: { toNumber: () => 7000 }, deal: { currency: 'USD' } },
+    ])
+
+    const res = await app.inject({ method: 'GET', url: `/api/v1/brands/${BRAND}`, headers: auth })
+    const stats = res.json().data.stats
+    expect(stats.receivedPaymentsCount).toBe(2)
+    expect(stats.avgDaysToPayment).toBeNull() // no qualifying pairs
+    expect(stats.onTimeRate).toBeNull()
+    expect(stats.receivedTotals).toHaveLength(2) // both currencies still counted
+  })
+
+  it('returns multi-currency receivedTotals sorted by currency', async () => {
+    const dueDate = new Date('2026-01-10T00:00:00.000Z')
+    const receivedAt = new Date('2026-01-15T00:00:00.000Z')
+    mockPrisma.payment.findMany.mockResolvedValue([
+      { dueDate, receivedAt, amount: { toNumber: () => 50000 }, deal: { currency: 'INR' } },
+      { dueDate, receivedAt, amount: { toNumber: () => 1000 }, deal: { currency: 'USD' } },
+      { dueDate, receivedAt, amount: { toNumber: () => 30000 }, deal: { currency: 'INR' } },
+    ])
+
+    const res = await app.inject({ method: 'GET', url: `/api/v1/brands/${BRAND}`, headers: auth })
+    const stats = res.json().data.stats
+    const totals = stats.receivedTotals as { currency: string; amount: number }[]
+    const inr = totals.find((t) => t.currency === 'INR')
+    const usd = totals.find((t) => t.currency === 'USD')
+    expect(inr?.amount).toBe(80000)
+    expect(usd?.amount).toBe(1000)
   })
 })

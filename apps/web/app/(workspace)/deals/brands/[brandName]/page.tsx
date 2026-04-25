@@ -61,6 +61,28 @@ export default async function BrandProfilePage({ params }: Props) {
       ? stats.contractedTotals.map((t) => formatCurrency(t.amount, t.currency)).join(' · ')
       : '—'
 
+  const receivedLabel =
+    stats.receivedTotals.length > 0
+      ? stats.receivedTotals.map((t) => formatCurrency(t.amount, t.currency)).join(' · ')
+      : null
+
+  const avgDaysLabel =
+    stats.avgDaysToPayment == null
+      ? null
+      : stats.avgDaysToPayment <= 0
+        ? `Paid ${Math.round(Math.abs(stats.avgDaysToPayment))}d early on avg`
+        : `Avg ${Math.round(stats.avgDaysToPayment)}d after due date`
+
+  const onTimeLabel =
+    stats.onTimeRate == null
+      ? null
+      : `${Math.round(stats.onTimeRate * 100)}% on time`
+
+  const isRisky =
+    stats.receivedPaymentsCount >= 2 &&
+    ((stats.avgDaysToPayment != null && stats.avgDaysToPayment > 14) ||
+      (stats.onTimeRate != null && stats.onTimeRate < 0.5))
+
   return (
     <div className="max-w-2xl space-y-6 pb-8">
       {/* Header */}
@@ -108,6 +130,78 @@ export default async function BrandProfilePage({ params }: Props) {
           </div>
         </dl>
       </div>
+
+      {/* Payment track record */}
+      {stats.receivedPaymentsCount > 0 && (
+        <section aria-label="Payment track record">
+          <div className={panelClass}>
+            <h2 className="text-base font-semibold text-stone-900 mb-4">Payment track record</h2>
+            <dl className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <div>
+                <dt className="text-xs font-semibold uppercase tracking-wide text-stone-500">
+                  Received
+                </dt>
+                <dd className="mt-1 text-2xl font-bold tabular-nums text-stone-900">
+                  {stats.receivedPaymentsCount}
+                  <span className="text-sm font-normal text-stone-500 ml-1">payments</span>
+                </dd>
+              </div>
+              {avgDaysLabel && (
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-wide text-stone-500">
+                    Payment timing
+                  </dt>
+                  <dd
+                    className={`mt-1 text-sm font-semibold ${
+                      stats.avgDaysToPayment! <= 0
+                        ? 'text-green-700'
+                        : stats.avgDaysToPayment! > 14
+                          ? 'text-amber-700'
+                          : 'text-stone-900'
+                    }`}
+                  >
+                    {avgDaysLabel}
+                  </dd>
+                </div>
+              )}
+              {onTimeLabel && (
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-wide text-stone-500">
+                    On-time rate
+                  </dt>
+                  <dd
+                    className={`mt-1 text-sm font-semibold ${
+                      stats.onTimeRate! >= 0.9
+                        ? 'text-green-700'
+                        : stats.onTimeRate! < 0.5
+                          ? 'text-amber-700'
+                          : 'text-stone-900'
+                    }`}
+                  >
+                    {onTimeLabel}
+                  </dd>
+                </div>
+              )}
+              {receivedLabel && (
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-wide text-stone-500">
+                    Total received
+                  </dt>
+                  <dd className="mt-1 text-sm font-semibold text-stone-900">{receivedLabel}</dd>
+                </div>
+              )}
+            </dl>
+            <p className="mt-4 text-xs text-stone-400">
+              Based on {stats.receivedPaymentsCount} received payment{stats.receivedPaymentsCount !== 1 ? 's' : ''}
+            </p>
+            {isRisky && (
+              <p className="mt-3 text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+                ⚠ Typically pays late — consider requiring advance payment or earlier due dates
+              </p>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Contact info (client — editable) */}
       <BrandProfileForm brandName={brandName} initial={profile} />

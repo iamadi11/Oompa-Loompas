@@ -29,5 +29,14 @@ export const BrandProfileStatsSchema = z.object({
       amount: z.number(),
     }),
   ),
+  receivedPaymentsCount: z.number().int().nonnegative(),
+  avgDaysToPayment: z.number().nullable(),
+  onTimeRate: z.number().min(0).max(1).nullable(),
+  receivedTotals: z.array(
+    z.object({
+      currency: CurrencySchema,
+      amount: z.number(),
+    }),
+  ),
 })
 export type BrandProfileStats = z.infer<typeof BrandProfileStatsSchema>

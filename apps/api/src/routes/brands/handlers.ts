@@ -30,7 +30,7 @@ export async function getBrandProfile(
   })
 
   // Compute stats from deals
-  const [dealRows, overdueCount] = await Promise.all([
+  const [dealRows, overdueCount, receivedPayments, recentDeals] = await Promise.all([
     prisma.deal.groupBy({
       by: ['currency'],
       where: { userId, brandName: { equals: brandName, mode: 'insensitive' } },
@@ -44,6 +44,31 @@ export async function getBrandProfile(
         status: { notIn: ['RECEIVED', 'REFUNDED'] },
       },
     }),
+    prisma.payment.findMany({
+      where: {
+        deal: { userId, brandName: { equals: brandName, mode: 'insensitive' } },
+        status: 'RECEIVED',
+      },
+      select: {
+        dueDate: true,
+        receivedAt: true,
+        amount: true,
+        deal: { select: { currency: true } },
+      },
+    }),
+    prisma.deal.findMany({
+      where: { userId, brandName: { equals: brandName, mode: 'insensitive' } },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+      select: {
+        id: true,
+        title: true,
+        value: true,
+        currency: true,
+        status: true,
+        createdAt: true,
+      },
+    }),
   ])
 
   const totalDeals = dealRows.reduce((sum, r) => sum + r._count.id, 0)
@@ -51,20 +76,26 @@ export async function getBrandProfile(
     .map((r) => ({ currency: r.currency, amount: Number(r._sum.value ?? 0) }))
     .sort((a, b) => a.currency.localeCompare(b.currency))
 
-  // Recent deals (last 5)
-  const recentDeals = await prisma.deal.findMany({
-    where: { userId, brandName: { equals: brandName, mode: 'insensitive' } },
-    orderBy: { createdAt: 'desc' },
-    take: 5,
-    select: {
-      id: true,
-      title: true,
-      value: true,
-      currency: true,
-      status: true,
-      createdAt: true,
-    },
-  })
+  // Payment behavior stats
+  const qualifying = receivedPayments.filter((p) => p.dueDate != null && p.receivedAt != null)
+  const ONE_DAY_MS = 24 * 60 * 60 * 1_000
+  const avgDaysToPayment =
+    qualifying.length > 0
+      ? qualifying.reduce((sum, p) => sum + (p.receivedAt!.getTime() - p.dueDate!.getTime()) / ONE_DAY_MS, 0) / qualifying.length
+      : null
+  const onTimeRate =
+    qualifying.length > 0
+      ? qualifying.filter((p) => p.receivedAt! <= p.dueDate!).length / qualifying.length
+      : null
+
+  const receivedTotalsMap = new Map<string, number>()
+  for (const p of receivedPayments) {
+    const cur = p.deal.currency
+    receivedTotalsMap.set(cur, (receivedTotalsMap.get(cur) ?? 0) + p.amount.toNumber())
+  }
+  const receivedTotals = [...receivedTotalsMap.entries()]
+    .map(([currency, amount]) => ({ currency, amount }))
+    .sort((a, b) => a.currency.localeCompare(b.currency))
 
   void reply.status(200).send({
     data: {
@@ -74,6 +105,10 @@ export async function getBrandProfile(
         totalDeals,
         overduePaymentsCount: overdueCount,
         contractedTotals,
+        receivedPaymentsCount: receivedPayments.length,
+        avgDaysToPayment,
+        onTimeRate,
+        receivedTotals,
       },
       recentDeals: recentDeals.map((d) => ({
         id: d.id,

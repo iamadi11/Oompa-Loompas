@@ -68,6 +68,10 @@ export interface BrandProfileStats {
   totalDeals: number
   overduePaymentsCount: number
   contractedTotals: { currency: Currency; amount: number }[]
+  receivedPaymentsCount: number
+  avgDaysToPayment: number | null
+  onTimeRate: number | null
+  receivedTotals: { currency: Currency; amount: number }[]
 }
 
 export interface BrandProfileView {

@@ -2,6 +2,14 @@
 
 All notable changes to this repository are documented in this file.
 
+## [0.5.7] - 2026-04-25
+
+### Added
+- **Brand payment track record** — brand profile page now shows payment behavior stats when a brand has ≥1 received payment: received count, avg days to payment (green if early, amber if >14d late), on-time rate, and total received per currency
+  - Risk signal: amber warning shown when ≥2 payments AND (avg >14d late OR on-time rate <50%) — "Typically pays late — consider requiring advance payment"
+  - All 4 stats computed server-side via a 4th parallel Prisma query (no extra round-trip); null-safe for payments missing `dueDate` or `receivedAt`
+  - 6 unit tests covering empty, late, early, mixed, null-field, and multi-currency scenarios; 96% utils coverage
+
 ## [0.5.6] - 2026-04-25
 
 ### Added
