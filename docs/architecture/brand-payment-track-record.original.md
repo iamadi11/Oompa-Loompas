@@ -1,7 +1,7 @@
 # Architecture: Brand Payment Track Record
 
 ## Module
-Deal + Payment Intelligence. Extends Brand module (`apps/api/src/routes/brands/`).
+Deal + Payment Intelligence. Extends existing Brand module (`apps/api/src/routes/brands/`).
 
 ## Data Flow
 `GET /api/v1/brands/:brandName` → handlers.ts → 3 parallel Prisma queries → aggregate → return extended BrandProfileStats
@@ -19,7 +19,7 @@ onTimeRate: number | null               -- fraction [0,1] paid receivedAt <= due
 receivedTotals: { currency, amount }[]  -- sum of amounts per currency for RECEIVED payments
 ```
 
-Backward-compatible. New fields added. No existing fields removed.
+Backward-compatible: new fields added to existing object. No existing fields removed.
 
 ## New Query (3rd parallel alongside existing two)
 
@@ -40,13 +40,13 @@ prisma.payment.findMany({
 
 Compute from rows:
 - `receivedPaymentsCount` = rows.length
-- Filter rows where both dueDate + receivedAt non-null → `qualifyingRows`
+- Filter to rows where both dueDate and receivedAt non-null → `qualifyingRows`
 - `avgDaysToPayment` = qualifyingRows.length > 0 ? mean((receivedAt - dueDate) / ONE_DAY_MS) : null
 - `onTimeRate` = qualifyingRows.length > 0 ? (rows where receivedAt <= dueDate).length / qualifyingRows.length : null
 - `receivedTotals` = group by deal.currency, sum amount.toNumber()
 
 ## Scale
-1 query per brand load. Index: `payments.deal_id` (existing) + join `deals.user_id`. 10K creators × 50 payments = 500K rows; filtered per brand/user. No cache needed.
+Single query per brand profile load. Index: `payments.deal_id` (existing) + join to `deals.user_id`. At 10K creators × 50 payments = 500K rows; query is filtered + small (per brand per user). No caching needed.
 
 ## Ops
-No migration. Additive. No rollback risk.
+No migration. Additive API change. No rollback risk.

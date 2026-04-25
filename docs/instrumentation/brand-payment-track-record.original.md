@@ -1,12 +1,12 @@
 # Instrumentation: Brand Payment Track Record
 
 ## Hypothesis
-Creators see brand profile w/ ≥2 received payments → use timing data to negotiate better terms → measurable: reduced overdue rate per brand after first profile view post-launch.
+Creators who view brand profiles with ≥2 received payments will use payment timing data to negotiate better terms (earlier due dates, advance payment) on follow-on deals — measurable as reduced overdue rate per brand after the first profile view post-launch.
 
 ## Baseline (pre-launch)
-- Overdue count: visible on /attention (no per-brand breakdown)
-- No payment timing data surfaced
-- Brand profile visits: not instrumented
+- Overdue payment count: visible on /attention (no per-brand breakdown)
+- No payment timing data surfaced anywhere
+- Brand profile page visits: not yet instrumented
 
 ## Post-deploy signals
 
@@ -17,4 +17,4 @@ Creators see brand profile w/ ≥2 received payments → use timing data to nego
 | Overdue rate per brand (post-negotiation) | `SELECT brandName, COUNT(*) FROM payments WHERE status NOT IN ('RECEIVED','REFUNDED') AND dueDate < NOW()` | Should decrease for brands that were risky |
 
 ## Rollout
-No flag needed — brand profile already auth-gated; section renders only when `receivedPaymentsCount > 0`. Existing flow unaffected. Zero-state hidden → new users see no change.
+No feature flag needed — brand profile page was already gated behind auth; section only renders when `receivedPaymentsCount > 0`. No existing flow disrupted. Zero-state is hidden, so new users see no change.
