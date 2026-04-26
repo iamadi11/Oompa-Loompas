@@ -86,10 +86,18 @@ describe('BrandProfileStatsSchema', () => {
       totalDeals: 5,
       overduePaymentsCount: 2,
       contractedTotals: [{ currency: 'INR', amount: 50000 }],
+      receivedPaymentsCount: 3,
+      avgDaysToPayment: 14.5,
+      onTimeRate: 0.8,
+      receivedTotals: [{ currency: 'INR', amount: 30000 }],
     })
     expect(stats.totalDeals).toBe(5)
     expect(stats.overduePaymentsCount).toBe(2)
     expect(stats.contractedTotals).toHaveLength(1)
+    expect(stats.receivedPaymentsCount).toBe(3)
+    expect(stats.avgDaysToPayment).toBe(14.5)
+    expect(stats.onTimeRate).toBe(0.8)
+    expect(stats.receivedTotals).toHaveLength(1)
   })
 
   it('parses stats with zero values', () => {
@@ -97,8 +105,14 @@ describe('BrandProfileStatsSchema', () => {
       totalDeals: 0,
       overduePaymentsCount: 0,
       contractedTotals: [],
+      receivedPaymentsCount: 0,
+      avgDaysToPayment: null,
+      onTimeRate: null,
+      receivedTotals: [],
     })
     expect(stats.totalDeals).toBe(0)
+    expect(stats.avgDaysToPayment).toBeNull()
+    expect(stats.onTimeRate).toBeNull()
   })
 
   it('rejects negative totalDeals', () => {
@@ -107,6 +121,10 @@ describe('BrandProfileStatsSchema', () => {
         totalDeals: -1,
         overduePaymentsCount: 0,
         contractedTotals: [],
+        receivedPaymentsCount: 0,
+        avgDaysToPayment: null,
+        onTimeRate: null,
+        receivedTotals: [],
       }),
     ).toThrow()
   })
@@ -117,6 +135,10 @@ describe('BrandProfileStatsSchema', () => {
         totalDeals: 0,
         overduePaymentsCount: -1,
         contractedTotals: [],
+        receivedPaymentsCount: 0,
+        avgDaysToPayment: null,
+        onTimeRate: null,
+        receivedTotals: [],
       }),
     ).toThrow()
   })
@@ -129,7 +151,29 @@ describe('BrandProfileStatsSchema', () => {
         { currency: 'INR', amount: 100000 },
         { currency: 'USD', amount: 500 },
       ],
+      receivedPaymentsCount: 2,
+      avgDaysToPayment: 7,
+      onTimeRate: 1,
+      receivedTotals: [
+        { currency: 'INR', amount: 80000 },
+        { currency: 'USD', amount: 300 },
+      ],
     })
     expect(stats.contractedTotals).toHaveLength(2)
+    expect(stats.receivedTotals).toHaveLength(2)
+  })
+
+  it('rejects onTimeRate out of range', () => {
+    expect(() =>
+      BrandProfileStatsSchema.parse({
+        totalDeals: 1,
+        overduePaymentsCount: 0,
+        contractedTotals: [],
+        receivedPaymentsCount: 0,
+        avgDaysToPayment: null,
+        onTimeRate: 1.5,
+        receivedTotals: [],
+      }),
+    ).toThrow()
   })
 })
